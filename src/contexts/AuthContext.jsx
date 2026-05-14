@@ -21,37 +21,80 @@ export function AuthProvider({ children }) {
       setProfile(null)
       return null
     }
+
     try {
       const row = await getProfile(nextUser.id)
       setProfile(row)
       return row
-    } catch {
+    } catch (err) {
+      console.error('Failed to load profile:', err)
       setProfile(null)
       return null
     }
   }, [])
 
   useEffect(() => {
-    let mounted = true
-    async function init() {
-      const { data } = await supabase.auth.getSession()
-      if (!mounted) return
-      const nextUser = data.session?.user ?? null
-      setUser(nextUser)
-      await loadProfile(nextUser)
-      if (mounted) setLoading(false)
-    }
-    init()
+    let cancelled = false
 
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_evt, session) => {
+    async function initAuth() {
+      setLoading(true)
+
+      try {
+        const { data, error } = await supabase.auth.getSession()
+
+        if (error) {
+          console.error('Failed to restore session:', error)
+        }
+
+        if (cancelled) return
+
+        const nextUser = data?.session?.user ?? null
+        setUser(nextUser)
+
+        if (nextUser?.id) {
+          await loadProfile(nextUser)
+        } else {
+          setProfile(null)
+        }
+      } catch (err) {
+        console.error('Auth init failed:', err)
+
+        if (!cancelled) {
+          setUser(null)
+          setProfile(null)
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    initAuth()
+
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       const nextUser = session?.user ?? null
+
       setUser(nextUser)
-      await loadProfile(nextUser)
+
+      if (!nextUser?.id) {
+        setProfile(null)
+        setLoading(false)
+        return
+      }
+
+      // Important: do not await Supabase queries directly inside onAuthStateChange.
+      // Running this on the next tick prevents refresh/login deadlocks.
+      setTimeout(() => {
+        loadProfile(nextUser).finally(() => {
+          setLoading(false)
+        })
+      }, 0)
     })
 
     return () => {
-      mounted = false
-      sub.subscription.unsubscribe()
+      cancelled = true
+      data?.subscription?.unsubscribe?.()
     }
   }, [loadProfile])
 
@@ -59,19 +102,38 @@ export function AuthProvider({ children }) {
 
   const updateProfile = useCallback(async (patch) => {
     if (!user) return null
-    const next = await upsertProfile(user, { ...(profile || {}), ...patch })
+
+    const next = await upsertProfile(user, {
+      ...(profile || {}),
+      ...patch,
+    })
+
     setProfile(next)
     return next
   }, [profile, user])
 
   const signOut = async () => {
-    await supabase.auth.signOut()
-    setUser(null)
-    setProfile(null)
+    setLoading(true)
+
+    try {
+      await supabase.auth.signOut()
+    } finally {
+      setUser(null)
+      setProfile(null)
+      setLoading(false)
+    }
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, refreshProfile, updateProfile, loading, signOut }}>
+    <AuthContext.Provider value={{
+      user,
+      profile,
+      refreshProfile,
+      updateProfile,
+      loading,
+      signOut,
+    }}
+    >
       {children}
     </AuthContext.Provider>
   )

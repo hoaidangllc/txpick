@@ -81,9 +81,6 @@ export function getUsageKey() {
 }
 
 
-export function writeJSON(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)) } catch {}
-}
 
 
 export function parseNaturalReminder(text) {
