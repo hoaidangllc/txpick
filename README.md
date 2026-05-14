@@ -131,3 +131,14 @@ src/
 —
 
 © TxPick. Quản lý tài chính thông minh cho người Việt ở Mỹ.
+
+## ⚠️ Dependency notes (đừng nâng cấp lung tung!)
+
+**KHÔNG** auto-upgrade các package này — sẽ vỡ build:
+
+| Package | Pin to | Lý do |
+|---|---|---|
+| `eslint` | `^8.57.1` | ESLint v9 conflict với `eslint-plugin-react-hooks@4.6.2` (ERESOLVE lúc `npm install` và lúc Vercel build) |
+| `eslint-plugin-react-hooks` | `^4.6.2` | Chưa có version cho ESLint v9 |
+
+Nếu bạn (hoặc Dependabot) muốn nâng ESLint lên v9, **phải** đợi `eslint-plugin-react-hooks@5+` ra trước.

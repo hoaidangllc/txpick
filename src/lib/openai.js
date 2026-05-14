@@ -78,3 +78,72 @@ export async function aiReadReceipt(imageDataUrl) {
     return { _error: 'Could not parse receipt' }
   }
 }
+
+// ---------- Reminder parsing (Smart Daily Reminder feature) ----------
+// Called only when the regex parser in src/lib/reminders.js wants a smarter
+// pass. Returns the same shape as parseReminder(). Falls back gracefully if
+// no API key is configured.
+
+export async function aiParseReminder(text, { now = new Date() } = {}) {
+  if (!OPENAI_CONFIGURED) return null
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + KEY },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        response_format: { type: 'json_object' },
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You parse Vietnamese and English reminder requests into JSON. ' +
+              'Return: {title, category, dueAt (ISO 8601), repeat, forPerson}. ' +
+              'category ∈ medication, bill, appointment, family, work, personal, other. ' +
+              'repeat ∈ none, daily, weekly, monthly. ' +
+              'forPerson ∈ me, mom, dad, spouse, child, other. ' +
+              'If time-of-day missing, default 9:00 AM local. ' +
+              'Current time is ' + now.toISOString() + '. ' +
+              'Reply with JSON only, no commentary.',
+          },
+          { role: 'user', content: text },
+        ],
+      }),
+    })
+    const json = await res.json()
+    const parsed = JSON.parse(json.choices?.[0]?.message?.content ?? '{}')
+    if (!parsed.title || !parsed.dueAt) return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+export async function aiDailySummary(reminders, lang = 'vi') {
+  if (!OPENAI_CONFIGURED || !reminders.length) return null
+  const compact = reminders.slice(0, 30).map((r) => ({
+    title: r.title, dueAt: r.dueAt, category: r.category, forPerson: r.forPerson,
+  }))
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + KEY },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: lang === 'vi'
+              ? 'Bạn là trợ lý nhắc việc TxPick. Viết tóm tắt 1-2 câu thân thiện cho ngày hôm nay dựa trên danh sách reminder. Ngắn gọn, ấm áp, kiểu nhắn tin với người thân.'
+              : 'You are the TxPick reminder assistant. Write a warm 1-2 sentence summary for today based on the reminder list. Short and friendly, like a text to a family member.',
+          },
+          { role: 'user', content: JSON.stringify(compact) },
+        ],
+      }),
+    })
+    const json = await res.json()
+    return json.choices?.[0]?.message?.content?.trim() ?? null
+  } catch {
+    return null
+  }
+}

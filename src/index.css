@@ -63,3 +63,44 @@
     radial-gradient(40% 40% at 90% 20%, rgba(245, 158, 11, 0.10) 0%, transparent 60%),
     linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
 }
+
+/* ===========================================================
+   Elder Mode — chữ to, nút to, đơn giản hơn
+   Toggled via .elder-mode class on <html> (ElderModeContext).
+   =========================================================== */
+html.elder-mode {
+  font-size: 18.5px; /* base bump from default 16px */
+}
+html.elder-mode body {
+  letter-spacing: 0.005em;
+}
+html.elder-mode .btn,
+html.elder-mode .btn-primary,
+html.elder-mode .btn-secondary,
+html.elder-mode .btn-ghost {
+  padding: 1rem 1.5rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  border-radius: 1rem;
+  min-height: 56px;
+}
+html.elder-mode .input {
+  padding: 1rem 1.25rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  border-radius: 1rem;
+  min-height: 56px;
+}
+html.elder-mode .badge {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+html.elder-mode .card {
+  border-radius: 1.5rem;
+}
+html.elder-mode h1 { font-size: 2.5rem; line-height: 1.1; }
+html.elder-mode h2 { font-size: 1.75rem; }
+html.elder-mode h3 { font-size: 1.4rem; }
+html.elder-mode .text-xs { font-size: 0.95rem; }
+html.elder-mode .text-sm { font-size: 1.05rem; }

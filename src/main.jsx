@@ -4,15 +4,18 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 import { LanguageProvider } from './contexts/LanguageContext.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
+import { ElderModeProvider } from './contexts/ElderModeContext.jsx'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <LanguageProvider>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
+        <ElderModeProvider>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </ElderModeProvider>
       </LanguageProvider>
     </BrowserRouter>
   </React.StrictMode>,
