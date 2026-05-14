@@ -1,0 +1,358 @@
+// Central bilingual dictionary for TxPick.
+// Every UI string lives here keyed by a stable id so we can switch languages
+// and add new locales later. The Trans component looks up `t.key` from
+// the active language and falls back to English.
+
+export const translations = {
+  en: {
+    appName: 'TxPick',
+    taglineMain: 'Smart finance for Vietnamese-Americans',
+    taglineSub: 'Run your shop, your home, and your taxes — in one place.',
+
+    nav: {
+      features: 'Features',
+      pricing: 'Pricing',
+      login: 'Log in',
+      getStarted: 'Get started',
+      business: 'Business',
+      personal: 'Personal',
+      tax: 'Tax',
+      ai: 'AI Agent',
+      logout: 'Log out',
+    },
+
+    hero: {
+      eyebrow: 'Built for nail salons, restaurants & families',
+      ctaPrimary: 'Join the waitlist',
+      ctaSecondary: 'See features',
+      trustLine: 'Bilingual • Mobile-first • Built by Vietnamese-Americans',
+      stat1: 'Schedule C-ready',
+      stat2: '1099-NEC automated',
+      stat3: 'AI receipt scanning',
+    },
+
+    waitlist: {
+      title: 'Be first to use TxPick',
+      sub: 'Drop your email and we’ll let you know the moment we launch.',
+      placeholder: 'you@example.com',
+      submit: 'Sign up early',
+      success: 'You’re on the list! We’ll be in touch soon.',
+      privacy: 'We never share your email.',
+    },
+
+    features: {
+      title: 'Everything you need, in two languages',
+      sub: 'From shop expenses to personal bills to year-end taxes — TxPick keeps it simple.',
+      business: {
+        title: 'Business',
+        sub: 'Track shop expenses, recurring bills, and your 1099 workers.',
+      },
+      personal: {
+        title: 'Personal',
+        sub: 'Mortgage, utilities, loans, and reminders so nothing slips.',
+      },
+      tax: {
+        title: 'Tax',
+        sub: 'Auto-map income & expenses to Schedule C and 1099-NEC.',
+      },
+      ai: {
+        title: 'AI Agent',
+        sub: 'Snap a receipt, chat in Vietnamese, get tax tips. Pro.',
+        badge: 'Pro $9.99/mo',
+      },
+    },
+
+    footer: {
+      tagline: 'Quản lý tài chính thông minh cho người Việt ở Mỹ.',
+      rights: 'All rights reserved.',
+    },
+
+    auth: {
+      loginTitle: 'Welcome back',
+      signupTitle: 'Create your TxPick account',
+      email: 'Email',
+      password: 'Password',
+      signIn: 'Sign in',
+      signUp: 'Create account',
+      orContinueWith: 'or continue with',
+      google: 'Continue with Google',
+      noAccount: 'Don’t have an account?',
+      haveAccount: 'Already have an account?',
+      forgot: 'Forgot password?',
+    },
+
+    onboarding: {
+      title: 'Tell us about you',
+      sub: 'We’ll set up the right dashboard.',
+      business: 'I own a business',
+      businessHint: 'Nail salon, restaurant, auto shop, etc.',
+      personal: 'Personal finances only',
+      personalHint: 'Track bills, debts, and reminders.',
+      both: 'Both',
+      bothHint: 'Manage business and personal together.',
+      continue: 'Continue',
+    },
+
+    business: {
+      title: 'Business dashboard',
+      sub: 'A quick look at your shop this month.',
+      monthExpenses: 'This month — expenses',
+      monthIncome: 'This month — income',
+      ytdNet: 'Year-to-date net',
+      recentExpenses: 'Recent expenses',
+      addExpense: 'Add expense',
+      recurringBills: 'Recurring bills',
+      workers1099: '1099 Workers',
+      categories: {
+        supply: 'Supply / Vật tư',
+        utilities: 'Utilities / Điện nước',
+        rent: 'Rent / Tiền thuê',
+        food: 'Food / Thức ăn',
+        equipment: 'Equipment / Thiết bị',
+        marketing: 'Marketing / Quảng cáo',
+        other: 'Other / Khác',
+      },
+    },
+
+    personal: {
+      title: 'Personal dashboard',
+      sub: 'Your monthly bills, debts, and reminders.',
+      totalBills: 'Total monthly bills',
+      totalDebt: 'Total debt',
+      nextDue: 'Next due',
+      bills: 'Bills',
+      debts: 'Debts & Loans',
+      reminders: 'Reminders',
+    },
+
+    tax: {
+      title: 'Tax center',
+      sub: 'Map your books to Schedule C and 1099-NEC.',
+      scheduleC: 'Schedule C',
+      form1099: 'Form 1099-NEC',
+      exportPdf: 'Export PDF',
+      lines: {
+        grossReceipts: 'Gross receipts or sales',
+        returns: 'Returns and allowances',
+        costGoods: 'Cost of goods sold',
+        advertising: 'Advertising',
+        carExpenses: 'Car and truck expenses',
+        contractLabor: 'Contract labor (1099)',
+        depreciation: 'Depreciation',
+        insurance: 'Insurance (other than health)',
+        rentLease: 'Rent or lease',
+        repairs: 'Repairs and maintenance',
+        supplies: 'Supplies',
+        taxesLicenses: 'Taxes and licenses',
+        travel: 'Travel',
+        utilities: 'Utilities',
+        wages: 'Wages',
+        otherExpenses: 'Other expenses',
+      },
+    },
+
+    ai: {
+      title: 'AI Agent',
+      pro: 'Pro feature',
+      proSub: '$9.99 / month — receipt scanning, Vietnamese chat, smart alerts.',
+      upgrade: 'Upgrade to Pro',
+      scanReceipt: 'Scan a receipt',
+      scanHint: 'Take a photo and we’ll fill in the expense for you.',
+      chat: 'Ask anything (Vietnamese or English)',
+      send: 'Send',
+      alerts: 'Smart alerts',
+    },
+
+    common: {
+      amount: 'Amount',
+      date: 'Date',
+      category: 'Category',
+      note: 'Note',
+      name: 'Name',
+      save: 'Save',
+      cancel: 'Cancel',
+      delete: 'Delete',
+      edit: 'Edit',
+      add: 'Add',
+      total: 'Total',
+      none: 'Nothing yet',
+      comingSoon: 'Coming soon',
+    },
+  },
+
+  vi: {
+    appName: 'TxPick',
+    taglineMain: 'Quản lý tài chính thông minh cho người Việt ở Mỹ',
+    taglineSub: 'Quản lý tiệm, gia đình, và thuế — tất cả trong một.',
+
+    nav: {
+      features: 'Tính năng',
+      pricing: 'Giá',
+      login: 'Đăng nhập',
+      getStarted: 'Bắt đầu',
+      business: 'Tiệm',
+      personal: 'Cá nhân',
+      tax: 'Thuế',
+      ai: 'AI',
+      logout: 'Đăng xuất',
+    },
+
+    hero: {
+      eyebrow: 'Dành cho tiệm nail, nhà hàng & gia đình',
+      ctaPrimary: 'Đăng ký sớm',
+      ctaSecondary: 'Xem tính năng',
+      trustLine: 'Song ngữ • Tối ưu điện thoại • Do người Việt thiết kế',
+      stat1: 'Sẵn cho Schedule C',
+      stat2: 'Tự động 1099-NEC',
+      stat3: 'AI đọc hóa đơn',
+    },
+
+    waitlist: {
+      title: 'Đăng ký dùng TxPick sớm',
+      sub: 'Để lại email, tụi mình sẽ báo khi app ra mắt.',
+      placeholder: 'ban@vidu.com',
+      submit: 'Đăng ký sớm',
+      success: 'Đã ghi nhận! Sẽ liên hệ với bạn sớm.',
+      privacy: 'Không chia sẻ email của bạn.',
+    },
+
+    features: {
+      title: 'Đầy đủ tính năng — song ngữ Anh Việt',
+      sub: 'Chi phí tiệm, hóa đơn cá nhân, thuế cuối năm — TxPick lo hết.',
+      business: {
+        title: 'Quản lý tiệm',
+        sub: 'Theo dõi chi phí, hóa đơn hàng tháng, và thợ 1099.',
+      },
+      personal: {
+        title: 'Cá nhân',
+        sub: 'Nhà, điện nước, xe, nợ — và nhắc lịch.',
+      },
+      tax: {
+        title: 'Thuế',
+        sub: 'Tự động ghép vào Schedule C và 1099-NEC.',
+      },
+      ai: {
+        title: 'AI Trợ lý',
+        sub: 'Chụp hóa đơn, hỏi bằng tiếng Việt, gợi ý khấu trừ. Pro.',
+        badge: 'Pro $9.99/tháng',
+      },
+    },
+
+    footer: {
+      tagline: 'Quản lý tài chính thông minh cho người Việt ở Mỹ.',
+      rights: 'Mọi quyền được bảo lưu.',
+    },
+
+    auth: {
+      loginTitle: 'Chào mừng trở lại',
+      signupTitle: 'Tạo tài khoản TxPick',
+      email: 'Email',
+      password: 'Mật khẩu',
+      signIn: 'Đăng nhập',
+      signUp: 'Tạo tài khoản',
+      orContinueWith: 'hoặc tiếp tục với',
+      google: 'Tiếp tục với Google',
+      noAccount: 'Chưa có tài khoản?',
+      haveAccount: 'Đã có tài khoản?',
+      forgot: 'Quên mật khẩu?',
+    },
+
+    onboarding: {
+      title: 'Cho tụi mình biết về bạn',
+      sub: 'Tụi mình sẽ thiết lập trang phù hợp.',
+      business: 'Tôi là chủ tiệm',
+      businessHint: 'Tiệm nail, nhà hàng, garage, v.v.',
+      personal: 'Chỉ quản lý cá nhân',
+      personalHint: 'Theo dõi hóa đơn, nợ, và nhắc lịch.',
+      both: 'Cả hai',
+      bothHint: 'Quản lý tiệm và cá nhân cùng lúc.',
+      continue: 'Tiếp tục',
+    },
+
+    business: {
+      title: 'Tổng quan tiệm',
+      sub: 'Xem nhanh tình hình tiệm tháng này.',
+      monthExpenses: 'Chi phí — tháng này',
+      monthIncome: 'Thu nhập — tháng này',
+      ytdNet: 'Lợi nhuận từ đầu năm',
+      recentExpenses: 'Chi phí gần đây',
+      addExpense: 'Thêm chi phí',
+      recurringBills: 'Hóa đơn định kỳ',
+      workers1099: 'Thợ 1099',
+      categories: {
+        supply: 'Vật tư / Supply',
+        utilities: 'Điện nước / Utilities',
+        rent: 'Tiền thuê / Rent',
+        food: 'Thức ăn / Food',
+        equipment: 'Thiết bị / Equipment',
+        marketing: 'Quảng cáo / Marketing',
+        other: 'Khác / Other',
+      },
+    },
+
+    personal: {
+      title: 'Tổng quan cá nhân',
+      sub: 'Hóa đơn, nợ, và nhắc lịch hàng tháng.',
+      totalBills: 'Tổng hóa đơn tháng',
+      totalDebt: 'Tổng nợ',
+      nextDue: 'Hạn kế tiếp',
+      bills: 'Hóa đơn',
+      debts: 'Nợ & Vay',
+      reminders: 'Nhắc lịch',
+    },
+
+    tax: {
+      title: 'Trung tâm thuế',
+      sub: 'Ghép sổ sách vào Schedule C và 1099-NEC.',
+      scheduleC: 'Schedule C',
+      form1099: 'Mẫu 1099-NEC',
+      exportPdf: 'Xuất PDF',
+      lines: {
+        grossReceipts: 'Tổng doanh thu',
+        returns: 'Hoàn trả và giảm giá',
+        costGoods: 'Giá vốn hàng bán',
+        advertising: 'Quảng cáo',
+        carExpenses: 'Xe cộ',
+        contractLabor: 'Thợ hợp đồng (1099)',
+        depreciation: 'Khấu hao',
+        insurance: 'Bảo hiểm (không phải sức khỏe)',
+        rentLease: 'Thuê / Lease',
+        repairs: 'Sửa chữa & bảo trì',
+        supplies: 'Vật tư',
+        taxesLicenses: 'Thuế & giấy phép',
+        travel: 'Đi lại',
+        utilities: 'Điện nước',
+        wages: 'Tiền lương',
+        otherExpenses: 'Chi phí khác',
+      },
+    },
+
+    ai: {
+      title: 'AI Trợ lý',
+      pro: 'Tính năng Pro',
+      proSub: '$9.99 / tháng — đọc hóa đơn, chat tiếng Việt, cảnh báo thông minh.',
+      upgrade: 'Nâng cấp Pro',
+      scanReceipt: 'Chụp hóa đơn',
+      scanHint: 'Chụp ảnh, AI tự đọc và điền chi phí cho bạn.',
+      chat: 'Hỏi gì cũng được (Việt hoặc Anh)',
+      send: 'Gửi',
+      alerts: 'Cảnh báo thông minh',
+    },
+
+    common: {
+      amount: 'Số tiền',
+      date: 'Ngày',
+      category: 'Loại',
+      note: 'Ghi chú',
+      name: 'Tên',
+      save: 'Lưu',
+      cancel: 'Hủy',
+      delete: 'Xóa',
+      edit: 'Sửa',
+      add: 'Thêm',
+      total: 'Tổng',
+      none: 'Chưa có gì',
+      comingSoon: 'Sắp ra mắt',
+    },
+  },
+}
