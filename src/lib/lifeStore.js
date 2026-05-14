@@ -144,7 +144,7 @@ export function parseNaturalReminder(text) {
   return { title, category, repeat, date, time }
 }
 
-export function buildDailyInsight({ reminders, expenses, bills }) {
+export function buildDailyInsight({ reminders, expenses, bills, lang = 'vi' }) {
   const todayReminders = reminders.filter((r) => !r.done && isSameDay(r.date))
   const monthExpenses = expenses.filter((e) => isCurrentMonth(e.date))
   const business = monthExpenses.filter((e) => ['business', 'salon', 'supply'].includes(e.category)).reduce((s, e) => s + Number(e.amount || 0), 0)
@@ -156,11 +156,20 @@ export function buildDailyInsight({ reminders, expenses, bills }) {
     return diff <= 5
   })
   const tips = []
-  if (todayReminders.length) tips.push(`Hôm nay có ${todayReminders.length} reminder cần xử lý.`)
-  else tips.push('Hôm nay chưa có reminder nào — mở app là thấy nhẹ người rồi đó.')
-  if (dueSoon.length) tips.push(`${dueSoon.length} bill sắp tới hạn trong 5 ngày.`)
-  if (business > 0) tips.push(`Business expense tháng này: ${fmtUSD(business)}.`)
-  if (personal > 0) tips.push(`Personal expense tháng này: ${fmtUSD(personal)}.`)
-  if (!monthExpenses.length) tips.push('Bạn chưa nhập chi tiêu tháng này. Nhập mỗi ngày một chút, cuối năm đỡ cực.')
+  if (lang === 'en') {
+    if (todayReminders.length) tips.push(`You have ${todayReminders.length} reminder${todayReminders.length > 1 ? 's' : ''} to handle today.`)
+    else tips.push('No reminders are due today. Nice and clean.')
+    if (dueSoon.length) tips.push(`${dueSoon.length} bill${dueSoon.length > 1 ? 's are' : ' is'} due within 5 days.`)
+    if (business > 0) tips.push(`Business expenses this month: ${fmtUSD(business)}.`)
+    if (personal > 0) tips.push(`Personal expenses this month: ${fmtUSD(personal)}.`)
+    if (!monthExpenses.length) tips.push('No expenses entered this month. Add small entries daily so year-end is easier.')
+  } else {
+    if (todayReminders.length) tips.push(`Hôm nay có ${todayReminders.length} việc cần xử lý.`)
+    else tips.push('Hôm nay chưa có việc cần nhắc. Mở app ra thấy gọn là thắng rồi đó.')
+    if (dueSoon.length) tips.push(`${dueSoon.length} bill sắp tới hạn trong 5 ngày.`)
+    if (business > 0) tips.push(`Chi tiêu business tháng này: ${fmtUSD(business)}.`)
+    if (personal > 0) tips.push(`Chi tiêu cá nhân tháng này: ${fmtUSD(personal)}.`)
+    if (!monthExpenses.length) tips.push('Bạn chưa nhập chi tiêu tháng này. Nhập mỗi ngày một chút, cuối năm đỡ cực.')
+  }
   return tips.join(' ')
 }
