@@ -3,8 +3,8 @@ import { ArrowRight, CheckCircle2 } from 'lucide-react'
 import { useLang } from '../contexts/LanguageContext.jsx'
 
 const copy = {
-  vi: { title: 'Bắt đầu rất đơn giản', sub: 'Mỗi ngày chỉ cần mở trang Hôm nay. Sau đó thêm nhắc việc, hóa đơn và chi tiêu khi cần.', s1: 'Tạo nhắc việc đầu tiên', s2: 'Thêm hóa đơn hằng tháng', s3: 'Thêm chi tiêu', go: 'Vào trang Hôm nay' },
-  en: { title: 'Setup is simple', sub: 'Start with the Today page. Then add reminders, monthly bills, and expenses as needed.', s1: 'Add first reminder', s2: 'Add monthly bill', s3: 'Add expense', go: 'Go to Today' },
+  vi: { title: 'Thiết lập nhanh', sub: 'Bắt đầu ở trang Hôm nay. Sau đó thêm nhắc việc, hóa đơn và chi tiêu khi cần.', s1: 'Thêm nhắc việc đầu tiên', s2: 'Thêm hóa đơn hằng tháng', s3: 'Ghi chi tiêu đầu tiên', go: 'Vào trang Hôm nay' },
+  en: { title: 'Quick setup', sub: 'Start on the Today page. Then add reminders, monthly bills, and expenses as needed.', s1: 'Add your first reminder', s2: 'Add a monthly bill', s3: 'Add your first expense', go: 'Go to Today' },
 }
 
 export default function Onboarding() {

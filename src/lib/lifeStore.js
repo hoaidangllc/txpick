@@ -37,8 +37,8 @@ export const REPEAT_LABELS = {
 
 export const PLANS = {
   free: { name: 'Free', viName: 'Miễn phí', reminderLimit: 20, expenseLimit: 40, aiDailyLimit: 3, ads: true },
-  basic: { name: 'Pro Basic $1.99', viName: 'Pro Cơ Bản $1.99', reminderLimit: 50, expenseLimit: 120, aiDailyLimit: 8, ads: false },
-  premium: { name: 'Pro Plus $4.99', viName: 'Pro Plus $4.99', reminderLimit: Infinity, expenseLimit: Infinity, aiDailyLimit: 20, ads: false },
+  basic: { name: 'Pro Basic', viName: 'Pro Cơ Bản', reminderLimit: 50, expenseLimit: 120, aiDailyLimit: 8, ads: false },
+  premium: { name: 'Pro Plus', viName: 'Pro Plus', reminderLimit: Infinity, expenseLimit: Infinity, aiDailyLimit: 20, ads: false },
 }
 
 export function categoryLabel(key, lang = 'vi', list = CATEGORIES) {

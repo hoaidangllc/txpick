@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { translations } from '../data/translations.js'
 
-const LanguageContext = createContext({ lang: 'en', setLang: () => {}, t: translations.en })
+const LanguageContext = createContext({ lang: 'vi', setLang: () => {}, t: translations.vi })
 
 export function LanguageProvider({ children }) {
   const [lang, setLangState] = useState(() => {
@@ -9,21 +9,20 @@ export function LanguageProvider({ children }) {
       const saved = localStorage.getItem('txpick_lang')
       if (saved === 'en' || saved === 'vi') return saved
     } catch {}
-    // Default to Vietnamese if browser locale starts with vi
-    if (typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('vi')) return 'vi'
-    return 'en'
+    return 'vi'
   })
 
   const setLang = useCallback((next) => {
-    setLangState(next)
-    try { localStorage.setItem('txpick_lang', next) } catch {}
+    const safe = next === 'en' ? 'en' : 'vi'
+    setLangState(safe)
+    try { localStorage.setItem('txpick_lang', safe) } catch {}
   }, [])
 
   useEffect(() => {
     if (typeof document !== 'undefined') document.documentElement.lang = lang
   }, [lang])
 
-  const t = translations[lang] ?? translations.en
+  const t = translations[lang] ?? translations.vi
 
   return (
     <LanguageContext.Provider value={{ lang, setLang, t }}>

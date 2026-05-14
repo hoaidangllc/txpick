@@ -44,7 +44,7 @@ function createMockClient() {
         return { data: { session }, error: null }
       },
       async signInWithOAuth() {
-        session = { user: { id: 'mock-google', email: 'demo@txpick.com' }, access_token: 'mock' }
+        session = { user: { id: 'mock-google', email: 'local@txpick.com' }, access_token: 'mock' }
         persist()
         return { data: {}, error: null }
       },
