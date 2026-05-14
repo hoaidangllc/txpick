@@ -9,9 +9,9 @@ export const STORAGE_KEYS = {
 
 export const CATEGORIES = [
   { key: 'personal', label: 'Personal', vi: 'Cá nhân' },
-  { key: 'business', label: 'Business', vi: 'Business' },
+  { key: 'business', label: 'Business', vi: 'Kinh doanh' },
   { key: 'family', label: 'Family', vi: 'Gia đình' },
-  { key: 'bill', label: 'Bill', vi: 'Bill' },
+  { key: 'bill', label: 'Bill', vi: 'Hóa đơn' },
   { key: 'health', label: 'Health', vi: 'Sức khỏe' },
   { key: 'work', label: 'Work', vi: 'Công việc' },
   { key: 'other', label: 'Other', vi: 'Khác' },
@@ -19,19 +19,41 @@ export const CATEGORIES = [
 
 export const EXPENSE_CATEGORIES = [
   { key: 'personal', label: 'Personal', vi: 'Cá nhân' },
-  { key: 'business', label: 'Business', vi: 'Business' },
+  { key: 'business', label: 'Business', vi: 'Kinh doanh' },
   { key: 'salon', label: 'Salon', vi: 'Tiệm nail' },
-  { key: 'bill', label: 'Bill', vi: 'Bill' },
+  { key: 'bill', label: 'Bill', vi: 'Hóa đơn' },
   { key: 'food', label: 'Food', vi: 'Ăn uống' },
   { key: 'supply', label: 'Supplies', vi: 'Vật tư' },
   { key: 'gas', label: 'Gas', vi: 'Xăng xe' },
   { key: 'other', label: 'Other', vi: 'Khác' },
 ]
 
+export const REPEAT_LABELS = {
+  none: { en: 'One time', vi: 'Một lần' },
+  daily: { en: 'Daily', vi: 'Hằng ngày' },
+  weekly: { en: 'Weekly', vi: 'Hằng tuần' },
+  monthly: { en: 'Monthly', vi: 'Hằng tháng' },
+}
+
 export const PLANS = {
-  free: { name: 'Free', reminderLimit: 20, expenseLimit: 40, aiDailyLimit: 3, ads: true },
-  basic: { name: 'Pro $1.99', reminderLimit: 50, expenseLimit: 120, aiDailyLimit: 8, ads: false },
-  premium: { name: 'Pro $4.99', reminderLimit: Infinity, expenseLimit: Infinity, aiDailyLimit: 20, ads: false },
+  free: { name: 'Free', viName: 'Miễn phí', reminderLimit: 20, expenseLimit: 40, aiDailyLimit: 3, ads: true },
+  basic: { name: 'Pro Basic $1.99', viName: 'Pro Cơ Bản $1.99', reminderLimit: 50, expenseLimit: 120, aiDailyLimit: 8, ads: false },
+  premium: { name: 'Pro Plus $4.99', viName: 'Pro Plus $4.99', reminderLimit: Infinity, expenseLimit: Infinity, aiDailyLimit: 20, ads: false },
+}
+
+export function categoryLabel(key, lang = 'vi', list = CATEGORIES) {
+  const item = list.find((x) => x.key === key)
+  if (!item) return key || ''
+  return lang === 'vi' ? item.vi : item.label
+}
+
+export function repeatLabel(key, lang = 'vi') {
+  return REPEAT_LABELS[key]?.[lang] || key || ''
+}
+
+export function planLabel(planKey, lang = 'vi') {
+  const plan = getPlan(planKey)
+  return lang === 'vi' ? plan.viName : plan.name
 }
 
 export function fmtUSD(value) {
@@ -155,21 +177,24 @@ export function buildDailyInsight({ reminders, expenses, bills, lang = 'vi' }) {
     const diff = (due - today + 31) % 31
     return diff <= 5
   })
-  const tips = []
+
   if (lang === 'en') {
-    if (todayReminders.length) tips.push(`You have ${todayReminders.length} reminder${todayReminders.length > 1 ? 's' : ''} to handle today.`)
-    else tips.push('No reminders are due today. Nice and clean.')
-    if (dueSoon.length) tips.push(`${dueSoon.length} bill${dueSoon.length > 1 ? 's are' : ' is'} due within 5 days.`)
+    const tips = []
+    if (todayReminders.length) tips.push(`You have ${todayReminders.length} reminder${todayReminders.length > 1 ? 's' : ''} today.`)
+    else tips.push('No reminders due today.')
+    if (dueSoon.length) tips.push(`${dueSoon.length} bill${dueSoon.length > 1 ? 's are' : ' is'} due soon.`)
     if (business > 0) tips.push(`Business expenses this month: ${fmtUSD(business)}.`)
     if (personal > 0) tips.push(`Personal expenses this month: ${fmtUSD(personal)}.`)
-    if (!monthExpenses.length) tips.push('No expenses entered this month. Add small entries daily so year-end is easier.')
-  } else {
-    if (todayReminders.length) tips.push(`Hôm nay có ${todayReminders.length} việc cần xử lý.`)
-    else tips.push('Hôm nay chưa có việc cần nhắc. Mở app ra thấy gọn là thắng rồi đó.')
-    if (dueSoon.length) tips.push(`${dueSoon.length} bill sắp tới hạn trong 5 ngày.`)
-    if (business > 0) tips.push(`Chi tiêu business tháng này: ${fmtUSD(business)}.`)
-    if (personal > 0) tips.push(`Chi tiêu cá nhân tháng này: ${fmtUSD(personal)}.`)
-    if (!monthExpenses.length) tips.push('Bạn chưa nhập chi tiêu tháng này. Nhập mỗi ngày một chút, cuối năm đỡ cực.')
+    if (!monthExpenses.length) tips.push('You have not added expenses this month yet.')
+    return tips.join(' ')
   }
+
+  const tips = []
+  if (todayReminders.length) tips.push(`Hôm nay bạn có ${todayReminders.length} việc cần nhớ.`)
+  else tips.push('Hôm nay chưa có việc đến hạn.')
+  if (dueSoon.length) tips.push(`${dueSoon.length} hóa đơn sắp tới hạn trong vài ngày tới.`)
+  if (business > 0) tips.push(`Chi tiêu kinh doanh tháng này: ${fmtUSD(business)}.`)
+  if (personal > 0) tips.push(`Chi tiêu cá nhân tháng này: ${fmtUSD(personal)}.`)
+  if (!monthExpenses.length) tips.push('Bạn chưa nhập chi tiêu tháng này. Nhập đều mỗi ngày sẽ dễ tổng kết cuối năm hơn.')
   return tips.join(' ')
 }
