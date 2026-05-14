@@ -1,7 +1,9 @@
 import { Check, Crown, X, ArrowLeft, Sparkles } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useMemo, useState } from 'react'
 import Logo from '../components/Logo.jsx'
 import LanguageToggle from '../components/LanguageToggle.jsx'
+import Modal from '../components/Modal.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 
@@ -9,44 +11,52 @@ const copy = {
   vi: {
     back: 'Quay lại',
     today: 'Về trang Hôm nay',
-    title: 'Bảng giá đơn giản, không bất ngờ',
-    sub: 'Không bán AI vô hạn, không scan hóa đơn, không tư vấn thuế. Chỉ tập trung vào điều bạn dùng mỗi ngày.',
+    title: 'Chọn gói phù hợp với cách bạn dùng app',
+    sub: 'Miễn phí để theo dõi hằng ngày. Plus cho cá nhân dùng nhiều hơn. Pro cho business, W2, 1099 và xuất file cuối năm.',
     bill: 'Trả theo tháng • hủy bất cứ lúc nào',
-    popular: 'Phổ biến nhất',
-    current: 'Đang dùng gói này',
-    pickFree: 'Bắt đầu miễn phí',
-    pickPaid: 'Nâng cấp',
+    popular: 'Phù hợp nhất cho business',
+    current: 'Gói đang chọn',
+    pickFree: 'Chọn miễn phí',
+    pickPaid: 'Chọn gói này',
+    coming: 'Thanh toán sẽ được bật sau',
+    comingText: 'Hiện tại app đang cho chọn gói để test giao diện và tính năng. Stripe/payment sẽ gắn sau khi app ổn định.',
+    close: 'Đóng',
+    selected: 'Bạn đã chọn',
     plans: [
       { key: 'free', name: 'Miễn phí', price: '$0', priceUnit: '', sub: 'Đủ để dùng cơ bản mỗi ngày',
-        features: ['Trang Hôm nay', 'Nhắc việc cơ bản', 'Chi tiêu cơ bản', 'Hóa đơn hằng tháng', 'Có quảng cáo nhỏ', 'Giới hạn lượt AI mỗi ngày'],
-        missing: ['Xuất file cuối năm', 'Thông báo nâng cao', 'Nhắc cho gia đình'] },
-      { key: 'basic', name: 'Pro Cơ Bản', price: '$1.99', priceUnit: '/tháng', sub: 'Tắt quảng cáo, mở rộng giới hạn',
-        features: ['Không quảng cáo', 'Nhiều nhắc việc hơn', 'Nhiều chi tiêu hơn', 'Thêm lượt AI mỗi ngày', 'Giao diện gọn hơn'],
-        missing: ['Không giới hạn dữ liệu', 'Tổng kết cuối năm'] },
-      { key: 'premium', name: 'Pro Plus', price: '$4.99', priceUnit: '/tháng', sub: 'Phù hợp cho gia đình và cả tiệm/business',
-        features: ['Không giới hạn nhắc việc', 'Không giới hạn chi tiêu', 'Tổng kết và xuất file cuối năm', 'Gợi ý thông minh', 'Nhắc cho người trong gia đình', 'Thông báo nâng cao'],
+        features: ['Trang Hôm nay', 'Nhắc việc cơ bản', 'Chi tiêu cá nhân cơ bản', 'Hóa đơn hằng tháng', 'Tổng kết đơn giản'],
+        missing: ['W2 / 1099', 'Xuất file cuối năm', 'Business tax report'] },
+      { key: 'basic', name: 'Plus', price: '$1.99', priceUnit: '/tháng', sub: 'Cho cá nhân muốn theo dõi nhiều hơn',
+        features: ['Không quảng cáo', 'Nhiều nhắc việc hơn', 'Nhiều chi tiêu hơn', 'CSV/PDF export cơ bản', 'Tổng kết tháng rõ hơn'],
+        missing: ['W2 / 1099 đầy đủ', 'Business tax report nâng cao'] },
+      { key: 'premium', name: 'Pro', price: '$4.99', priceUnit: '/tháng', sub: 'Cho gia đình, tiệm nail, Uber/DoorDash và business',
+        features: ['Không giới hạn nhắc việc', 'Không giới hạn chi tiêu', 'W2 Employees', '1099 Contractors', 'Business expenses', 'Year-end tax export', 'Personal/business split'],
         missing: [] },
     ],
   },
   en: {
     back: 'Back',
     today: 'Go to Today',
-    title: 'Simple pricing, no surprises',
-    sub: 'No unlimited AI, no receipt scanning, no tax advice. Just the things you’ll actually use every day.',
+    title: 'Choose the plan that fits how you use the app',
+    sub: 'Free for daily tracking. Plus for heavier personal use. Pro for business, W2, 1099, and year-end exports.',
     bill: 'Billed monthly • cancel anytime',
-    popular: 'Most popular',
-    current: 'Current plan',
-    pickFree: 'Start free',
-    pickPaid: 'Upgrade',
+    popular: 'Best for business',
+    current: 'Selected plan',
+    pickFree: 'Choose free',
+    pickPaid: 'Choose this plan',
+    coming: 'Payment coming soon',
+    comingText: 'Plan selection is available now for testing the app experience. Stripe/payment will be connected after the product is stable.',
+    close: 'Close',
+    selected: 'You selected',
     plans: [
-      { key: 'free', name: 'Free', price: '$0', priceUnit: '', sub: 'Everything you need for daily basics',
-        features: ['Today page', 'Basic reminders', 'Basic expenses', 'Monthly bills', 'Small ad area', 'Limited AI actions per day'],
-        missing: ['Year-end export', 'Advanced notifications', 'Family reminders'] },
-      { key: 'basic', name: 'Pro Basic', price: '$1.99', priceUnit: '/mo', sub: 'Remove ads, raise the limits',
-        features: ['No ads', 'More reminders', 'More expenses', 'More AI actions per day', 'A cleaner experience'],
-        missing: ['Unlimited records', 'Year-end summary'] },
-      { key: 'premium', name: 'Pro Plus', price: '$4.99', priceUnit: '/mo', sub: 'Best for family + business owners',
-        features: ['Unlimited reminders', 'Unlimited expenses', 'Year-end summary & export', 'Smart insights', 'Reminders for family', 'Advanced notifications'],
+      { key: 'free', name: 'Free', price: '$0', priceUnit: '', sub: 'Daily basics to get started',
+        features: ['Today page', 'Basic reminders', 'Basic personal expenses', 'Monthly bills', 'Simple summary'],
+        missing: ['W2 / 1099', 'Year-end export', 'Business tax report'] },
+      { key: 'basic', name: 'Plus', price: '$1.99', priceUnit: '/mo', sub: 'For personal users who track more',
+        features: ['No ads', 'More reminders', 'More expenses', 'Basic CSV/PDF export', 'Better monthly summary'],
+        missing: ['Full W2 / 1099', 'Advanced business tax report'] },
+      { key: 'premium', name: 'Pro', price: '$4.99', priceUnit: '/mo', sub: 'For family, nail salon, Uber/DoorDash, and business use',
+        features: ['Unlimited reminders', 'Unlimited expenses', 'W2 Employees', '1099 Contractors', 'Business expenses', 'Year-end tax export', 'Personal/business split'],
         missing: [] },
     ],
   },
@@ -54,11 +64,19 @@ const copy = {
 
 export default function Pricing() {
   const { profile, updateProfile } = useAuth()
-  const planKey = profile?.is_pro ? 'premium' : 'free'
   const { lang } = useLang()
   const navigate = useNavigate()
   const c = copy[lang]
-  const choosePlan = async (key) => { await updateProfile?.({ is_pro: key !== 'free' }); if (window.history.length > 1) navigate('/today') }
+  const initialPlan = profile?.plan_key || (profile?.is_pro ? 'premium' : 'free')
+  const [selectedPlan, setSelectedPlan] = useState(initialPlan)
+  const [modalPlan, setModalPlan] = useState(null)
+  const selected = useMemo(() => c.plans.find((p) => p.key === selectedPlan) || c.plans[0], [c.plans, selectedPlan])
+
+  const choosePlan = async (plan) => {
+    setSelectedPlan(plan.key)
+    await updateProfile?.({ is_pro: plan.key !== 'free', plan_key: plan.key })
+    setModalPlan(plan)
+  }
 
   return (
     <div className="min-h-screen bg-ink-50">
@@ -82,10 +100,10 @@ export default function Pricing() {
         </div>
         <div className="mt-10 grid lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
           {c.plans.map((p) => {
-            const isCurrent = planKey === p.key
+            const isCurrent = selectedPlan === p.key
             const isPopular = p.key === 'premium'
             return (
-              <div key={p.key} className={`card p-6 relative flex flex-col ${isPopular ? 'ring-2 ring-brand-500 shadow-glow' : ''}`}>
+              <div key={p.key} className={`card p-6 relative flex flex-col transition ${isCurrent ? 'ring-2 ring-brand-600 bg-brand-50/70 shadow-glow' : ''} ${isPopular && !isCurrent ? 'ring-2 ring-brand-200' : ''}`}>
                 {isPopular && (
                   <span className="absolute -top-3 right-6 badge bg-brand-600 text-white shadow-soft">
                     <Sparkles className="w-3 h-3" /> {c.popular}
@@ -100,7 +118,7 @@ export default function Pricing() {
                   {p.priceUnit && <span className="text-sm font-semibold text-ink-500">{p.priceUnit}</span>}
                 </div>
                 <p className="text-sm text-ink-500 mt-1">{p.sub}</p>
-                <button onClick={() => choosePlan(p.key)} className={`mt-5 w-full ${isCurrent ? 'btn-secondary' : 'btn-primary'}`} disabled={isCurrent}>
+                <button onClick={() => choosePlan(p)} className={`mt-5 w-full ${isCurrent ? 'btn-secondary' : 'btn-primary'}`}>
                   {isCurrent ? c.current : (p.key === 'free' ? c.pickFree : c.pickPaid)}
                 </button>
                 <ul className="mt-6 space-y-2 text-sm">
@@ -122,6 +140,16 @@ export default function Pricing() {
           })}
         </div>
       </main>
+
+      <Modal open={Boolean(modalPlan)} onClose={() => setModalPlan(null)} title={modalPlan ? `${c.selected}: ${modalPlan.name}` : c.coming} footer={<><button className="btn-secondary" onClick={() => setModalPlan(null)}>{c.close}</button><button className="btn-primary" onClick={() => navigate('/today')}>{c.today}</button></>}>
+        <p className="text-sm text-ink-600">{c.comingText}</p>
+        <div className="mt-4 rounded-2xl bg-brand-50 border border-brand-100 p-4">
+          <p className="font-bold text-brand-900">{selected.name} {selected.price}{selected.priceUnit}</p>
+          <ul className="mt-2 space-y-1 text-sm text-brand-800">
+            {selected.features.map((f) => <li key={f}>• {f}</li>)}
+          </ul>
+        </div>
+      </Modal>
     </div>
   )
 }

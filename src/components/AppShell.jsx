@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { Bell, CalendarDays, FileText, LogOut, Receipt, Sparkles, WalletCards } from 'lucide-react'
+import { Bell, CalendarDays, FileText, LogOut, Receipt, Sparkles, WalletCards, BriefcaseBusiness } from 'lucide-react'
 import Logo from './Logo.jsx'
 import LanguageToggle from './LanguageToggle.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
@@ -11,10 +11,11 @@ const navItems = [
   { to: '/expenses',  icon: Receipt,      en: 'Expenses',  vi: 'Chi tiêu' },
   { to: '/bills',     icon: WalletCards,  en: 'Bills',     vi: 'Hóa đơn' },
   { to: '/summary',   icon: FileText,     en: 'Summary',   vi: 'Tổng kết' },
+  { to: '/tax',       icon: BriefcaseBusiness, en: 'Tax', vi: 'Thuế' },
   { to: '/smart',     icon: Sparkles,     en: 'Smart',     vi: 'Gợi ý' },
 ]
 
-const mobileNav = navItems.filter((n) => n.to !== '/smart')
+const mobileNav = navItems.filter((n) => n.to !== '/smart' && n.to !== '/summary')
 
 export default function AppShell() {
   const { user, signOut } = useAuth()
