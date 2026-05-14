@@ -1,8 +1,8 @@
 // Browser notification foundation.
-// This handles in-app/local notifications while the app is open or installed as a PWA.
-// True background push still needs a server push provider later.
+// Local notifications work while the app/PWA is open. True background push needs a server push provider later.
 
-const NOTIFIED_KEY = 'txpick_notified_v2'
+const NOTIFIED_KEY = 'txpick_notified_v3'
+const DAILY_KEY = 'txpick_daily_briefing_notified_v1'
 
 export async function ensurePermission() {
   if (typeof window === 'undefined' || typeof Notification === 'undefined') return 'unsupported'
@@ -25,13 +25,37 @@ function loadNotified() {
 }
 
 function saveNotified(set) {
-  try { localStorage.setItem(NOTIFIED_KEY, JSON.stringify([...set].slice(-300))) } catch {}
+  try { localStorage.setItem(NOTIFIED_KEY, JSON.stringify([...set].slice(-500))) } catch {}
 }
 
-function notify({ title, body, tag }) {
+function todayKey() {
+  return new Date().toISOString().slice(0, 10)
+}
+
+export function alreadySentDailyBriefing() {
+  try { return localStorage.getItem(DAILY_KEY) === todayKey() } catch { return false }
+}
+
+export function markDailyBriefingSent() {
+  try { localStorage.setItem(DAILY_KEY, todayKey()) } catch {}
+}
+
+function notify({ title, body, tag, url = '/today' }) {
   if (!notificationSupported() || Notification.permission !== 'granted') return false
   try {
-    new Notification(title, { body, tag, icon: '/favicon.svg', badge: '/favicon.svg' })
+    const n = new Notification(title, {
+      body,
+      tag,
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
+      data: { url },
+    })
+    n.onclick = () => {
+      try {
+        window.focus()
+        window.location.assign(url)
+      } catch {}
+    }
     return true
   } catch {
     return false
@@ -61,6 +85,7 @@ export function fireDueNotifications({ reminders = [], bills = [], lang = 'vi' }
       title: lang === 'vi' ? `Nhắc việc: ${r.title || 'Việc cần nhớ'}` : `Reminder: ${r.title || 'Reminder'}`,
       body: r.notes || (lang === 'vi' ? 'Đã tới giờ cần làm việc này.' : 'This reminder is due.'),
       tag: key,
+      url: '/reminders',
     })
     if (ok) { notified.add(key); fired += 1 }
   }
@@ -75,14 +100,29 @@ export function fireDueNotifications({ reminders = [], bills = [], lang = 'vi' }
     if (notified.has(key)) continue
     const ok = notify({
       title: lang === 'vi' ? `Hóa đơn sắp tới hạn: ${b.name || b.title}` : `Bill due soon: ${b.name || b.title}`,
-      body: lang === 'vi' ? 'Kiểm tra và paid nếu đã tới hạn.' : 'Review and mark paid when complete.',
+      body: lang === 'vi' ? 'Kiểm tra và mark paid nếu đã trả xong.' : 'Review and mark paid when complete.',
       tag: key,
+      url: '/bills',
     })
     if (ok) { notified.add(key); fired += 1 }
   }
 
   if (fired) saveNotified(notified)
   return fired
+}
+
+export function fireDailyBriefingNotification(lines = [], lang = 'vi') {
+  if (!notificationSupported() || Notification.permission !== 'granted') return false
+  if (alreadySentDailyBriefing()) return false
+  const body = Array.isArray(lines) ? lines.slice(0, 2).join(' ') : String(lines || '')
+  const ok = notify({
+    title: lang === 'vi' ? 'Tóm tắt hôm nay' : 'Today briefing',
+    body: body || (lang === 'vi' ? 'Mở app để xem việc hôm nay.' : 'Open the app to review today.'),
+    tag: `daily:${todayKey()}`,
+    url: '/today',
+  })
+  if (ok) markDailyBriefingSent()
+  return ok
 }
 
 export function startNotificationTicker(getPayload, intervalMs = 60_000) {

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Plus, Trash2, WalletCards } from 'lucide-react'
+import { CheckCircle2, Plus, RotateCcw, Trash2, WalletCards } from 'lucide-react'
 import Modal from '../components/Modal.jsx'
 import StatCard from '../components/StatCard.jsx'
 import { CATEGORIES, fmtUSD, categoryLabel } from '../lib/lifeStore.js'
@@ -14,6 +14,7 @@ const copy = {
     add: 'Thêm hóa đơn',
     empty: 'Chưa có hóa đơn nào. Thêm điện, nước, internet, tiền nhà… để app nhắc đúng ngày.',
     due: 'Ngày',
+    paid: 'Đã paid', unpaid: 'Chưa paid', markPaid: 'Mark paid', reopen: 'Mở lại',
     modal: 'Thêm hóa đơn hằng tháng', close: 'Đóng', save: 'Lưu',
     name: 'Tên hóa đơn', amount: 'Số tiền', dueDay: 'Ngày đến hạn trong tháng', category: 'Phân loại',
     monthly: 'Tổng mỗi tháng', count: 'Số hóa đơn',
@@ -25,6 +26,7 @@ const copy = {
     add: 'Add bill',
     empty: 'No bills yet. Add power, water, internet, rent… and the app will remind you on time.',
     due: 'Day',
+    paid: 'Paid', unpaid: 'Unpaid', markPaid: 'Mark paid', reopen: 'Reopen',
     modal: 'Add monthly bill', close: 'Cancel', save: 'Save',
     name: 'Bill name', amount: 'Amount', dueDay: 'Due day of month', category: 'Category',
     monthly: 'Monthly total', count: 'Bills',
@@ -72,10 +74,15 @@ export default function Bills() {
               <li key={b.id} className="py-3 flex items-center justify-between gap-3">
                 <div>
                   <p className="font-semibold text-ink-900">{b.name || b.title}</p>
-                  <p className="text-xs text-ink-500">{c.due} {b.dueDay} • {categoryLabel(b.category, lang)}</p>
+                  <p className="text-xs text-ink-500">{c.due} {b.dueDay} • {categoryLabel(b.category, lang)} • {b.paid ? c.paid : c.unpaid}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="font-bold text-ink-900">{fmtUSD(b.amount)}</span>
+                  {b.paid ? (
+                    <button onClick={() => api.update(b.id, { paid: false, paid_at: null })} className="text-ink-400 hover:text-brand-700" aria-label={c.reopen} title={c.reopen}><RotateCcw className="w-4 h-4" /></button>
+                  ) : (
+                    <button onClick={() => api.update(b.id, { paid: true, paid_at: new Date().toISOString() })} className="text-brand-600 hover:text-brand-800" aria-label={c.markPaid} title={c.markPaid}><CheckCircle2 className="w-5 h-5" /></button>
+                  )}
                   <button onClick={() => api.remove(b.id)} className="text-ink-300 hover:text-rose-600" aria-label="Delete"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </li>

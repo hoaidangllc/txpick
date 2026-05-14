@@ -13,8 +13,8 @@ import {
   planLabel,
 } from '../lib/lifeStore.js'
 import { billsDb, expensesDb, remindersDb, useRemoteCollection } from '../lib/db.js'
-import { buildTodayFocus, getBillBuckets, getReminderBuckets } from '../lib/assistantIntelligence.js'
-import { ensurePermission, notificationSupported, startNotificationTicker } from '../lib/notifications.js'
+import { buildDailyBriefing, buildTodayActionCards, buildTodayFocus, getBillBuckets, getReminderBuckets } from '../lib/assistantIntelligence.js'
+import { ensurePermission, fireDailyBriefingNotification, notificationSupported, startNotificationTicker } from '../lib/notifications.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 
@@ -30,6 +30,9 @@ const txt = {
     insight: 'Gợi ý hôm nay',
     cached: 'Cập nhật từ dữ liệu thật trong Supabase',
     focus: 'Trọng tâm cần làm',
+    nextActions: 'Việc nên làm trước',
+    briefing: 'Tóm tắt nhanh hôm nay',
+    open: 'Mở',
     urgent: 'Quá hạn / cần chú ý',
     notify: 'Bật thông báo',
     notifyOn: 'Thông báo đã bật',
@@ -79,6 +82,9 @@ const txt = {
     insight: 'Daily insight',
     cached: 'Powered by your live Supabase data',
     focus: 'Today focus',
+    nextActions: 'Best next actions',
+    briefing: 'Quick daily briefing',
+    open: 'Open',
     urgent: 'Overdue / urgent',
     notify: 'Enable notifications',
     notifyOn: 'Notifications enabled',
@@ -153,6 +159,14 @@ export default function Today() {
     () => buildTodayFocus({ reminders, bills, expenses, lang }),
     [reminders, bills, expenses, lang],
   )
+  const actionCards = useMemo(
+    () => buildTodayActionCards({ reminders, bills, expenses, lang }),
+    [reminders, bills, expenses, lang],
+  )
+  const dailyBriefing = useMemo(
+    () => buildDailyBriefing({ reminders, bills, expenses, lang }),
+    [reminders, bills, expenses, lang],
+  )
 
   const monthExpenses = useMemo(
     () => expenses.filter((e) => isCurrentMonth(e.date)),
@@ -170,8 +184,9 @@ export default function Today() {
 
   useEffect(() => {
     if (!notificationSupported() || notifyState !== 'granted') return undefined
+    fireDailyBriefingNotification(dailyBriefing, lang)
     return startNotificationTicker(() => ({ reminders, bills, lang }), 60_000)
-  }, [reminders, bills, lang, notifyState])
+  }, [reminders, bills, lang, notifyState, dailyBriefing])
 
   const enableNotifications = async () => {
     const state = await ensurePermission()
@@ -244,6 +259,42 @@ export default function Today() {
             <button onClick={enableNotifications} disabled={notifyState === 'granted' || notifyState === 'unsupported'} className="btn-secondary text-xs py-2">
               {c.notify}
             </button>
+          </div>
+        </div>
+      </section>
+
+
+      <section className="mt-5 grid lg:grid-cols-[0.9fr_1.1fr] gap-3">
+        <div className="card p-4 sm:p-5">
+          <h2 className="font-bold text-ink-900">{c.briefing}</h2>
+          <ul className="mt-3 space-y-2">
+            {dailyBriefing.map((line) => (
+              <li key={line} className="rounded-xl bg-ink-50 px-3 py-2 text-sm text-ink-700">{line}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="card p-4 sm:p-5">
+          <h2 className="font-bold text-ink-900">{c.nextActions}</h2>
+          <div className="mt-3 grid sm:grid-cols-2 gap-2">
+            {actionCards.map((card) => (
+              <Link
+                key={card.id}
+                to={card.href}
+                className={`rounded-2xl border p-3 text-sm transition hover:-translate-y-0.5 ${
+                  card.tone === 'danger'
+                    ? 'border-rose-100 bg-rose-50 text-rose-800'
+                    : card.tone === 'gold'
+                      ? 'border-gold-500/20 bg-gold-500/10 text-gold-700'
+                      : card.tone === 'brand'
+                        ? 'border-brand-100 bg-brand-50 text-brand-800'
+                        : 'border-ink-100 bg-ink-50 text-ink-700'
+                }`}
+              >
+                <p className="font-bold">{card.title}</p>
+                <p className="mt-1 text-xs leading-relaxed opacity-90">{card.body}</p>
+                <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold">{c.open} <ArrowRight className="w-3 h-3" /></span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

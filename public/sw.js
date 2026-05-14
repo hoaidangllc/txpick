@@ -1,8 +1,8 @@
-const CACHE_NAME = 'sh-life-ai-shell-v2'
-const SHELL = ['/', '/today', '/favicon.svg', '/manifest.webmanifest']
+const CACHE_NAME = 'txpick-life-v3'
+const APP_SHELL = ['/', '/today', '/manifest.webmanifest', '/favicon.svg']
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL)).catch(() => null))
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)).catch(() => undefined))
   self.skipWaiting()
 })
 
@@ -19,34 +19,29 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url)
   if (url.origin !== self.location.origin) return
 
-  if (req.mode === 'navigate') {
-    event.respondWith(fetch(req).catch(() => caches.match('/today').then((res) => res || caches.match('/'))))
-    return
-  }
-
   event.respondWith(
-    caches.match(req).then((cached) => cached || fetch(req).then((res) => {
-      if (res && res.status === 200 && ['style', 'script', 'image', 'font'].includes(req.destination)) {
+    fetch(req)
+      .then((res) => {
         const copy = res.clone()
-        caches.open(CACHE_NAME).then((cache) => cache.put(req, copy)).catch(() => null)
-      }
-      return res
-    }).catch(() => cached))
+        caches.open(CACHE_NAME).then((cache) => cache.put(req, copy)).catch(() => undefined)
+        return res
+      })
+      .catch(() => caches.match(req).then((cached) => cached || caches.match('/')))
   )
-})
-
-self.addEventListener('push', (event) => {
-  let payload = { title: 'SH Life AI', body: 'You have something to review.' }
-  try { payload = event.data?.json() || payload } catch {}
-  event.waitUntil(self.registration.showNotification(payload.title, {
-    body: payload.body,
-    icon: '/favicon.svg',
-    badge: '/favicon.svg',
-    tag: payload.tag || 'sh-life-ai',
-  }))
 })
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  event.waitUntil(clients.openWindow('/today'))
+  const targetUrl = event.notification?.data?.url || '/today'
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      for (const client of clients) {
+        if ('focus' in client) {
+          client.navigate(targetUrl)
+          return client.focus()
+        }
+      }
+      return self.clients.openWindow(targetUrl)
+    })
+  )
 })
