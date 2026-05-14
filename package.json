@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "TxPick - Quản lý tài chính cho người Việt ở Mỹ / Finance management for Vietnamese-Americans",
+  "description": "TxPick - App quan ly doi song hang ngay cho nguoi Viet o My.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

@@ -2,12 +2,51 @@ import { useMemo, useState } from 'react'
 import { Bell, CheckCircle2, Plus, Trash2, RotateCcw } from 'lucide-react'
 import Modal from '../components/Modal.jsx'
 import { useLocalStore } from '../lib/useLocalStore.js'
-import { STORAGE_KEYS, CATEGORIES, todayISO, parseNaturalReminder, categoryLabel, repeatLabel } from '../lib/lifeStore.js'
+import {
+  STORAGE_KEYS, CATEGORIES, todayISO, parseNaturalReminder,
+  categoryLabel, repeatLabel,
+} from '../lib/lifeStore.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
 
 const copy = {
-  vi: { title: 'Nhắc việc', sub: 'Gom việc một lần, việc lặp lại, nhắc cho gia đình và nhắc hóa đơn.', active: 'Đang cần nhớ', done: 'Đã xong gần đây', new: 'Tạo mới', empty: 'Chưa có dữ liệu.', noDate: 'Chưa chọn ngày', modal: 'Tạo nhắc việc', close: 'Đóng', save: 'Lưu', natural: 'Gõ nhanh bằng câu tự nhiên', read: 'Đọc câu', titleField: 'Nội dung cần nhớ', date: 'Ngày', time: 'Giờ', category: 'Phân loại', repeat: 'Lặp lại', notes: 'Ghi chú', none: 'Một lần', daily: 'Hằng ngày', weekly: 'Hằng tuần', monthly: 'Hằng tháng' },
-  en: { title: 'Reminders', sub: 'One-time tasks, recurring tasks, family reminders, and bill reminders in one place.', active: 'Active reminders', done: 'Done recently', new: 'New', empty: 'No data yet.', noDate: 'No date', modal: 'New reminder', close: 'Cancel', save: 'Save', natural: 'Natural text', read: 'Read', titleField: 'Title', date: 'Date', time: 'Time', category: 'Category', repeat: 'Repeat', notes: 'Notes', none: 'One time', daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly' },
+  vi: {
+    title: 'Nhắc việc',
+    sub: 'Việc một lần, việc lặp lại, nhắc cho gia đình và nhắc hóa đơn — gom chung một chỗ.',
+    active: 'Đang cần nhớ',
+    done: 'Đã xong gần đây',
+    new: 'Tạo mới',
+    emptyActive: 'Chưa có việc nào. Thêm việc đầu tiên để bắt đầu.',
+    emptyDone: 'Khi bạn hoàn thành việc, nó sẽ hiện ở đây.',
+    noDate: 'Chưa chọn ngày',
+    modal: 'Tạo nhắc việc',
+    close: 'Đóng',
+    save: 'Lưu',
+    natural: 'Gõ nhanh bằng câu tự nhiên',
+    naturalPh: 'Ví dụ: nhắc tôi uống thuốc mỗi ngày lúc 9 giờ tối',
+    read: 'Đọc câu',
+    titleField: 'Nội dung cần nhớ',
+    date: 'Ngày', time: 'Giờ', category: 'Phân loại', repeat: 'Lặp lại', notes: 'Ghi chú',
+    none: 'Một lần', daily: 'Hằng ngày', weekly: 'Hằng tuần', monthly: 'Hằng tháng',
+  },
+  en: {
+    title: 'Reminders',
+    sub: 'One-time tasks, recurring tasks, family reminders, and bill reminders — all in one place.',
+    active: 'Active',
+    done: 'Done recently',
+    new: 'New',
+    emptyActive: 'Nothing here yet. Add your first reminder to get started.',
+    emptyDone: 'Completed reminders will appear here.',
+    noDate: 'No date',
+    modal: 'New reminder',
+    close: 'Cancel',
+    save: 'Save',
+    natural: 'Quick add (natural language)',
+    naturalPh: 'Example: remind me to take medicine every day at 9 PM',
+    read: 'Parse',
+    titleField: 'Title',
+    date: 'Date', time: 'Time', category: 'Category', repeat: 'Repeat', notes: 'Notes',
+    none: 'One time', daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly',
+  },
 }
 
 export default function Reminders() {
@@ -17,9 +56,107 @@ export default function Reminders() {
   const [open, setOpen] = useState(false)
   const active = useMemo(() => items.filter((x) => !x.done), [items])
   const done = useMemo(() => items.filter((x) => x.done).slice(0, 20), [items])
-  return <div className="container-app py-6 sm:py-8"><Header onAdd={() => setOpen(true)} c={c} /><section className="mt-5 grid lg:grid-cols-2 gap-4"><ReminderCard title={c.active} items={active} api={api} c={c} lang={lang} /><ReminderCard title={c.done} items={done} api={api} done c={c} lang={lang} /></section><ReminderModal open={open} onClose={() => setOpen(false)} onSave={(item) => { api.add(item); setOpen(false) }} c={c} lang={lang} /></div>
+
+  return (
+    <div className="container-app py-6 sm:py-8">
+      <div className="flex items-end justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-3xl font-extrabold text-ink-900 flex items-center gap-2">
+            <Bell className="w-7 h-7 text-brand-600" /> {c.title}
+          </h1>
+          <p className="text-ink-500 mt-1 max-w-2xl">{c.sub}</p>
+        </div>
+        <button onClick={() => setOpen(true)} className="btn-primary">
+          <Plus className="w-4 h-4" /> {c.new}
+        </button>
+      </div>
+
+      <section className="mt-5 grid lg:grid-cols-2 gap-4">
+        <ReminderCard title={c.active} items={active} api={api} empty={c.emptyActive} c={c} lang={lang} />
+        <ReminderCard title={c.done} items={done} api={api} empty={c.emptyDone} done c={c} lang={lang} />
+      </section>
+
+      <ReminderModal open={open} onClose={() => setOpen(false)} onSave={(item) => { api.add(item); setOpen(false) }} c={c} lang={lang} />
+    </div>
+  )
 }
-function Header({ onAdd, c }) { return <div className="flex items-end justify-between gap-3"><div><h1 className="text-3xl font-extrabold text-ink-900 flex items-center gap-2"><Bell className="w-7 h-7 text-brand-600" /> {c.title}</h1><p className="text-ink-500 mt-1">{c.sub}</p></div><button onClick={onAdd} className="btn-primary"><Plus className="w-4 h-4" /> {c.new}</button></div> }
-function ReminderCard({ title, items, api, done, c, lang }) { return <div className="card p-5"><h2 className="font-bold text-ink-900">{title}</h2>{items.length === 0 ? <p className="py-10 text-center text-sm text-ink-400">{c.empty}</p> : <ul className="mt-3 divide-y divide-ink-100">{items.map((r) => <li key={r.id} className="py-3 flex items-start justify-between gap-3"><div><p className="font-semibold text-ink-900">{r.title}</p><p className="text-xs text-ink-500">{r.date || c.noDate} {r.time ? '• ' + r.time : ''} • {categoryLabel(r.category, lang)} {r.repeat !== 'none' ? '• ' + repeatLabel(r.repeat, lang) : ''}</p></div><div className="flex gap-2">{done ? <button onClick={() => api.update(r.id, { done: false, doneAt: null })} className="text-brand-600"><RotateCcw className="w-4 h-4" /></button> : <button onClick={() => api.update(r.id, { done: true, doneAt: new Date().toISOString() })} className="text-brand-600"><CheckCircle2 className="w-5 h-5" /></button>}<button onClick={() => api.remove(r.id)} className="text-ink-300 hover:text-rose-600"><Trash2 className="w-4 h-4" /></button></div></li>)}</ul>}</div> }
-function ReminderModal({ open, onClose, onSave, c, lang }) { const [quick, setQuick] = useState(''); const [form, setForm] = useState({ title: '', date: todayISO(), time: '', category: 'personal', repeat: 'none', notes: '' }); const applyQuick = () => setForm({ ...form, ...parseNaturalReminder(quick) }); const save = () => { const item = { ...form, done: false }; if (!item.title) return; onSave(item); setForm({ title: '', date: todayISO(), time: '', category: 'personal', repeat: 'none', notes: '' }); setQuick('') }; return <Modal open={open} onClose={onClose} title={c.modal} footer={<><button className="btn-secondary" onClick={onClose}>{c.close}</button><button className="btn-primary" onClick={save}>{c.save}</button></>}><label className="label">{c.natural}</label><div className="flex gap-2 mb-3"><input className="input" value={quick} onChange={(e) => setQuick(e.target.value)} placeholder="nhắc tôi uống thuốc mỗi ngày 9pm" /><button className="btn-secondary !px-3" onClick={applyQuick}>{c.read}</button></div><Field label={c.titleField} value={form.title} onChange={(v) => setForm({ ...form, title: v })} /><div className="grid grid-cols-2 gap-3"><Field label={c.date} type="date" value={form.date} onChange={(v) => setForm({ ...form, date: v })} /><Field label={c.time} type="time" value={form.time} onChange={(v) => setForm({ ...form, time: v })} /></div><label className="label">{c.category}</label><select className="input mb-3" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>{CATEGORIES.map((cat) => <option key={cat.key} value={cat.key}>{categoryLabel(cat.key, lang)}</option>)}</select><label className="label">{c.repeat}</label><select className="input mb-3" value={form.repeat} onChange={(e) => setForm({ ...form, repeat: e.target.value })}><option value="none">{c.none}</option><option value="daily">{c.daily}</option><option value="weekly">{c.weekly}</option><option value="monthly">{c.monthly}</option></select><Field label={c.notes} value={form.notes} onChange={(v) => setForm({ ...form, notes: v })} /></Modal> }
-function Field({ label, value, onChange, type = 'text' }) { return <label className="block mb-3"><span className="label">{label}</span><input className="input" type={type} value={value} onChange={(e) => onChange(e.target.value)} /></label> }
+
+function ReminderCard({ title, items, api, empty, done, c, lang }) {
+  return (
+    <div className="card p-5">
+      <h2 className="font-bold text-ink-900">{title}</h2>
+      {items.length === 0 ? (
+        <p className="py-10 text-center text-sm text-ink-400">{empty}</p>
+      ) : (
+        <ul className="mt-3 divide-y divide-ink-100">
+          {items.map((r) => (
+            <li key={r.id} className="py-3 flex items-start justify-between gap-3">
+              <div>
+                <p className="font-semibold text-ink-900">{r.title}</p>
+                <p className="text-xs text-ink-500">
+                  {r.date || c.noDate}{r.time ? ` • ${r.time}` : ''} • {categoryLabel(r.category, lang)}{r.repeat && r.repeat !== 'none' ? ` • ${repeatLabel(r.repeat, lang)}` : ''}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {done ? (
+                  <button onClick={() => api.update(r.id, { done: false, doneAt: null })} className="text-brand-600 hover:text-brand-800" aria-label="Reopen"><RotateCcw className="w-4 h-4" /></button>
+                ) : (
+                  <button onClick={() => api.update(r.id, { done: true, doneAt: new Date().toISOString() })} className="text-brand-600 hover:text-brand-800" aria-label="Done"><CheckCircle2 className="w-5 h-5" /></button>
+                )}
+                <button onClick={() => api.remove(r.id)} className="text-ink-300 hover:text-rose-600" aria-label="Delete"><Trash2 className="w-4 h-4" /></button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+function ReminderModal({ open, onClose, onSave, c, lang }) {
+  const [quick, setQuick] = useState('')
+  const [form, setForm] = useState({ title: '', date: todayISO(), time: '', category: 'personal', repeat: 'none', notes: '' })
+  const applyQuick = () => setForm({ ...form, ...parseNaturalReminder(quick) })
+  const save = () => {
+    const item = { ...form, done: false }
+    if (!item.title) return
+    onSave(item)
+    setForm({ title: '', date: todayISO(), time: '', category: 'personal', repeat: 'none', notes: '' })
+    setQuick('')
+  }
+  return (
+    <Modal open={open} onClose={onClose} title={c.modal} footer={<><button className="btn-secondary" onClick={onClose}>{c.close}</button><button className="btn-primary" onClick={save}>{c.save}</button></>}>
+      <label className="label">{c.natural}</label>
+      <div className="flex gap-2 mb-3">
+        <input className="input" value={quick} onChange={(e) => setQuick(e.target.value)} placeholder={c.naturalPh} />
+        <button className="btn-secondary !px-3" onClick={applyQuick}>{c.read}</button>
+      </div>
+      <Field label={c.titleField} value={form.title} onChange={(v) => setForm({ ...form, title: v })} />
+      <div className="grid grid-cols-2 gap-3">
+        <Field label={c.date} type="date" value={form.date} onChange={(v) => setForm({ ...form, date: v })} />
+        <Field label={c.time} type="time" value={form.time} onChange={(v) => setForm({ ...form, time: v })} />
+      </div>
+      <label className="label">{c.category}</label>
+      <select className="input mb-3" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+        {CATEGORIES.map((cat) => <option key={cat.key} value={cat.key}>{categoryLabel(cat.key, lang)}</option>)}
+      </select>
+      <label className="label">{c.repeat}</label>
+      <select className="input mb-3" value={form.repeat} onChange={(e) => setForm({ ...form, repeat: e.target.value })}>
+        <option value="none">{c.none}</option>
+        <option value="daily">{c.daily}</option>
+        <option value="weekly">{c.weekly}</option>
+        <option value="monthly">{c.monthly}</option>
+      </select>
+      <Field label={c.notes} value={form.notes} onChange={(v) => setForm({ ...form, notes: v })} />
+    </Modal>
+  )
+}
+
+function Field({ label, value, onChange, type = 'text' }) {
+  return (
+    <label className="block mb-3">
+      <span className="label">{label}</span>
+      <input className="input" type={type} value={value} onChange={(e) => onChange(e.target.value)} />
+    </label>
+  )
+}

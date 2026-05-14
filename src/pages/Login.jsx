@@ -53,7 +53,7 @@ export default function Login() {
   return (
     <AuthLayout>
       <h1 className="text-2xl font-bold text-ink-900">{t.auth.loginTitle}</h1>
-      <p className="mt-1 text-sm text-ink-500">{t.taglineMain}</p>
+      <p className="mt-1 text-sm text-ink-500">{t.auth.loginSub}</p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
