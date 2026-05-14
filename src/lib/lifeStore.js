@@ -1,11 +1,3 @@
-export const STORAGE_KEYS = {
-  reminders: 'txpick_life_reminders',
-  expenses: 'txpick_life_expenses',
-  bills: 'txpick_life_bills',
-  plan: 'txpick_life_plan',
-  aiUsage: 'txpick_life_ai_usage',
-  dailySummary: 'txpick_life_daily_summary',
-}
 
 export const CATEGORIES = [
   { key: 'personal', label: 'Personal', vi: 'Cá nhân' },
@@ -88,32 +80,11 @@ export function getUsageKey() {
   return `txpick_life_ai_usage_${todayISO()}`
 }
 
-export function readJSON(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? JSON.parse(raw) : fallback
-  } catch {
-    return fallback
-  }
-}
 
 export function writeJSON(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)) } catch {}
 }
 
-export function canUseAI(planKey) {
-  const plan = getPlan(planKey)
-  const usage = readJSON(getUsageKey(), { count: 0 })
-  return { allowed: usage.count < plan.aiDailyLimit, used: usage.count, limit: plan.aiDailyLimit }
-}
-
-export function bumpAIUsage() {
-  const key = getUsageKey()
-  const usage = readJSON(key, { count: 0 })
-  const next = { count: Number(usage.count || 0) + 1, date: todayISO() }
-  writeJSON(key, next)
-  return next
-}
 
 export function parseNaturalReminder(text) {
   const raw = String(text || '').trim()

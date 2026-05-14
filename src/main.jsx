@@ -8,7 +8,9 @@ import { ElderModeProvider } from './contexts/ElderModeContext.jsx'
 import './index.css'
 import { registerPWA } from './lib/pwa.js'
 
-registerPWA()
+if (import.meta.env.PROD) {
+  registerPWA()
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
