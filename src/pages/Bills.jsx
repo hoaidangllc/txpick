@@ -10,27 +10,49 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 const copy = {
   vi: {
     title: 'Hóa đơn',
-    sub: 'Theo dõi hóa đơn hằng tháng để không quên ngày đến hạn.',
+    sub: 'Theo dõi hóa đơn cá nhân và business để không quên ngày đến hạn.',
     add: 'Thêm hóa đơn',
     empty: 'Chưa có hóa đơn nào. Thêm điện, nước, internet, tiền nhà… để app nhắc đúng ngày.',
     due: 'Ngày',
-    paid: 'Đã paid', unpaid: 'Chưa paid', markPaid: 'Mark paid', reopen: 'Mở lại',
-    modal: 'Thêm hóa đơn hằng tháng', close: 'Đóng', save: 'Lưu',
-    name: 'Tên hóa đơn', amount: 'Số tiền', dueDay: 'Ngày đến hạn trong tháng', category: 'Phân loại',
-    monthly: 'Tổng mỗi tháng', count: 'Số hóa đơn',
+    paid: 'Đã thanh toán',
+    unpaid: 'Chưa thanh toán',
+    markPaid: 'Đánh dấu đã trả',
+    reopen: 'Mở lại hóa đơn',
+    modal: 'Thêm hóa đơn hằng tháng',
+    close: 'Đóng',
+    save: 'Lưu',
+    name: 'Tên hóa đơn',
+    amount: 'Số tiền',
+    dueDay: 'Ngày đến hạn trong tháng',
+    category: 'Phân loại',
+    monthly: 'Tổng mỗi tháng',
+    count: 'Số hóa đơn',
     none: '—',
+    delete: 'Xóa hóa đơn',
+    loading: 'Đang tải…',
   },
   en: {
     title: 'Bills',
-    sub: 'Track monthly bills so due dates never slip.',
+    sub: 'Track personal and business bills so due dates never slip.',
     add: 'Add bill',
     empty: 'No bills yet. Add power, water, internet, rent… and the app will remind you on time.',
     due: 'Day',
-    paid: 'Paid', unpaid: 'Unpaid', markPaid: 'Mark paid', reopen: 'Reopen',
-    modal: 'Add monthly bill', close: 'Cancel', save: 'Save',
-    name: 'Bill name', amount: 'Amount', dueDay: 'Due day of month', category: 'Category',
-    monthly: 'Monthly total', count: 'Bills',
+    paid: 'Paid',
+    unpaid: 'Unpaid',
+    markPaid: 'Mark paid',
+    reopen: 'Reopen bill',
+    modal: 'Add monthly bill',
+    close: 'Cancel',
+    save: 'Save',
+    name: 'Bill name',
+    amount: 'Amount',
+    dueDay: 'Due day of month',
+    category: 'Category',
+    monthly: 'Monthly total',
+    count: 'Bills',
     none: '—',
+    delete: 'Delete bill',
+    loading: 'Loading…',
   },
 }
 
@@ -63,7 +85,7 @@ export default function Bills() {
 
       <div className="mt-5 card p-5">
         {state.loading ? (
-          <p className="py-10 text-center text-sm text-ink-400">Loading…</p>
+          <p className="py-10 text-center text-sm text-ink-400">{c.loading}</p>
         ) : state.error ? (
           <p className="py-10 text-center text-sm text-rose-600">{state.error}</p>
         ) : items.length === 0 ? (
@@ -74,16 +96,34 @@ export default function Bills() {
               <li key={b.id} className="py-3 flex items-center justify-between gap-3">
                 <div>
                   <p className="font-semibold text-ink-900">{b.name || b.title}</p>
-                  <p className="text-xs text-ink-500">{c.due} {b.dueDay} • {categoryLabel(b.category, lang)} • {b.paid ? c.paid : c.unpaid}</p>
+                  <p className="text-xs text-ink-500">
+                    {c.due} {b.dueDay} • {categoryLabel(b.category, lang)} • {b.paid ? c.paid : c.unpaid}
+                  </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="font-bold text-ink-900">{fmtUSD(b.amount)}</span>
                   {b.paid ? (
-                    <button onClick={() => api.update(b.id, { paid: false, paid_at: null })} className="text-ink-400 hover:text-brand-700" aria-label={c.reopen} title={c.reopen}><RotateCcw className="w-4 h-4" /></button>
+                    <button
+                      onClick={() => api.update(b.id, { paid: false, paid_at: null })}
+                      className="text-ink-400 hover:text-brand-700"
+                      aria-label={c.reopen}
+                      title={c.reopen}
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                    </button>
                   ) : (
-                    <button onClick={() => api.update(b.id, { paid: true, paid_at: new Date().toISOString() })} className="text-brand-600 hover:text-brand-800" aria-label={c.markPaid} title={c.markPaid}><CheckCircle2 className="w-5 h-5" /></button>
+                    <button
+                      onClick={() => api.update(b.id, { paid: true, paid_at: new Date().toISOString() })}
+                      className="text-brand-600 hover:text-brand-800"
+                      aria-label={c.markPaid}
+                      title={c.markPaid}
+                    >
+                      <CheckCircle2 className="w-5 h-5" />
+                    </button>
                   )}
-                  <button onClick={() => api.remove(b.id)} className="text-ink-300 hover:text-rose-600" aria-label="Delete"><Trash2 className="w-4 h-4" /></button>
+                  <button onClick={() => api.remove(b.id)} className="text-ink-300 hover:text-rose-600" aria-label={c.delete} title={c.delete}>
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </li>
             ))}

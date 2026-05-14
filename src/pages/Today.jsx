@@ -253,7 +253,7 @@ export default function Today() {
               <Smartphone className="w-5 h-5" />
             </div>
             <div className="flex-1">
-              <h2 className="font-bold text-ink-900">PWA</h2>
+              <h2 className="font-bold text-ink-900">Ứng dụng điện thoại</h2>
               <p className="text-xs text-ink-500">{notifyState === 'granted' ? c.notifyOn : c.notifyOff}</p>
             </div>
             <button onClick={enableNotifications} disabled={notifyState === 'granted' || notifyState === 'unsupported'} className="btn-secondary text-xs py-2">
