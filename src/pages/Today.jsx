@@ -6,13 +6,13 @@ import {
 import { Link } from 'react-router-dom'
 import Modal from '../components/Modal.jsx'
 import StatCard from '../components/StatCard.jsx'
-import { useLocalStore } from '../lib/useLocalStore.js'
 import {
-  STORAGE_KEYS, EXPENSE_CATEGORIES, CATEGORIES, fmtUSD, isCurrentMonth,
-  isSameDay, parseNaturalReminder, buildDailyInsight, getPlan, canUseAI,
-  bumpAIUsage, readJSON, writeJSON, todayISO, categoryLabel, repeatLabel,
+  EXPENSE_CATEGORIES, CATEGORIES, fmtUSD, isCurrentMonth,
+  isSameDay, parseNaturalReminder, buildDailyInsight, getPlan,
+  todayISO, categoryLabel, repeatLabel,
   planLabel,
 } from '../lib/lifeStore.js'
+import { billsDb, expensesDb, remindersDb, useRemoteCollection } from '../lib/db.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 
@@ -123,12 +123,12 @@ function todayLabel(c) {
 
 export default function Today() {
   const { lang } = useLang()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const c = txt[lang]
-  const [reminders, remApi] = useLocalStore(STORAGE_KEYS.reminders, [])
-  const [expenses, expApi] = useLocalStore(STORAGE_KEYS.expenses, [])
-  const [bills, billApi] = useLocalStore(STORAGE_KEYS.bills, [])
-  const [planKey] = useLocalStore(STORAGE_KEYS.plan, 'free')
+  const [reminders, remApi, remState] = useRemoteCollection(user?.id, remindersDb)
+  const [expenses, expApi, expState] = useRemoteCollection(user?.id, expensesDb)
+  const [bills, billApi, billState] = useRemoteCollection(user?.id, billsDb)
+  const planKey = profile?.is_pro ? 'premium' : 'free'
   const [quickText, setQuickText] = useState('')
   const [expenseOpen, setExpenseOpen] = useState(false)
   const [billOpen, setBillOpen] = useState(false)
@@ -152,7 +152,7 @@ export default function Today() {
     .reduce((s, e) => s + Number(e.amount || 0), 0)
   const personalTotal = monthTotal - businessTotal
   const insight = useMemo(
-    () => getCachedInsight({ reminders, expenses, bills, planKey, lang }),
+    () => buildDailyInsight({ reminders, expenses, bills, planKey, lang }),
     [reminders, expenses, bills, planKey, lang],
   )
 
@@ -187,6 +187,10 @@ export default function Today() {
         <div className="mt-4 rounded-2xl border border-dashed border-ink-200 bg-white p-3 text-center text-xs text-ink-400">
           {c.ad}
         </div>
+      )}
+
+      {(remState.error || expState.error || billState.error) && (
+        <p className="mt-4 text-sm text-rose-600">{remState.error || expState.error || billState.error}</p>
       )}
 
       <section className="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -258,17 +262,6 @@ export default function Today() {
       <BillModal open={billOpen} onClose={() => setBillOpen(false)} onSave={(item) => { billApi.add(item); setBillOpen(false) }} lang={lang} c={c} />
     </div>
   )
-}
-
-function getCachedInsight(payload) {
-  const key = `${STORAGE_KEYS.dailySummary}_${todayISO()}_${payload.lang}`
-  const cached = readJSON(key, null)
-  if (cached?.text) return cached.text
-  const usage = canUseAI(payload.planKey)
-  if (usage.allowed) bumpAIUsage()
-  const text = buildDailyInsight(payload)
-  writeJSON(key, { text, createdAt: new Date().toISOString(), local: true })
-  return text
 }
 
 function ReminderList({ items, api, empty, emptyCTA, emptyHref, compact, lang, c }) {

@@ -2,8 +2,9 @@ import { useMemo, useState } from 'react'
 import { Plus, Trash2, WalletCards } from 'lucide-react'
 import Modal from '../components/Modal.jsx'
 import StatCard from '../components/StatCard.jsx'
-import { useLocalStore } from '../lib/useLocalStore.js'
-import { STORAGE_KEYS, CATEGORIES, fmtUSD, categoryLabel } from '../lib/lifeStore.js'
+import { CATEGORIES, fmtUSD, categoryLabel } from '../lib/lifeStore.js'
+import { billsDb, useRemoteCollection } from '../lib/db.js'
+import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
 
 const copy = {
@@ -34,7 +35,8 @@ const copy = {
 export default function Bills() {
   const { lang } = useLang()
   const c = copy[lang]
-  const [items, api] = useLocalStore(STORAGE_KEYS.bills, [])
+  const { user } = useAuth()
+  const [items, api, state] = useRemoteCollection(user?.id, billsDb)
   const [open, setOpen] = useState(false)
   const total = useMemo(() => items.reduce((s, b) => s + Number(b.amount || 0), 0), [items])
 
@@ -58,14 +60,18 @@ export default function Bills() {
       </section>
 
       <div className="mt-5 card p-5">
-        {items.length === 0 ? (
+        {state.loading ? (
+          <p className="py-10 text-center text-sm text-ink-400">Loading…</p>
+        ) : state.error ? (
+          <p className="py-10 text-center text-sm text-rose-600">{state.error}</p>
+        ) : items.length === 0 ? (
           <p className="py-10 text-center text-sm text-ink-400">{c.empty}</p>
         ) : (
           <ul className="divide-y divide-ink-100">
             {items.map((b) => (
               <li key={b.id} className="py-3 flex items-center justify-between gap-3">
                 <div>
-                  <p className="font-semibold text-ink-900">{b.name}</p>
+                  <p className="font-semibold text-ink-900">{b.name || b.title}</p>
                   <p className="text-xs text-ink-500">{c.due} {b.dueDay} • {categoryLabel(b.category, lang)}</p>
                 </div>
                 <div className="flex items-center gap-3">

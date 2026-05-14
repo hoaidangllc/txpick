@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
 import { Bell, CheckCircle2, Plus, Trash2, RotateCcw } from 'lucide-react'
 import Modal from '../components/Modal.jsx'
-import { useLocalStore } from '../lib/useLocalStore.js'
 import {
-  STORAGE_KEYS, CATEGORIES, todayISO, parseNaturalReminder,
+  CATEGORIES, todayISO, parseNaturalReminder,
   categoryLabel, repeatLabel,
 } from '../lib/lifeStore.js'
+import { remindersDb, useRemoteCollection } from '../lib/db.js'
+import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
 
 const copy = {
@@ -52,7 +53,8 @@ const copy = {
 export default function Reminders() {
   const { lang } = useLang()
   const c = copy[lang]
-  const [items, api] = useLocalStore(STORAGE_KEYS.reminders, [])
+  const { user } = useAuth()
+  const [items, api, state] = useRemoteCollection(user?.id, remindersDb)
   const [open, setOpen] = useState(false)
   const active = useMemo(() => items.filter((x) => !x.done), [items])
   const done = useMemo(() => items.filter((x) => x.done).slice(0, 20), [items])
@@ -71,8 +73,9 @@ export default function Reminders() {
         </button>
       </div>
 
+      {state.error && <p className="mt-4 text-sm text-rose-600">{state.error}</p>}
       <section className="mt-5 grid lg:grid-cols-2 gap-4">
-        <ReminderCard title={c.active} items={active} api={api} empty={c.emptyActive} c={c} lang={lang} />
+        <ReminderCard title={c.active} items={active} api={api} empty={state.loading ? 'Loading…' : c.emptyActive} c={c} lang={lang} />
         <ReminderCard title={c.done} items={done} api={api} empty={c.emptyDone} done c={c} lang={lang} />
       </section>
 

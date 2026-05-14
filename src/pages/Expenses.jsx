@@ -2,11 +2,12 @@ import { useMemo, useState } from 'react'
 import { Plus, Receipt, Trash2, Wallet } from 'lucide-react'
 import Modal from '../components/Modal.jsx'
 import StatCard from '../components/StatCard.jsx'
-import { useLocalStore } from '../lib/useLocalStore.js'
 import {
-  STORAGE_KEYS, EXPENSE_CATEGORIES, fmtUSD, isCurrentMonth, todayISO,
+  EXPENSE_CATEGORIES, fmtUSD, isCurrentMonth, todayISO,
   categoryLabel,
 } from '../lib/lifeStore.js'
+import { expensesDb, useRemoteCollection } from '../lib/db.js'
+import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
 
 const copy = {
@@ -35,7 +36,8 @@ const copy = {
 export default function Expenses() {
   const { lang } = useLang()
   const c = copy[lang]
-  const [items, api] = useLocalStore(STORAGE_KEYS.expenses, [])
+  const { user } = useAuth()
+  const [items, api, state] = useRemoteCollection(user?.id, expensesDb)
   const [open, setOpen] = useState(false)
   const monthItems = useMemo(() => items.filter((x) => isCurrentMonth(x.date)), [items])
   const total = monthItems.reduce((s, e) => s + Number(e.amount || 0), 0)
@@ -63,7 +65,11 @@ export default function Expenses() {
 
       <div className="mt-5 card p-5">
         <h2 className="font-bold text-ink-900">{c.list}</h2>
-        {items.length === 0 ? (
+        {state.loading ? (
+          <p className="py-10 text-center text-sm text-ink-400">Loading…</p>
+        ) : state.error ? (
+          <p className="py-10 text-center text-sm text-rose-600">{state.error}</p>
+        ) : items.length === 0 ? (
           <p className="py-10 text-center text-sm text-ink-400">{c.empty}</p>
         ) : (
           <ul className="mt-3 divide-y divide-ink-100">

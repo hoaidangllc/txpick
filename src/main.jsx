@@ -6,6 +6,9 @@ import { LanguageProvider } from './contexts/LanguageContext.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
 import { ElderModeProvider } from './contexts/ElderModeContext.jsx'
 import './index.css'
+import { registerPWA } from './lib/pwa.js'
+
+registerPWA()
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

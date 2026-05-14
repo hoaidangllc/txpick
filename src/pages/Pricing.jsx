@@ -2,9 +2,8 @@ import { Check, Crown, X, ArrowLeft, Sparkles } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo.jsx'
 import LanguageToggle from '../components/LanguageToggle.jsx'
-import { useLocalStore } from '../lib/useLocalStore.js'
-import { STORAGE_KEYS } from '../lib/lifeStore.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
+import { useAuth } from '../contexts/AuthContext.jsx'
 
 const copy = {
   vi: {
@@ -54,11 +53,12 @@ const copy = {
 }
 
 export default function Pricing() {
-  const [planKey, api] = useLocalStore(STORAGE_KEYS.plan, 'free')
+  const { profile, updateProfile } = useAuth()
+  const planKey = profile?.is_pro ? 'premium' : 'free'
   const { lang } = useLang()
   const navigate = useNavigate()
   const c = copy[lang]
-  const choosePlan = (key) => { api.setValue(key); if (window.history.length > 1) navigate('/today') }
+  const choosePlan = async (key) => { await updateProfile?.({ is_pro: key !== 'free' }); if (window.history.length > 1) navigate('/today') }
 
   return (
     <div className="min-h-screen bg-ink-50">

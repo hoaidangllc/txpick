@@ -1,0 +1,12 @@
+{
+  "name": "TxPick Life Assistant",
+  "short_name": "TxPick",
+  "description": "Daily life reminders, bills, and expenses for Vietnamese users in the US.",
+  "start_url": "/today",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

@@ -1,15 +1,17 @@
 import { useMemo } from 'react'
 import { Download, FileText, Wallet } from 'lucide-react'
 import StatCard from '../components/StatCard.jsx'
-import { useLocalStore } from '../lib/useLocalStore.js'
-import { STORAGE_KEYS, fmtUSD, monthKey } from '../lib/lifeStore.js'
+import { fmtUSD, monthKey } from '../lib/lifeStore.js'
+import { billsDb, expensesDb, useRemoteCollection } from '../lib/db.js'
+import { downloadCSV, downloadSimplePDF } from '../lib/exporters.js'
+import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
 
 const copy = {
   vi: {
     title: 'Tổng kết',
     sub: 'Không tư vấn thuế. Trang này chỉ gom số liệu cuối tháng và cuối năm để bạn đưa cho người làm thuế.',
-    export: 'Xuất CSV',
+    export: 'Xuất CSV', exportPdf: 'Xuất PDF',
     yearExpenses: 'Chi tiêu trong năm', monthlyBills: 'Hóa đơn hằng tháng', records: 'Số dòng dữ liệu',
     month: 'Tháng', business: 'Kinh doanh', personal: 'Cá nhân', total: 'Tổng',
     empty: 'Chưa có dữ liệu để tổng kết. Hãy ghi chi tiêu đầu tiên.',
@@ -19,7 +21,7 @@ const copy = {
   en: {
     title: 'Summary',
     sub: 'No tax advice. This page only organizes monthly and yearly numbers so you can hand them to your tax preparer.',
-    export: 'Export CSV',
+    export: 'Export CSV', exportPdf: 'Export PDF',
     yearExpenses: 'Year expenses', monthlyBills: 'Monthly bills', records: 'Records',
     month: 'Month', business: 'Business', personal: 'Personal', total: 'Total',
     empty: 'Nothing to summarize yet. Add your first expense to get started.',
@@ -31,8 +33,9 @@ const copy = {
 export default function Summary() {
   const { lang } = useLang()
   const c = copy[lang]
-  const [expenses] = useLocalStore(STORAGE_KEYS.expenses, [])
-  const [bills] = useLocalStore(STORAGE_KEYS.bills, [])
+  const { user } = useAuth()
+  const [expenses, , expensesState] = useRemoteCollection(user?.id, expensesDb)
+  const [bills, , billsState] = useRemoteCollection(user?.id, billsDb)
 
   const rows = useMemo(() => {
     const map = {}
@@ -51,14 +54,21 @@ export default function Summary() {
   const monthlyBillTotal = bills.reduce((s, b) => s + Number(b.amount || 0), 0)
 
   const exportCSV = () => {
-    const csv = ['date,title,category,amount,note', ...expenses.map((e) => `${e.date},"${e.title}",${e.category},${e.amount || 0},"${e.note || ''}"`)].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'txpick-expenses.csv'
-    a.click()
-    URL.revokeObjectURL(url)
+    downloadCSV('txpick-expenses.csv', [
+      ['date', 'title', 'category', 'expense_type', 'tax_category', 'amount', 'note'],
+      ...expenses.map((e) => [e.date, e.title, e.category, e.expense_type || '', e.tax_category || '', e.amount || 0, e.note || '']),
+    ])
+  }
+
+
+  const exportPDF = () => {
+    downloadSimplePDF('txpick-summary.pdf', 'TxPick Summary', [
+      `Year expenses: ${fmtUSD(yearly)}`,
+      `Monthly bills: ${fmtUSD(monthlyBillTotal)}`,
+      `Records: ${expenses.length}`,
+      '',
+      ...rows.map(([m, v]) => `${m}: total ${fmtUSD(v.total)} | business ${fmtUSD(v.business)} | personal ${fmtUSD(v.personal)}`),
+    ])
   }
 
   return (
@@ -70,10 +80,16 @@ export default function Summary() {
           </h1>
           <p className="text-ink-500 mt-1 max-w-2xl">{c.sub}</p>
         </div>
-        <button onClick={exportCSV} className="btn-primary" disabled={expenses.length === 0}>
-          <Download className="w-4 h-4" /> {c.export}
-        </button>
+        <div className="flex gap-2">
+          <button onClick={exportCSV} className="btn-primary" disabled={expenses.length === 0}>
+            <Download className="w-4 h-4" /> {c.export}
+          </button>
+          <button onClick={exportPDF} className="btn-secondary" disabled={expenses.length === 0}>
+            <Download className="w-4 h-4" /> {c.exportPdf}
+          </button>
+        </div>
       </div>
+      {(expensesState.error || billsState.error) && <p className="mt-4 text-sm text-rose-600">{expensesState.error || billsState.error}</p>}
       <section className="mt-5 grid sm:grid-cols-3 gap-3">
         <StatCard label={c.yearExpenses} value={yearly ? fmtUSD(yearly) : c.none} icon={Wallet} tone="brand" />
         <StatCard label={c.monthlyBills} value={monthlyBillTotal ? fmtUSD(monthlyBillTotal) : c.none} />

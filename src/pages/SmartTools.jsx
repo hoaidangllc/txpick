@@ -1,7 +1,8 @@
 import { Sparkles, Zap, ShieldCheck, Bell, CalendarCheck, FileText, Crown } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useLocalStore } from '../lib/useLocalStore.js'
-import { STORAGE_KEYS, canUseAI, buildDailyInsight, planLabel } from '../lib/lifeStore.js'
+import { buildDailyInsight, getPlan, planLabel } from '../lib/lifeStore.js'
+import { billsDb, expensesDb, remindersDb, useRemoteCollection } from '../lib/db.js'
+import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
 
 const copy = {
@@ -58,11 +59,13 @@ const copy = {
 export default function SmartTools() {
   const { lang } = useLang()
   const c = copy[lang]
-  const [planKey, planApi] = useLocalStore(STORAGE_KEYS.plan, 'free')
-  const [reminders] = useLocalStore(STORAGE_KEYS.reminders, [])
-  const [expenses] = useLocalStore(STORAGE_KEYS.expenses, [])
-  const [bills] = useLocalStore(STORAGE_KEYS.bills, [])
-  const usage = canUseAI(planKey)
+  const { user, profile, updateProfile } = useAuth()
+  const planKey = profile?.is_pro ? 'premium' : 'free'
+  const [reminders] = useRemoteCollection(user?.id, remindersDb)
+  const [expenses] = useRemoteCollection(user?.id, expensesDb)
+  const [bills] = useRemoteCollection(user?.id, billsDb)
+  const plan = getPlan(planKey)
+  const usage = { used: 0, limit: plan.aiDailyLimit }
 
   return (
     <div className="container-app py-6 sm:py-8">
@@ -100,7 +103,7 @@ export default function SmartTools() {
           {[{ key: 'free', label: c.free }, { key: 'basic', label: c.basic }, { key: 'premium', label: c.premium }].map((p) => (
             <button
               key={p.key}
-              onClick={() => planApi.setValue(p.key)}
+              onClick={() => updateProfile?.({ is_pro: p.key !== 'free' })}
               className={`px-3 py-3 rounded-xl border text-left transition ${
                 planKey === p.key
                   ? 'border-brand-500 bg-brand-50 text-brand-700 font-semibold'
