@@ -56,7 +56,7 @@ export function parseReminder(input) {
   if (tod.match) working = working.replace(tod.match, '').trim()
 
   // 4. detect day reference (ngày mai, thứ X, day-of-month)
-  const day = detectDay(working, repeat.pattern)
+  const day = detectDay(working)
   if (day.match) working = working.replace(day.match, '').trim()
 
   // 5. build dueAt
@@ -137,7 +137,7 @@ function detectTime(text) {
   return { hour, minute, match: m[0] }
 }
 
-function detectDay(text, repeatPattern) {
+function detectDay(text) {
   // ngày X hàng tháng / on the Xth
   const monthly = text.match(/ng[aà]y\s+(\d{1,2})\s*(?:h[aà]ng\s+th[aá]ng)?|day\s+(\d{1,2})/i)
   if (monthly) {
