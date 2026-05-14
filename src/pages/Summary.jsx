@@ -1,9 +1,10 @@
 import { useMemo } from 'react'
 import { Download, FileText, Wallet } from 'lucide-react'
 import StatCard from '../components/StatCard.jsx'
-import { fmtUSD, monthKey } from '../lib/lifeStore.js'
+import { fmtUSD } from '../lib/lifeStore.js'
 import { billsDb, expensesDb, useRemoteCollection } from '../lib/db.js'
 import { downloadCSV, downloadSimplePDF } from '../lib/exporters.js'
+import { buildMonthlySummary, groupExpensesByMonth } from '../lib/assistantIntelligence.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
 
@@ -15,6 +16,7 @@ const copy = {
     yearExpenses: 'Chi tiêu trong năm', monthlyBills: 'Hóa đơn hằng tháng', records: 'Số dòng dữ liệu',
     month: 'Tháng', business: 'Kinh doanh', personal: 'Cá nhân', total: 'Tổng',
     empty: 'Chưa có dữ liệu để tổng kết. Hãy ghi chi tiêu đầu tiên.',
+    aiSummary: 'Tóm tắt thông minh',
     pro: 'Pro Plus $4.99/tháng mở tổng kết và xuất file cuối năm, gợi ý thông minh, nhắc cho người trong gia đình và thông báo nâng cao. Gói miễn phí vẫn dùng được trang Hôm nay, nhắc việc và chi tiêu cơ bản.',
     none: '—',
   },
@@ -25,6 +27,7 @@ const copy = {
     yearExpenses: 'Year expenses', monthlyBills: 'Monthly bills', records: 'Records',
     month: 'Month', business: 'Business', personal: 'Personal', total: 'Total',
     empty: 'Nothing to summarize yet. Add your first expense to get started.',
+    aiSummary: 'Smart summary',
     pro: 'Pro Plus $4.99/mo unlocks year-end summary & export, smart insights, family reminders, and advanced notifications. Free still includes Today, reminders, and basic expenses.',
     none: '—',
   },
@@ -37,18 +40,11 @@ export default function Summary() {
   const [expenses, , expensesState] = useRemoteCollection(user?.id, expensesDb)
   const [bills, , billsState] = useRemoteCollection(user?.id, billsDb)
 
-  const rows = useMemo(() => {
-    const map = {}
-    for (const e of expenses) {
-      const m = monthKey(e.date)
-      if (!map[m]) map[m] = { business: 0, personal: 0, total: 0 }
-      const amount = Number(e.amount || 0)
-      if (['business', 'salon', 'supply'].includes(e.category)) map[m].business += amount
-      else map[m].personal += amount
-      map[m].total += amount
-    }
-    return Object.entries(map).sort((a, b) => b[0].localeCompare(a[0]))
-  }, [expenses])
+  const rows = useMemo(() => groupExpensesByMonth(expenses), [expenses])
+  const smartSummary = useMemo(
+    () => buildMonthlySummary({ expenses, bills, lang }),
+    [expenses, bills, lang],
+  )
 
   const yearly = expenses.reduce((s, e) => s + Number(e.amount || 0), 0)
   const monthlyBillTotal = bills.reduce((s, b) => s + Number(b.amount || 0), 0)
@@ -66,6 +62,8 @@ export default function Summary() {
       `Year expenses: ${fmtUSD(yearly)}`,
       `Monthly bills: ${fmtUSD(monthlyBillTotal)}`,
       `Records: ${expenses.length}`,
+      '',
+      smartSummary,
       '',
       ...rows.map(([m, v]) => `${m}: total ${fmtUSD(v.total)} | business ${fmtUSD(v.business)} | personal ${fmtUSD(v.personal)}`),
     ])
@@ -90,6 +88,11 @@ export default function Summary() {
         </div>
       </div>
       {(expensesState.error || billsState.error) && <p className="mt-4 text-sm text-rose-600">{expensesState.error || billsState.error}</p>}
+      <section className="mt-5 card p-4 sm:p-5">
+        <h2 className="font-bold text-ink-900">{c.aiSummary}</h2>
+        <p className="mt-1 text-sm text-ink-600 leading-relaxed">{smartSummary}</p>
+      </section>
+
       <section className="mt-5 grid sm:grid-cols-3 gap-3">
         <StatCard label={c.yearExpenses} value={yearly ? fmtUSD(yearly) : c.none} icon={Wallet} tone="brand" />
         <StatCard label={c.monthlyBills} value={monthlyBillTotal ? fmtUSD(monthlyBillTotal) : c.none} />

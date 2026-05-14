@@ -1,12 +1,14 @@
 {
-  "name": "TxPick Life Assistant",
-  "short_name": "TxPick",
-  "description": "Daily life reminders, bills, and expenses for Vietnamese users in the US.",
+  "name": "SH Life AI",
+  "short_name": "SH Life",
+  "description": "Daily life assistant for Vietnamese users in the US: reminders, bills, expenses, and monthly summaries.",
   "start_url": "/today",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#f8fafc",
   "theme_color": "#2563eb",
   "icons": [
-    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
 }

@@ -1,4 +1,3 @@
-
 export const CATEGORIES = [
   { key: 'personal', label: 'Personal', vi: 'Cá nhân' },
   { key: 'business', label: 'Business', vi: 'Kinh doanh' },
@@ -75,13 +74,6 @@ export function isCurrentMonth(iso) {
 export function getPlan(planKey) {
   return PLANS[planKey] || PLANS.free
 }
-
-export function getUsageKey() {
-  return `txpick_life_ai_usage_${todayISO()}`
-}
-
-
-
 
 export function parseNaturalReminder(text) {
   const raw = String(text || '').trim()

@@ -42,31 +42,22 @@ export function AuthProvider({ children }) {
       try {
         const { data, error } = await supabase.auth.getSession()
 
-        if (error) {
-          console.error('Failed to restore session:', error)
-        }
-
+        if (error) console.error('Failed to restore session:', error)
         if (cancelled) return
 
         const nextUser = data?.session?.user ?? null
         setUser(nextUser)
 
-        if (nextUser?.id) {
-          await loadProfile(nextUser)
-        } else {
-          setProfile(null)
-        }
+        if (nextUser?.id) await loadProfile(nextUser)
+        else setProfile(null)
       } catch (err) {
         console.error('Auth init failed:', err)
-
         if (!cancelled) {
           setUser(null)
           setProfile(null)
         }
       } finally {
-        if (!cancelled) {
-          setLoading(false)
-        }
+        if (!cancelled) setLoading(false)
       }
     }
 
@@ -74,7 +65,6 @@ export function AuthProvider({ children }) {
 
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       const nextUser = session?.user ?? null
-
       setUser(nextUser)
 
       if (!nextUser?.id) {
@@ -83,12 +73,8 @@ export function AuthProvider({ children }) {
         return
       }
 
-      // Important: do not await Supabase queries directly inside onAuthStateChange.
-      // Running this on the next tick prevents refresh/login deadlocks.
       setTimeout(() => {
-        loadProfile(nextUser).finally(() => {
-          setLoading(false)
-        })
+        loadProfile(nextUser).finally(() => setLoading(false))
       }, 0)
     })
 
@@ -125,15 +111,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      profile,
-      refreshProfile,
-      updateProfile,
-      loading,
-      signOut,
-    }}
-    >
+    <AuthContext.Provider value={{ user, profile, refreshProfile, updateProfile, loading, signOut }}>
       {children}
     </AuthContext.Provider>
   )

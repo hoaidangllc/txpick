@@ -1,18 +1,20 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Bell, Plus, Receipt, CalendarDays, Sparkles, CheckCircle2, Trash2,
-  Wallet, Crown, ArrowRight,
+  Wallet, Crown, ArrowRight, Smartphone, AlertTriangle,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import Modal from '../components/Modal.jsx'
 import StatCard from '../components/StatCard.jsx'
 import {
   EXPENSE_CATEGORIES, CATEGORIES, fmtUSD, isCurrentMonth,
-  isSameDay, parseNaturalReminder, buildDailyInsight, getPlan,
+  parseNaturalReminder, buildDailyInsight, getPlan,
   todayISO, categoryLabel, repeatLabel,
   planLabel,
 } from '../lib/lifeStore.js'
 import { billsDb, expensesDb, remindersDb, useRemoteCollection } from '../lib/db.js'
+import { buildTodayFocus, getBillBuckets, getReminderBuckets } from '../lib/assistantIntelligence.js'
+import { ensurePermission, notificationSupported, startNotificationTicker } from '../lib/notifications.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 
@@ -26,7 +28,12 @@ const txt = {
     business: 'Kinh doanh',
     personal: 'Cá nhân',
     insight: 'Gợi ý hôm nay',
-    cached: 'Cập nhật mỗi ngày một lần',
+    cached: 'Cập nhật từ dữ liệu thật trong Supabase',
+    focus: 'Trọng tâm cần làm',
+    urgent: 'Quá hạn / cần chú ý',
+    notify: 'Bật thông báo',
+    notifyOn: 'Thông báo đã bật',
+    notifyOff: 'Thông báo chưa bật',
     quick: 'Nhắc nhanh',
     add: 'Thêm',
     placeholder: 'Ví dụ: nhắc tôi trả tiền điện ngày mai lúc 9 giờ tối',
@@ -70,7 +77,12 @@ const txt = {
     business: 'Business',
     personal: 'Personal',
     insight: 'Daily insight',
-    cached: 'Refreshed once a day',
+    cached: 'Powered by your live Supabase data',
+    focus: 'Today focus',
+    urgent: 'Overdue / urgent',
+    notify: 'Enable notifications',
+    notifyOn: 'Notifications enabled',
+    notifyOff: 'Notifications off',
     quick: 'Quick reminder',
     add: 'Add',
     placeholder: 'Example: remind me to pay the electric bill tomorrow at 9 PM',
@@ -132,16 +144,16 @@ export default function Today() {
   const [quickText, setQuickText] = useState('')
   const [expenseOpen, setExpenseOpen] = useState(false)
   const [billOpen, setBillOpen] = useState(false)
+  const [notifyState, setNotifyState] = useState(() => (notificationSupported() ? Notification.permission : 'unsupported'))
   const plan = getPlan(planKey)
 
-  const todayReminders = useMemo(
-    () => reminders.filter((r) => !r.done && isSameDay(r.date)),
-    [reminders],
+  const reminderBuckets = useMemo(() => getReminderBuckets(reminders), [reminders])
+  const billBuckets = useMemo(() => getBillBuckets(bills), [bills])
+  const focusText = useMemo(
+    () => buildTodayFocus({ reminders, bills, expenses, lang }),
+    [reminders, bills, expenses, lang],
   )
-  const upcoming = useMemo(
-    () => reminders.filter((r) => !r.done && !isSameDay(r.date)).slice(0, 6),
-    [reminders],
-  )
+
   const monthExpenses = useMemo(
     () => expenses.filter((e) => isCurrentMonth(e.date)),
     [expenses],
@@ -155,6 +167,16 @@ export default function Today() {
     () => buildDailyInsight({ reminders, expenses, bills, planKey, lang }),
     [reminders, expenses, bills, planKey, lang],
   )
+
+  useEffect(() => {
+    if (!notificationSupported() || notifyState !== 'granted') return undefined
+    return startNotificationTicker(() => ({ reminders, bills, lang }), 60_000)
+  }, [reminders, bills, lang, notifyState])
+
+  const enableNotifications = async () => {
+    const state = await ensurePermission()
+    setNotifyState(state)
+  }
 
   const userName = (user?.email?.split('@')[0] || '').replace(/[._-]+/g, ' ').trim()
 
@@ -193,8 +215,41 @@ export default function Today() {
         <p className="mt-4 text-sm text-rose-600">{remState.error || expState.error || billState.error}</p>
       )}
 
+      <section className="mt-5 grid lg:grid-cols-[1.2fr_0.8fr] gap-3">
+        <div className="card p-4 sm:p-5 border-l-4 border-l-brand-500">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="font-bold text-ink-900">{c.focus}</h2>
+              <p className="mt-1 text-sm text-ink-600 leading-relaxed">{focusText}</p>
+              {(reminderBuckets.overdue.length > 0 || billBuckets.overdue.length > 0) && (
+                <p className="mt-2 text-xs font-semibold text-rose-600">
+                  {c.urgent}: {reminderBuckets.overdue.length + billBuckets.overdue.length}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="card p-4 sm:p-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-ink-50 text-ink-700 flex items-center justify-center shrink-0">
+              <Smartphone className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <h2 className="font-bold text-ink-900">PWA</h2>
+              <p className="text-xs text-ink-500">{notifyState === 'granted' ? c.notifyOn : c.notifyOff}</p>
+            </div>
+            <button onClick={enableNotifications} disabled={notifyState === 'granted' || notifyState === 'unsupported'} className="btn-secondary text-xs py-2">
+              {c.notify}
+            </button>
+          </div>
+        </div>
+      </section>
+
       <section className="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label={c.remindersToday} value={todayReminders.length || c.none} icon={Bell} tone="brand" />
+        <StatCard label={c.remindersToday} value={(reminderBuckets.today.length + reminderBuckets.overdue.length) || c.none} icon={Bell} tone="brand" />
         <StatCard label={c.thisMonth} value={monthTotal ? fmtUSD(monthTotal) : c.none} icon={Wallet} />
         <StatCard label={c.business} value={businessTotal ? fmtUSD(businessTotal) : c.none} icon={Receipt} tone="gold" />
         <StatCard label={c.personal} value={personalTotal ? fmtUSD(personalTotal) : c.none} icon={CalendarDays} tone="ink" />
@@ -235,7 +290,7 @@ export default function Today() {
           <p className="mt-2 text-xs text-ink-400">{c.helper}</p>
           <div className="mt-5">
             <h3 className="text-sm font-bold text-ink-700">{c.today}</h3>
-            <ReminderList items={todayReminders} api={remApi} empty={c.noToday} emptyCTA={c.noTodayCTA} emptyHref="/reminders" lang={lang} c={c} />
+            <ReminderList items={[...reminderBuckets.overdue, ...reminderBuckets.today]} api={remApi} empty={c.noToday} emptyCTA={c.noTodayCTA} emptyHref="/reminders" lang={lang} c={c} />
           </div>
         </div>
 
@@ -253,7 +308,7 @@ export default function Today() {
           </div>
           <div className="mt-5">
             <h3 className="text-sm font-bold text-ink-700">{c.upcoming}</h3>
-            <ReminderList items={upcoming} api={remApi} empty={c.noUpcoming} emptyCTA={c.noUpcomingCTA} emptyHref="/reminders" compact lang={lang} c={c} />
+            <ReminderList items={reminderBuckets.upcoming.slice(0, 6)} api={remApi} empty={c.noUpcoming} emptyCTA={c.noUpcomingCTA} emptyHref="/reminders" compact lang={lang} c={c} />
           </div>
         </div>
       </section>

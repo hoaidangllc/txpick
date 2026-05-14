@@ -253,7 +253,7 @@ export function useRemoteCollection(userId, adapter) {
     } finally {
       setLoading(false)
     }
- }, [userId, adapter])
+  }, [userId, adapter])
 
   useEffect(() => { reload() }, [reload])
 
