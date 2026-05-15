@@ -1,6 +1,6 @@
 import { Download, FileText } from 'lucide-react'
 
-export default function TaxHeader({ labels, onExportWorkers, onExportIncome, onExportExpenses, onExportPdf, disableWorkers, disableIncome, disableExpenses }) {
+export default function TaxHeader({ labels, onExportWorkers, onExportIncome, onExportExpenses, onExportPackage, onExportPdf, disableWorkers, disableIncome, disableExpenses }) {
   return (
     <div className="flex items-end justify-between gap-3 flex-wrap">
       <div>
@@ -13,7 +13,8 @@ export default function TaxHeader({ labels, onExportWorkers, onExportIncome, onE
         <button className="btn-secondary" onClick={onExportWorkers} disabled={disableWorkers}><Download className="w-4 h-4" /> {labels.exportWorkers}</button>
         <button className="btn-secondary" onClick={onExportIncome} disabled={disableIncome}><Download className="w-4 h-4" /> {labels.exportIncome}</button>
         <button className="btn-secondary" onClick={onExportExpenses} disabled={disableExpenses}><Download className="w-4 h-4" /> {labels.exportExpenses}</button>
-        <button className="btn-primary" onClick={onExportPdf}><Download className="w-4 h-4" /> {labels.exportPdf}</button>
+        <button className="btn-primary" onClick={onExportPackage}><Download className="w-4 h-4" /> {labels.exportPackage}</button>
+        <button className="btn-secondary" onClick={onExportPdf}><Download className="w-4 h-4" /> {labels.exportPdf}</button>
       </div>
     </div>
   )

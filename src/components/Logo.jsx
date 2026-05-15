@@ -1,4 +1,4 @@
-// TxPick logo mark + wordmark. The "Tx" doubles as a checkmark; the gold dot
+// SH Life AI logo mark + wordmark. The "Tx" doubles as a checkmark; the gold dot
 // represents money / a coin.
 
 export default function Logo({ size = 36, withWord = true, className = '' }) {

@@ -35,3 +35,24 @@ export function exportTaxSummaryPdf({ year, lang, labels, totals, workersCount, 
     `Generated: ${todayISO()}`,
   ])
 }
+
+
+export function exportTaxPackageCsv({ year, workers, incomeRows, expenseRows, totals }) {
+  const rows = [
+    ['SECTION', 'FIELD 1', 'FIELD 2', 'FIELD 3', 'AMOUNT', 'NOTES'],
+    ['SUMMARY', 'Business income', '', '', money(totals.income), ''],
+    ['SUMMARY', 'Worker payments', '', '', money(totals.workerPay), ''],
+    ['SUMMARY', 'Business expenses', '', '', money(totals.expense), ''],
+    ['SUMMARY', 'Estimated net', '', '', money(totals.net), ''],
+    [],
+    ['WORKERS', 'Type', 'Name', 'SSN/EIN', 'Total', 'Address / Notes'],
+    ...workers.map((x) => ['WORKERS', x.type, x.name, x.tax_id || x.ssn || x.tin || '', workerTotal(x), `${addressFrom(x)} ${x.notes || ''}`.trim()]),
+    [],
+    ['INCOME', 'Date', 'Source', 'Category', 'Amount', 'Notes'],
+    ...incomeRows.filter((x) => inTaxYear(x.record_date, year)).map((x) => ['INCOME', x.record_date, x.source, x.category, money(x.amount), x.notes || '']),
+    [],
+    ['EXPENSES', 'Date', 'Title', 'Category', 'Amount', 'Notes'],
+    ...expenseRows.map((x) => ['EXPENSES', x.expense_date || x.date, x.title, x.category, money(x.amount), x.notes || x.note || '']),
+  ]
+  downloadCSV(`tax-package-${year}.csv`, rows)
+}

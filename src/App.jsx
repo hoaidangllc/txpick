@@ -16,6 +16,7 @@ const Bills = lazy(() => import('./pages/Bills.jsx'))
 const Summary = lazy(() => import('./pages/Summary.jsx'))
 const SmartTools = lazy(() => import('./pages/SmartTools.jsx'))
 const TaxCenter = lazy(() => import('./pages/TaxCenter.jsx'))
+const Settings = lazy(() => import('./pages/Settings.jsx'))
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/summary" element={<Summary />} />
           <Route path="/tax" element={<TaxCenter />} />
           <Route path="/smart" element={<SmartTools />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/business" element={<Navigate to="/today" replace />} />
           <Route path="/personal" element={<Navigate to="/today" replace />} />
           <Route path="/ai" element={<Navigate to="/smart" replace />} />

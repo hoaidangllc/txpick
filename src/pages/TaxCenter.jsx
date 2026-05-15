@@ -10,7 +10,7 @@ import { taxCopy } from './tax-center/copy.js'
 import { useTaxCenterData } from './tax-center/hooks/useTaxCenterData.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
-import { exportExpensesCsv, exportIncomeCsv, exportTaxSummaryPdf, exportWorkersCsv } from './tax-center/utils/taxExports.js'
+import { exportExpensesCsv, exportIncomeCsv, exportTaxPackageCsv, exportTaxSummaryPdf, exportWorkersCsv } from './tax-center/utils/taxExports.js'
 
 export default function TaxCenter() {
   const { user } = useAuth()
@@ -40,6 +40,7 @@ export default function TaxCenter() {
         onExportWorkers={() => exportWorkersCsv(tax.year, tax.allWorkers)}
         onExportIncome={() => exportIncomeCsv(tax.year, tax.incomeRows)}
         onExportExpenses={() => exportExpensesCsv(tax.year, tax.businessExpenses)}
+        onExportPackage={() => exportTaxPackageCsv({ year: tax.year, workers: tax.allWorkers, incomeRows: tax.incomeRows, expenseRows: tax.businessExpenses, totals: tax.totals })}
         onExportPdf={exportPdf}
         disableWorkers={tax.allWorkers.length === 0}
         disableIncome={tax.yearIncomeRows.length === 0}
