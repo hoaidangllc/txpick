@@ -22,20 +22,20 @@ const copy = {
     loading: 'Đang tải…',
     email: 'Email',
     note: 'App ưu tiên nhập tay nhanh, nhắc việc rõ ràng và tổng kết cuối tháng/cuối năm. Không scan hình để giữ app nhẹ và rẻ.',
-    pushTitle: 'Nhắc trên điện thoại',
-    pushSub: 'Bật để nhắc việc vẫn báo khi bạn không mở app. Hoạt động tốt nhất sau khi cài app vào màn hình chính.',
-    pushUnsupported: 'Trình duyệt này chưa hỗ trợ nhắc nền. Hãy thử sau khi cài app vào màn hình chính hoặc dùng Chrome/Edge/Android.',
-    pushOff: 'Chưa bật trên thiết bị này',
-    pushOn: 'Đã bật trên thiết bị này',
-    permissionDenied: 'Bạn đã chặn nhắc trên trình duyệt. Mở lại quyền thông báo trong cài đặt máy để bật lại.',
-    enablePush: 'Bật nhắc trên thiết bị này',
-    disablePush: 'Tắt trên thiết bị này',
-    testPush: 'Gửi thông báo thử',
-    pushEnabled: 'Đã bật. Bấm "Gửi thông báo thử" để kiểm tra.',
-    pushDisabled: 'Đã tắt trên thiết bị này.',
-    testSent: 'Đã gửi thông báo thử.',
-    pushSetupError: 'Không bật được. Kiểm tra quyền thông báo của trình duyệt rồi thử lại.',
-    pushNotReady: 'Nhắc trên điện thoại chưa sẵn sàng trên bản deploy này. Kiểm tra lại cấu hình Web Push rồi thử lại.',
+    pushTitle: 'Nhắc việc trên điện thoại',
+    pushSub: 'Khi bật, điện thoại sẽ tự báo đúng giờ nhắc việc. Không cần mở app để nhận thông báo.',
+    pushUnsupported: 'Thiết bị này chưa hỗ trợ nhắc nền. Trên iPhone, hãy cài app vào màn hình chính rồi mở lại.',
+    pushOff: 'Chưa bật nhắc nền trên máy này',
+    pushOn: 'Nhắc nền đang bật trên máy này',
+    permissionDenied: 'Bạn đã chặn thông báo. Vào cài đặt của điện thoại/trình duyệt để cho phép lại.',
+    enablePush: 'Bật nhắc ngay',
+    disablePush: 'Tạm tắt nhắc trên máy này',
+    testPush: 'Gửi thử một nhắc việc',
+    pushEnabled: 'Xong. Điện thoại này sẽ tự báo khi tới giờ nhắc việc.',
+    pushDisabled: 'Đã tạm tắt nhắc nền trên máy này.',
+    testSent: 'Đã gửi thử một thông báo nhắc việc.',
+    pushSetupError: 'Chưa gửi được thông báo. Kiểm tra quyền thông báo rồi thử lại.',
+    pushNotReady: 'Chưa bật được nhắc nền lúc này. Kiểm tra cài đặt thông báo rồi thử lại.',
   },
   en: {
     title: 'Settings',
@@ -53,19 +53,19 @@ const copy = {
     email: 'Email',
     note: 'The app is built for quick manual entry, clear reminders, and month-end/year-end summaries. No receipt scan — to keep it light and affordable.',
     pushTitle: 'Phone reminders',
-    pushSub: 'Turn on so reminders can notify you even when the app is closed. Works best after installing the app to your home screen.',
-    pushUnsupported: 'This browser does not support background reminders yet. Try after installing the app, or use Chrome/Edge on Android.',
-    pushOff: 'Off on this device',
-    pushOn: 'On this device',
+    pushSub: 'When enabled, this phone can notify you when reminders are due. You do not need to keep the app open.',
+    pushUnsupported: 'This device does not support background reminders yet. On iPhone, add the app to the Home Screen and reopen it.',
+    pushOff: 'Background reminders are off on this device',
+    pushOn: 'Background reminders are on for this device',
     permissionDenied: 'Notifications are blocked. Open browser/phone settings to allow notifications again.',
-    enablePush: 'Enable on this device',
-    disablePush: 'Disable on this device',
-    testPush: 'Send a test',
-    pushEnabled: 'Enabled. Send a test to verify.',
-    pushDisabled: 'Disabled on this device.',
-    testSent: 'Test notification sent.',
-    pushSetupError: 'Could not enable. Check notification permission in your browser and try again.',
-    pushNotReady: 'Phone reminders are not ready on this deployment yet. Check Web Push setup and try again.',
+    enablePush: 'Enable reminders',
+    disablePush: 'Pause reminders on this device',
+    testPush: 'Send a reminder test',
+    pushEnabled: 'Done. This phone will notify you when reminders are due.',
+    pushDisabled: 'Background reminders are paused on this device.',
+    testSent: 'A reminder test was sent.',
+    pushSetupError: 'Could not send a notification. Check notification permission and try again.',
+    pushNotReady: 'Could not enable background reminders right now. Check notification settings and try again.',
   },
 }
 
@@ -143,9 +143,9 @@ export default function Settings() {
       const result = await enableBackgroundReminders()
       await refreshPushStatus()
       if (result.ok) setPushMessage(c.pushEnabled)
-      else setPushError(result.status === 'denied' ? c.permissionDenied : (result.status === 'missing_key' ? c.pushNotReady : (result.message || c.pushSetupError)))
+      else setPushError(result.status === 'denied' ? c.permissionDenied : (result.status === 'missing_key' ? c.pushNotReady : c.pushSetupError))
     } catch (err) {
-      setPushError(err.message || c.pushSetupError)
+      setPushError(c.pushSetupError)
     } finally {
       setPushBusy(false)
     }
@@ -160,7 +160,7 @@ export default function Settings() {
       await refreshPushStatus()
       setPushMessage(c.pushDisabled)
     } catch (err) {
-      setPushError(err.message || c.pushSetupError)
+      setPushError(c.pushSetupError)
     } finally {
       setPushBusy(false)
     }
@@ -174,7 +174,7 @@ export default function Settings() {
       await sendTestPush()
       setPushMessage(c.testSent)
     } catch (err) {
-      setPushError(err.message || c.pushSetupError)
+      setPushError(c.pushSetupError)
     } finally {
       setPushBusy(false)
     }

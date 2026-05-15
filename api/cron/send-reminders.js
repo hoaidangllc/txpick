@@ -63,16 +63,37 @@ function occurrenceFor(reminder, now) {
   return { due, key: `${reminder.id}:once:${due.toISOString()}` }
 }
 
+function cleanText(value) {
+  return String(value || '').replace(/\s+/g, ' ').trim()
+}
+
+function categoryIcon(category) {
+  const value = String(category || '').toLowerCase()
+  if (value.includes('health') || value.includes('med')) return '💊'
+  if (value.includes('bill')) return '💵'
+  if (value.includes('expense') || value.includes('spend')) return '💳'
+  if (value.includes('business') || value.includes('work')) return '💼'
+  if (value.includes('family')) return '👨‍👩‍👧‍👦'
+  return '🔔'
+}
+
+function formatDueTime(value) {
+  const due = asDate(value)
+  if (!due) return ''
+  return due.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })
+}
+
 function pushPayload(reminder) {
-  const title = reminder.title || 'Reminder'
-  const notes = reminder.notes || ''
-  const viTitle = `Nhắc việc: ${title}`
+  const title = cleanText(reminder.title) || 'Việc cần nhớ'
+  const notes = cleanText(reminder.notes)
+  const time = formatDueTime(reminder.due_at)
+  const timeText = time ? ` • ${time}` : ''
   return {
-    title: viTitle,
-    body: notes || 'Đã tới giờ cần làm việc này. Mở TX Life để xem chi tiết.',
+    title: `${categoryIcon(reminder.category)} ${title}`,
+    body: notes || `Đến giờ làm việc này${timeText}. Mở TX Life để xem chi tiết.`,
     tag: `reminder-${reminder.id}`,
     url: '/reminders',
-    data: { reminderId: reminder.id },
+    data: { reminderId: reminder.id, category: reminder.category || 'personal' },
   }
 }
 
@@ -88,7 +109,7 @@ export default async function handler(req, res) {
   try {
     const { data: reminders, error: reminderError } = await supabase
       .from('reminders')
-      .select('id, profile_id, title, notes, due_at, repeat_pattern, completed')
+      .select('id, profile_id, title, notes, category, due_at, repeat_pattern, completed')
       .eq('completed', false)
       .lte('due_at', dueBefore)
       .gte('due_at', dueAfter)

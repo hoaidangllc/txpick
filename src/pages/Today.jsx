@@ -61,13 +61,13 @@ const txt = {
     greetNight: 'Khuya rồi, chúc bạn ngủ ngon',
     weekday: ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'],
     monthFmt: (d) => `${d.getDate()} tháng ${d.getMonth() + 1}, ${d.getFullYear()}`,
-    phonePromptTitle: 'Bật nhắc trên điện thoại',
-    phonePromptBody: 'Cài app vào màn hình chính và bật thông báo để nhắc việc vẫn báo khi bạn không mở app.',
+    phonePromptTitle: 'Nhắc việc trên điện thoại',
+    phonePromptBody: 'Bật một lần để điện thoại tự báo khi tới giờ nhắc việc, kể cả khi bạn không mở app.',
     phonePromptButton: 'Bật nhắc ngay',
-    phonePromptOn: 'Đã bật nhắc trên thiết bị này.',
-    phonePromptUnsupported: 'Thiết bị/trình duyệt này chưa hỗ trợ nhắc nền. Hãy thử sau khi cài app vào màn hình chính.',
-    phonePromptDenied: 'Bạn đã chặn thông báo. Mở quyền notification trong cài đặt máy để bật lại.',
-    phonePromptNotReady: 'Nhắc trên điện thoại chưa sẵn sàng trên bản deploy này.',
+    phonePromptOn: 'Xong. Điện thoại này sẽ nhận nhắc việc khi tới giờ.',
+    phonePromptUnsupported: 'Thiết bị này chưa hỗ trợ nhắc nền. Trên iPhone, hãy cài app vào màn hình chính rồi mở lại.',
+    phonePromptDenied: 'Bạn đã chặn thông báo. Vào cài đặt của điện thoại/trình duyệt để cho phép lại.',
+    phonePromptNotReady: 'Chưa bật được nhắc nền lúc này. Kiểm tra cài đặt thông báo rồi thử lại.',
     none: '—',
   },
   en: {
@@ -111,13 +111,13 @@ const txt = {
     greetNight: 'It’s late — rest well',
     weekday: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
     monthFmt: (d) => d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-    phonePromptTitle: 'Enable phone reminders',
-    phonePromptBody: 'Install the app and enable notifications so reminders can alert you even when the app is closed.',
+    phonePromptTitle: 'Phone reminders',
+    phonePromptBody: 'Turn this on once so your phone can alert you when reminders are due, even if the app is closed.',
     phonePromptButton: 'Enable reminders',
-    phonePromptOn: 'Phone reminders are enabled on this device.',
-    phonePromptUnsupported: 'This device/browser does not support background reminders yet. Try after installing the app.',
-    phonePromptDenied: 'Notifications are blocked. Allow notifications in phone/browser settings to enable this.',
-    phonePromptNotReady: 'Phone reminders are not ready on this deployment yet.',
+    phonePromptOn: 'Done. This phone will receive reminders when they are due.',
+    phonePromptUnsupported: 'This device does not support background reminders yet. On iPhone, add the app to the Home Screen and reopen it.',
+    phonePromptDenied: 'Notifications are blocked. Allow notifications in phone/browser settings to enable them again.',
+    phonePromptNotReady: 'Could not enable background reminders right now. Check notification settings and try again.',
     none: '—',
   },
 }
@@ -185,7 +185,20 @@ export default function Today() {
 
   useEffect(() => {
     let alive = true
-    getPushStatus().then((status) => { if (alive) setPush(status) }).catch(() => undefined)
+    getPushStatus()
+      .then(async (status) => {
+        if (!alive) return
+        setPush(status)
+        // If the user already allowed notifications, silently re-save the device.
+        // Browsers do not allow asking permission automatically, so first-time setup still needs one tap.
+        if (status.supported && status.permission === 'granted' && !status.subscribed) {
+          const result = await enableBackgroundReminders().catch(() => null)
+          if (!alive || !result?.ok) return
+          const nextStatus = await getPushStatus().catch(() => status)
+          if (alive) setPush(nextStatus)
+        }
+      })
+      .catch(() => undefined)
     return () => { alive = false }
   }, [])
 
