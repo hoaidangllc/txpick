@@ -3,6 +3,9 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "crons": [
+    { "path": "/api/cron/send-reminders", "schedule": "*/5 * * * *" }
+  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ],

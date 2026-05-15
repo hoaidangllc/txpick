@@ -1,11 +1,28 @@
-// Browser notification foundation.
-// Local notifications work while the app/PWA is open. True background push needs a server push provider later.
+// Notification foundation for TX Life.
+// - Local notification: works while app/PWA is open.
+// - Web Push: works from server cron after the user installs/opens PWA and allows notifications.
 
-const NOTIFIED_KEY = 'txpick_notified_v3'
-const DAILY_KEY = 'txpick_daily_briefing_notified_v1'
+import { supabase, SUPABASE_CONFIGURED } from './supabase.js'
+
+const NOTIFIED_KEY = 'txlife_notified_v4'
+const DAILY_KEY = 'txlife_daily_briefing_notified_v1'
+const PUSH_STATUS_KEY = 'txlife_push_status_v1'
+
+export function notificationSupported() {
+  return typeof window !== 'undefined' && typeof Notification !== 'undefined'
+}
+
+export function pushSupported() {
+  return (
+    typeof window !== 'undefined' &&
+    'serviceWorker' in navigator &&
+    'PushManager' in window &&
+    notificationSupported()
+  )
+}
 
 export async function ensurePermission() {
-  if (typeof window === 'undefined' || typeof Notification === 'undefined') return 'unsupported'
+  if (!notificationSupported()) return 'unsupported'
   if (Notification.permission === 'granted') return 'granted'
   if (Notification.permission === 'denied') return 'denied'
   try {
@@ -13,10 +30,6 @@ export async function ensurePermission() {
   } catch {
     return 'denied'
   }
-}
-
-export function notificationSupported() {
-  return typeof window !== 'undefined' && typeof Notification !== 'undefined'
 }
 
 function loadNotified() {
@@ -46,8 +59,8 @@ function notify({ title, body, tag, url = '/today' }) {
     const n = new Notification(title, {
       body,
       tag,
-      icon: '/icon-192.png',
-      badge: '/icon-192.png',
+      icon: '/favicon.svg',
+      badge: '/favicon.svg',
       data: { url },
     })
     n.onclick = () => {
@@ -134,4 +147,81 @@ export function startNotificationTicker(getPayload, intervalMs = 60_000) {
   tick()
   const id = setInterval(tick, intervalMs)
   return () => { stopped = true; clearInterval(id) }
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+  const rawData = window.atob(base64)
+  const outputArray = new Uint8Array(rawData.length)
+  for (let i = 0; i < rawData.length; i += 1) outputArray[i] = rawData.charCodeAt(i)
+  return outputArray
+}
+
+async function postJson(url, body) {
+  const { data } = SUPABASE_CONFIGURED ? await supabase.auth.getSession() : { data: { session: null } }
+  const token = data?.session?.access_token
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(body || {}),
+  })
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(json.error || 'Unable to complete notification setup')
+  return json
+}
+
+export async function getPushStatus() {
+  if (!pushSupported()) return { supported: false, permission: 'unsupported', subscribed: false }
+  const reg = await navigator.serviceWorker.ready
+  const sub = await reg.pushManager.getSubscription()
+  return { supported: true, permission: Notification.permission, subscribed: Boolean(sub) }
+}
+
+export async function enableBackgroundReminders() {
+  if (!pushSupported()) {
+    return { ok: false, status: 'unsupported', message: 'Push notification is not supported on this browser.' }
+  }
+
+  const permission = await ensurePermission()
+  if (permission !== 'granted') {
+    return { ok: false, status: permission, message: 'Notification permission was not granted.' }
+  }
+
+  const publicKey = import.meta.env.VITE_WEB_PUSH_PUBLIC_KEY
+  if (!publicKey) {
+    return { ok: false, status: 'missing_key', message: 'Missing VITE_WEB_PUSH_PUBLIC_KEY.' }
+  }
+
+  const reg = await navigator.serviceWorker.ready
+  let subscription = await reg.pushManager.getSubscription()
+  if (!subscription) {
+    subscription = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    })
+  }
+
+  const result = await postJson('/api/push/subscribe', { subscription })
+  try { localStorage.setItem(PUSH_STATUS_KEY, JSON.stringify({ enabledAt: new Date().toISOString() })) } catch {}
+  return { ok: true, status: 'enabled', subscription, result }
+}
+
+export async function disableBackgroundReminders() {
+  if (!pushSupported()) return { ok: true, status: 'unsupported' }
+  const reg = await navigator.serviceWorker.ready
+  const subscription = await reg.pushManager.getSubscription()
+  if (subscription) {
+    await postJson('/api/push/unsubscribe', { endpoint: subscription.endpoint })
+    await subscription.unsubscribe().catch(() => undefined)
+  }
+  try { localStorage.removeItem(PUSH_STATUS_KEY) } catch {}
+  return { ok: true, status: 'disabled' }
+}
+
+export async function sendTestPush() {
+  return postJson('/api/push/test', {})
 }

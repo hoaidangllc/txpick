@@ -1,4 +1,4 @@
-const CACHE_NAME = 'txpick-life-v3'
+const CACHE_NAME = 'txlife-v4'
 const APP_SHELL = ['/', '/today', '/manifest.webmanifest', '/favicon.svg']
 
 self.addEventListener('install', (event) => {
@@ -18,6 +18,7 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return
   const url = new URL(req.url)
   if (url.origin !== self.location.origin) return
+  if (url.pathname.startsWith('/api/')) return
 
   event.respondWith(
     fetch(req)
@@ -28,6 +29,27 @@ self.addEventListener('fetch', (event) => {
       })
       .catch(() => caches.match(req).then((cached) => cached || caches.match('/')))
   )
+})
+
+self.addEventListener('push', (event) => {
+  let payload = {}
+  try {
+    payload = event.data ? event.data.json() : {}
+  } catch {
+    payload = { body: event.data?.text?.() || '' }
+  }
+
+  const title = payload.title || 'TX Life reminder'
+  const options = {
+    body: payload.body || 'Open TX Life to review your reminder.',
+    tag: payload.tag || `txlife-${Date.now()}`,
+    renotify: true,
+    icon: payload.icon || '/favicon.svg',
+    badge: payload.badge || '/favicon.svg',
+    data: { url: payload.url || '/today', ...(payload.data || {}) },
+  }
+
+  event.waitUntil(self.registration.showNotification(title, options))
 })
 
 self.addEventListener('notificationclick', (event) => {
