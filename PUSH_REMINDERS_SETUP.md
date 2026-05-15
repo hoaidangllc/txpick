@@ -1,64 +1,90 @@
-# TX Life — Background Push Reminders Setup
+# TX Life Push Reminders
 
-This batch adds real Web Push reminders for the Vite + Vercel app.
+TX Life uses Web Push for real phone reminders.
 
-## What was added
+## Current production path
 
-- `public/sw.js` receives push events and opens `/reminders` when tapped.
-- `src/lib/notifications.js` can subscribe/unsubscribe the device and send a test push.
-- `src/pages/Settings.jsx` includes a phone reminders control panel.
-- `api/push/subscribe.js` saves the device subscription.
-- `api/push/unsubscribe.js` disables the device subscription.
-- `api/push/test.js` sends a test notification to the logged-in user.
-- `api/cron/send-reminders.js` checks due reminders and sends background Web Push.
-- `supabase/migration_005_web_push_reminders.sql` creates push tables/logs.
-- `vercel.json` runs the cron every 5 minutes.
+- Vercel hosts the Vite/PWA app only.
+- Vercel Cron is not used for production reminders.
+- Supabase stores push subscriptions.
+- Supabase Edge Function `send-reminders` sends due reminders.
+- Supabase `pg_cron` or Supabase scheduled jobs call that function every 5 minutes.
 
-## Required Supabase SQL
+## Why not Vercel Cron?
+
+Vercel Hobby cron is not reliable enough for reminder timing because it is too limited for frequent schedules. For the near-free beta path, Supabase should own the reminder scheduler.
+
+## Setup files
+
+- `public/sw.js` receives push events and shows notifications.
+- `src/lib/notifications.js` subscribes/unsubscribes the current device.
+- `api/push/subscribe.js` saves a browser push subscription.
+- `api/push/unsubscribe.js` disables a browser push subscription.
+- `api/push/test.js` sends a manual test push.
+- `supabase/functions/send-reminders/index.ts` is the production reminder sender.
+- `supabase/migrations/005_supabase_edge_push_reminders.sql` creates push tables and indexes.
+
+`api/cron/send-reminders.js` may remain as a manual/legacy fallback endpoint, but it is not the production scheduler.
+
+## Required env vars
+
+Frontend/Vercel:
+
+```env
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_WEB_PUSH_PUBLIC_KEY=your-public-vapid-key
+```
+
+Server/Vercel API fallback and push test endpoints:
+
+```env
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+WEB_PUSH_PUBLIC_KEY=your-public-vapid-key
+WEB_PUSH_PRIVATE_KEY=your-private-vapid-key
+WEB_PUSH_SUBJECT=mailto:you@example.com
+CRON_SECRET=make-a-long-random-secret
+REMINDER_LOOKBACK_MINUTES=8
+```
+
+Supabase Edge Function secrets:
+
+```bash
+supabase secrets set SUPABASE_URL="https://YOUR_PROJECT_REF.supabase.co"
+supabase secrets set SUPABASE_SERVICE_ROLE_KEY="YOUR_SERVICE_ROLE_KEY"
+supabase secrets set WEB_PUSH_PUBLIC_KEY="YOUR_PUBLIC_VAPID_KEY"
+supabase secrets set WEB_PUSH_PRIVATE_KEY="YOUR_PRIVATE_VAPID_KEY"
+supabase secrets set WEB_PUSH_SUBJECT="mailto:you@example.com"
+supabase secrets set CRON_SECRET="make-a-long-random-secret"
+```
+
+## Deploy function
+
+```bash
+supabase functions deploy send-reminders --no-verify-jwt
+```
+
+## SQL setup
 
 Run:
 
 ```sql
--- supabase/migration_005_web_push_reminders.sql
+-- supabase/migrations/005_supabase_edge_push_reminders.sql
 ```
 
-## Required Vercel environment variables
+Then create the 5-minute schedule using the template in that migration or in `SUPABASE_PUSH_SETUP.md`.
 
-Generate keys locally:
+## Phone test
 
-```bash
-npm install
-npm run push:keys
-```
+1. Deploy Vercel.
+2. Open the app on the phone.
+3. Install PWA / Add to Home Screen.
+4. Log in.
+5. Settings → enable notification.
+6. Tap test notification.
+7. Create a reminder 5–10 minutes from now.
+8. Close the app.
+9. Wait for the Supabase schedule.
 
-Add the generated values to Vercel:
-
-```bash
-VITE_WEB_PUSH_PUBLIC_KEY=...
-WEB_PUSH_PUBLIC_KEY=...
-WEB_PUSH_PRIVATE_KEY=...
-WEB_PUSH_SUBJECT=mailto:your-email@example.com
-CRON_SECRET=...
-SUPABASE_SERVICE_ROLE_KEY=...
-SUPABASE_URL=...
-```
-
-`SUPABASE_URL` can be the same value as `VITE_SUPABASE_URL`.
-
-## Test flow
-
-1. Deploy to Vercel.
-2. Login on phone.
-3. Install/Add to Home Screen if possible.
-4. Open Settings → Phone reminders.
-5. Tap Enable push reminders.
-6. Tap Send test notification.
-7. Create a reminder due 5–10 minutes from now.
-8. Wait for cron. It runs every 5 minutes.
-
-## Important notes
-
-- Web Push works best when the app is installed as PWA on mobile.
-- iPhone behavior depends on iOS/Safari PWA permission rules.
-- Cron checks reminders every 5 minutes, so notifications can arrive a few minutes late.
-- This is not an AI chat system and does not add receipt scanning or heavy features.
+Important for iPhone: Web Push requires the PWA to be installed to Home Screen.
