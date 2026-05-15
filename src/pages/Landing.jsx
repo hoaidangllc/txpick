@@ -10,7 +10,7 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 
 const copy = {
   vi: {
-    pricing: 'Bảng giá', login: 'Đăng nhập', start: 'Bắt đầu miễn phí', plans: 'Xem bảng giá',
+    login: 'Đăng nhập', start: 'Bắt đầu miễn phí',
     badge: 'App quản lý đời sống hằng ngày cho người Việt ở Mỹ',
     title: 'Mở mỗi ngày. Nhớ ít hơn. Quản lý gọn hơn.',
     sub: 'Nhắc việc, hóa đơn hằng tháng, chi tiêu cá nhân, chi tiêu kinh doanh và tổng kết cuối năm — một nơi đơn giản, dùng được mỗi ngày.',
@@ -32,7 +32,7 @@ const copy = {
     finalSub: 'Tạo tài khoản miễn phí trong chưa tới 30 giây.',
   },
   en: {
-    pricing: 'Pricing', login: 'Log in', start: 'Start free', plans: 'View pricing',
+    login: 'Log in', start: 'Start free',
     badge: 'A daily-life app for Vietnamese families in the U.S.',
     title: 'Open it daily. Remember less. Stay organized.',
     sub: 'Reminders, monthly bills, personal expenses, business expenses, and year-end summaries — one calm place you’ll actually open every day.',
@@ -64,7 +64,6 @@ export default function Landing() {
         <div className="container-app flex items-center justify-between h-16">
           <Logo />
           <div className="flex items-center gap-3">
-            <Link to="/pricing" className="hidden sm:block text-sm font-semibold text-ink-700 hover:text-ink-900">{c.pricing}</Link>
             <LanguageToggle />
             <Link to="/login" className="hidden sm:inline-flex btn-ghost text-sm">{c.login}</Link>
             <Link to="/signup" className="btn-primary text-sm !px-4 !py-2">{c.start}</Link>
@@ -79,9 +78,8 @@ export default function Landing() {
             </span>
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold text-ink-900 leading-[1.05]">{c.title}</h1>
             <p className="mt-5 text-lg sm:text-xl text-ink-600 max-w-2xl mx-auto">{c.sub}</p>
-            <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3">
+            <div className="mt-8 flex justify-center">
               <Link to="/signup" className="btn-primary">{c.start} <ArrowRight className="w-4 h-4" /></Link>
-              <Link to="/pricing" className="btn-secondary">{c.plans}</Link>
             </div>
             <p className="mt-3 text-xs text-ink-400">{c.socialProof}</p>
             <p className="mt-2 text-xs text-ink-400">{c.note}</p>
@@ -115,9 +113,8 @@ export default function Landing() {
           <div className="card max-w-3xl mx-auto p-8 sm:p-10 text-center">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-ink-900">{c.finalTitle}</h2>
             <p className="mt-2 text-ink-600">{c.finalSub}</p>
-            <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+            <div className="mt-6 flex justify-center">
               <Link to="/signup" className="btn-primary">{c.start} <ArrowRight className="w-4 h-4" /></Link>
-              <Link to="/pricing" className="btn-secondary">{c.plans}</Link>
             </div>
           </div>
         </div>

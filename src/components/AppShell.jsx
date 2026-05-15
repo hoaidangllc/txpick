@@ -5,7 +5,7 @@ import {
   FileText,
   LogOut,
   Receipt,
-  Sparkles,
+  Crown,
   WalletCards,
   BriefcaseBusiness,
   Settings,
@@ -22,11 +22,11 @@ const navItems = [
   { to: '/bills', icon: WalletCards, en: 'Bills', vi: 'Hóa đơn' },
   { to: '/summary', icon: FileText, en: 'Summary', vi: 'Tổng kết' },
   { to: '/tax', icon: BriefcaseBusiness, en: 'Year-end', vi: 'Cuối năm' },
-  { to: '/smart', icon: Sparkles, en: 'Smart', vi: 'Gợi ý' },
+  { to: '/pricing', icon: Crown, en: 'Upgrade', vi: 'Nâng cấp' },
   { to: '/settings', icon: Settings, en: 'Settings', vi: 'Cài đặt' },
 ]
 
-// Mobile bottom bar: only the 5 pages used daily. Smart + Settings live in the header.
+// Mobile bottom bar: only the 5 pages used daily. Upgrade + Settings live in the header.
 const mobileNav = [
   { to: '/today', icon: CalendarDays, en: 'Today', vi: 'Hôm nay' },
   { to: '/reminders', icon: Bell, en: 'Tasks', vi: 'Nhắc việc' },
@@ -47,7 +47,7 @@ export default function AppShell() {
 
   const logoutLabel = lang === 'vi' ? 'Đăng xuất' : 'Log out'
   const settingsLabel = lang === 'vi' ? 'Cài đặt' : 'Settings'
-  const smartLabel = lang === 'vi' ? 'Gợi ý' : 'Smart'
+  const upgradeLabel = lang === 'vi' ? 'Nâng cấp' : 'Upgrade'
 
   return (
     <div className="min-h-screen flex flex-col bg-ink-50">
@@ -75,14 +75,15 @@ export default function AppShell() {
           <div className="flex items-center gap-1 sm:gap-2">
             <LanguageToggle />
             <NavLink
-              to="/smart"
+              to="/pricing"
               className={({ isActive }) =>
-                `lg:hidden btn-ghost !px-2 !py-2 ${isActive ? 'text-brand-700 bg-brand-50' : ''}`
+                `lg:hidden inline-flex items-center gap-1.5 rounded-full border border-gold-200 bg-gold-50 px-2.5 py-2 text-xs font-extrabold text-gold-700 shadow-sm transition hover:bg-gold-100 ${isActive ? 'ring-2 ring-gold-200' : ''}`
               }
-              title={smartLabel}
-              aria-label={smartLabel}
+              title={upgradeLabel}
+              aria-label={upgradeLabel}
             >
-              <Sparkles className="w-4 h-4" />
+              <Crown className="w-4 h-4" />
+              <span>{upgradeLabel}</span>
             </NavLink>
             <NavLink
               to="/settings"
