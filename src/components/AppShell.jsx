@@ -9,6 +9,7 @@ import {
   WalletCards,
   BriefcaseBusiness,
   Settings,
+  Menu,
 } from 'lucide-react'
 import Logo from './Logo.jsx'
 import LanguageToggle from './LanguageToggle.jsx'
@@ -20,19 +21,19 @@ const navItems = [
   { to: '/reminders', icon: Bell, en: 'Reminders', vi: 'Nhắc việc' },
   { to: '/expenses', icon: Receipt, en: 'Expenses', vi: 'Chi tiêu' },
   { to: '/bills', icon: WalletCards, en: 'Bills', vi: 'Hóa đơn' },
-  { to: '/summary', icon: FileText, en: 'Insights', vi: 'Tổng kết' },
-  { to: '/tax', icon: BriefcaseBusiness, en: 'Tax', vi: 'Thuế' },
+  { to: '/summary', icon: FileText, en: 'Summary', vi: 'Tổng kết' },
+  { to: '/tax', icon: BriefcaseBusiness, en: 'Year-end', vi: 'Cuối năm' },
   { to: '/smart', icon: Sparkles, en: 'Smart', vi: 'Gợi ý' },
   { to: '/settings', icon: Settings, en: 'Settings', vi: 'Cài đặt' },
 ]
 
-// Mobile must stay one clean row. Keep only daily-use pages here.
+// Mobile stays one row: daily-use pages only. Other pages remain available from header/settings links.
 const mobileNav = [
   { to: '/today', icon: CalendarDays, en: 'Today', vi: 'Hôm nay' },
-  { to: '/bills', icon: WalletCards, en: 'Bills', vi: 'Hóa đơn' },
-  { to: '/expenses', icon: Receipt, en: 'Expenses', vi: 'Chi tiêu' },
-  { to: '/tax', icon: BriefcaseBusiness, en: 'Tax', vi: 'Thuế' },
-  { to: '/smart', icon: Sparkles, en: 'Smart', vi: 'Smart' },
+  { to: '/reminders', icon: Bell, en: 'Tasks', vi: 'Nhắc' },
+  { to: '/expenses', icon: Receipt, en: 'Spend', vi: 'Chi' },
+  { to: '/bills', icon: WalletCards, en: 'Bills', vi: 'Bill' },
+  { to: '/summary', icon: FileText, en: 'Review', vi: 'Tổng' },
 ]
 
 export default function AppShell() {
@@ -47,10 +48,11 @@ export default function AppShell() {
 
   const logoutLabel = lang === 'vi' ? 'Đăng xuất' : 'Log out'
   const settingsLabel = lang === 'vi' ? 'Cài đặt' : 'Settings'
+  const moreLabel = lang === 'vi' ? 'Gợi ý' : 'Smart'
 
   return (
     <div className="min-h-screen flex flex-col bg-ink-50">
-      <header className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-ink-100">
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-ink-100">
         <div className="container-app flex items-center justify-between h-16">
           <Logo />
 
@@ -73,6 +75,16 @@ export default function AppShell() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <LanguageToggle />
+            <NavLink
+              to="/smart"
+              className={({ isActive }) =>
+                `lg:hidden btn-ghost !px-2 !py-2 ${isActive ? 'text-brand-700 bg-brand-50' : ''}`
+              }
+              title={moreLabel}
+              aria-label={moreLabel}
+            >
+              <Menu className="w-4 h-4" />
+            </NavLink>
             <NavLink
               to="/settings"
               className={({ isActive }) =>

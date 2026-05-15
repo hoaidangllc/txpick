@@ -1,4 +1,4 @@
-// Lightweight AI helpers for TxPick.
+// Lightweight AI helpers for TX Life.
 // The app works without these helpers. Keep AI limited to natural reminder parsing
 // and short summaries; do not use this file for tax advice, receipt scanning, or chatbots.
 

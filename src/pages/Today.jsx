@@ -28,15 +28,15 @@ const txt = {
     business: 'Kinh doanh',
     personal: 'Cá nhân',
     insight: 'Gợi ý hôm nay',
-    cached: 'Cập nhật từ dữ liệu thật trong Supabase',
+    cached: 'Từ dữ liệu bạn đã nhập',
     focus: 'Trọng tâm cần làm',
     nextActions: 'Việc nên làm trước',
     briefing: 'Tóm tắt nhanh hôm nay',
     open: 'Mở',
     urgent: 'Quá hạn / cần chú ý',
-    notify: 'Bật thông báo',
-    notifyOn: 'Thông báo đã bật',
-    notifyOff: 'Thông báo chưa bật',
+    notify: 'Bật nhắc trên máy',
+    notifyOn: 'Nhắc trên máy đã bật',
+    notifyOff: 'Nhắc trên máy chưa bật',
     quick: 'Nhắc nhanh',
     add: 'Thêm',
     placeholder: 'Ví dụ: nhắc tôi trả tiền điện ngày mai lúc 9 giờ tối',
@@ -80,15 +80,15 @@ const txt = {
     business: 'Business',
     personal: 'Personal',
     insight: 'Daily insight',
-    cached: 'Powered by your live Supabase data',
+    cached: 'Based on your saved data',
     focus: 'Today focus',
     nextActions: 'Best next actions',
     briefing: 'Quick daily briefing',
     open: 'Open',
     urgent: 'Overdue / urgent',
-    notify: 'Enable notifications',
-    notifyOn: 'Notifications enabled',
-    notifyOff: 'Notifications off',
+    notify: 'Enable reminders',
+    notifyOn: 'Device reminders enabled',
+    notifyOff: 'Device reminders off',
     quick: 'Quick reminder',
     add: 'Add',
     placeholder: 'Example: remind me to pay the electric bill tomorrow at 9 PM',
@@ -146,7 +146,7 @@ export default function Today() {
   const [reminders, remApi, remState] = useRemoteCollection(user?.id, remindersDb)
   const [expenses, expApi, expState] = useRemoteCollection(user?.id, expensesDb)
   const [bills, billApi, billState] = useRemoteCollection(user?.id, billsDb)
-  const planKey = profile?.is_pro ? 'premium' : 'free'
+  const planKey = profile?.plan_key || (profile?.is_pro ? 'premium' : 'free')
   const [quickText, setQuickText] = useState('')
   const [expenseOpen, setExpenseOpen] = useState(false)
   const [billOpen, setBillOpen] = useState(false)
@@ -253,7 +253,7 @@ export default function Today() {
               <Smartphone className="w-5 h-5" />
             </div>
             <div className="flex-1">
-              <h2 className="font-bold text-ink-900">Smart notifications</h2>
+              <h2 className="font-bold text-ink-900">{lang === 'vi' ? 'Nhắc trên điện thoại' : 'Device reminders'}</h2>
               <p className="text-xs text-ink-500">{notifyState === 'granted' ? c.notifyOn : c.notifyOff}</p>
             </div>
             <button onClick={enableNotifications} disabled={notifyState === 'granted' || notifyState === 'unsupported'} className="btn-secondary text-xs py-2">

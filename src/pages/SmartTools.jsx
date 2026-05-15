@@ -25,7 +25,7 @@ const copy = {
     h3: 'Tổng kết ngắn',
     h3Text: 'Tóm tắt nhanh trong ngày và trong tháng để mở app là biết cần làm gì tiếp theo.',
     noteTitle: 'Giới hạn rõ ràng',
-    note: 'TxPick không bán chatbot vô hạn, không tư vấn thuế, không scan hình hóa đơn. Những phần đó dễ tốn tiền và dễ rối, nên chưa đưa vào bản này.',
+    note: 'TX Life chỉ dùng gợi ý thông minh nhẹ: hiểu câu nhắc, nhắc việc còn thiếu và tóm tắt nhanh. App không tư vấn thuế, không scan hình và không mở chat tự do.',
     free: 'Miễn phí',
     basic: 'Pro Cơ Bản — $1.99/tháng',
     premium: 'Pro Plus — $4.99/tháng',
@@ -49,7 +49,7 @@ const copy = {
     h3: 'Short summaries',
     h3Text: 'A quick daily and monthly summary so opening the app immediately tells you what to do next.',
     noteTitle: 'Clear limits',
-    note: 'TxPick does not include unlimited chatbot use, tax advice, or receipt photo scanning in this version. Those features can become costly and confusing.',
+    note: 'TX Life uses light smart assistance only: natural reminders, missing-task hints, and short summaries. It does not include tax advice, receipt scanning, or open-ended chat.',
     free: 'Free',
     basic: 'Pro Basic — $1.99/mo',
     premium: 'Pro Plus — $4.99/mo',
@@ -60,7 +60,7 @@ export default function SmartTools() {
   const { lang } = useLang()
   const c = copy[lang]
   const { user, profile, updateProfile } = useAuth()
-  const planKey = profile?.is_pro ? 'premium' : 'free'
+  const planKey = profile?.plan_key || (profile?.is_pro ? 'premium' : 'free')
   const [reminders] = useRemoteCollection(user?.id, remindersDb)
   const [expenses] = useRemoteCollection(user?.id, expensesDb)
   const [bills] = useRemoteCollection(user?.id, billsDb)
@@ -103,7 +103,7 @@ export default function SmartTools() {
           {[{ key: 'free', label: c.free }, { key: 'basic', label: c.basic }, { key: 'premium', label: c.premium }].map((p) => (
             <button
               key={p.key}
-              onClick={() => updateProfile?.({ is_pro: p.key !== 'free' })}
+              onClick={() => updateProfile?.({ is_pro: p.key !== 'free', plan_key: p.key })}
               className={`px-3 py-3 rounded-xl border text-left transition ${
                 planKey === p.key
                   ? 'border-brand-500 bg-brand-50 text-brand-700 font-semibold'

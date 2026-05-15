@@ -1,6 +1,6 @@
 export const translations = {
   vi: {
-    appName: 'TxPick',
+    appName: 'TX Life',
     taglineMain: 'Một nơi gọn gàng để nhớ việc, ghi chi tiêu và tổng kết cuối năm.',
     taglineSub: 'Dành cho người Việt ở Mỹ — nhắc việc, hóa đơn, chi tiêu cá nhân và kinh doanh.',
     welcome: 'Chào mừng bạn quay lại.',
@@ -13,7 +13,7 @@ export const translations = {
       terms: 'Điều khoản',
     },
     auth: {
-      loginTitle: 'Đăng nhập', signupTitle: 'Tạo tài khoản TxPick',
+      loginTitle: 'Đăng nhập', signupTitle: 'Tạo tài khoản TX Life',
       email: 'Email', password: 'Mật khẩu',
       signIn: 'Đăng nhập', signUp: 'Tạo tài khoản',
       orContinueWith: 'hoặc tiếp tục với', google: 'Tiếp tục với Google',
@@ -25,7 +25,7 @@ export const translations = {
     common: { save: 'Lưu', cancel: 'Hủy', delete: 'Xóa', add: 'Thêm', amount: 'Số tiền', date: 'Ngày', category: 'Phân loại', note: 'Ghi chú', name: 'Tên' },
   },
   en: {
-    appName: 'TxPick',
+    appName: 'TX Life',
     taglineMain: 'A calm home for reminders, expenses, and year-end summaries.',
     taglineSub: 'Built for Vietnamese families in the U.S. — reminders, bills, personal and business expenses.',
     welcome: 'Welcome back.',
@@ -38,7 +38,7 @@ export const translations = {
       terms: 'Terms',
     },
     auth: {
-      loginTitle: 'Welcome back', signupTitle: 'Create your TxPick account',
+      loginTitle: 'Welcome back', signupTitle: 'Create your TX Life account',
       email: 'Email', password: 'Password',
       signIn: 'Log in', signUp: 'Create account',
       orContinueWith: 'or continue with', google: 'Continue with Google',

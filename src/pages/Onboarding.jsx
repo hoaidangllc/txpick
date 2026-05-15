@@ -7,7 +7,7 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 
 const copy = {
   vi: {
-    title: 'Chào mừng đến với TxPick',
+    title: 'Chào mừng đến với TX Life',
     sub: 'Một nơi gọn gàng để nhớ việc, ghi chi tiêu và xem lại cuối năm. Cùng đi qua nhanh 3 bước nhé.',
     s1Title: 'Thêm một nhắc việc',
     s1Sub: 'Trả tiền điện, đón con, đi gặp bác sĩ — bất cứ việc gì bạn muốn nhớ.',
@@ -16,7 +16,7 @@ const copy = {
     s2Sub: 'Điện, nước, internet, tiền nhà — nhập một lần, app nhắc đúng ngày mỗi tháng.',
     s2CTA: 'Mở Hóa đơn',
     s3Title: 'Ghi chi tiêu đầu tiên',
-    s3Sub: 'Cá nhân hay kinh doanh đều ghi chung một chỗ, phân loại sẵn để cuối năm dễ xem lại.',
+    s3Sub: 'Cá nhân hay kinh doanh đều ghi chung một chỗ, phân loại rõ để cuối tháng/cuối năm dễ xem lại.',
     s3CTA: 'Mở Chi tiêu',
     cta: 'Vào trang Hôm nay',
     skip: 'Bỏ qua, vào Hôm nay',
@@ -26,7 +26,7 @@ const copy = {
     night: 'Khuya rồi',
   },
   en: {
-    title: 'Welcome to TxPick',
+    title: 'Welcome to TX Life',
     sub: 'A calm place to remember tasks, track expenses, and review at year-end. Three quick steps and you’re set.',
     s1Title: 'Add a reminder',
     s1Sub: 'Pay the electric bill, pick up the kids, doctor visit — anything you want to remember.',

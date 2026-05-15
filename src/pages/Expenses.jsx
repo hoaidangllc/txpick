@@ -13,7 +13,7 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 const copy = {
   vi: {
     title: 'Chi tiêu',
-    sub: 'Ghi tay nhanh gọn — không scan hình để giữ app nhẹ và miễn phí cho người mới.',
+    sub: 'Ghi tay nhanh gọn — không cần scan hình, app vẫn nhẹ và dễ dùng mỗi ngày.',
     add: 'Thêm', thisMonth: 'Tháng này', business: 'Kinh doanh', personal: 'Cá nhân / khác',
     list: 'Danh sách chi tiêu',
     empty: 'Chưa có chi tiêu nào. Nhập khoản đầu tiên để theo dõi cả tháng.',
@@ -66,7 +66,7 @@ export default function Expenses() {
       <div className="mt-5 card p-5">
         <h2 className="font-bold text-ink-900">{c.list}</h2>
         {state.loading ? (
-          <p className="py-10 text-center text-sm text-ink-400">Loading…</p>
+          <p className="py-10 text-center text-sm text-ink-400">Đang tải…</p>
         ) : state.error ? (
           <p className="py-10 text-center text-sm text-rose-600">{state.error}</p>
         ) : items.length === 0 ? (

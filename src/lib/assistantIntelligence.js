@@ -158,7 +158,7 @@ export function buildDailyBriefing({ reminders = [], bills = [], expenses = [], 
   return [
     `Hôm nay: ${r.today.length} việc cần nhớ, ${r.overdue.length} việc quá hạn.`,
     `Hóa đơn: ${b.dueToday.length} tới hạn hôm nay, ${b.dueSoon.length} sắp tới hạn, ${b.overdue.length} quá hạn.`,
-    `Tháng này: ${fmtUSD(total)} tổng chi tiêu — ${fmtUSD(business)} business và ${fmtUSD(personal)} cá nhân.`,
+    `Tháng này: ${fmtUSD(total)} tổng chi tiêu — ${fmtUSD(business)} kinh doanh và ${fmtUSD(personal)} cá nhân.`,
     r.overdue.length || b.overdue.length ? 'Việc nên làm trước: xử lý nhóm quá hạn.' : 'Việc nên làm trước: thêm việc quan trọng trước khi bận.',
   ]
 }
@@ -173,7 +173,7 @@ export function buildMonthlySummary({ expenses = [], bills = [], lang = 'vi' }) 
   if (lang === 'en') {
     return `This month: ${fmtUSD(total)} expenses, ${fmtUSD(business)} business, ${fmtUSD(personal)} personal, and ${fmtUSD(unpaidBills)} unpaid bills.`
   }
-  return `Tháng này: ${fmtUSD(total)} chi tiêu, ${fmtUSD(business)} phần business, ${fmtUSD(personal)} phần cá nhân, và ${fmtUSD(unpaidBills)} hóa đơn chưa paid.`
+  return `Tháng này: ${fmtUSD(total)} chi tiêu, ${fmtUSD(business)} phần kinh doanh, ${fmtUSD(personal)} phần cá nhân, và ${fmtUSD(unpaidBills)} hóa đơn chưa thanh toán.`
 }
 
 export function groupExpensesByMonth(expenses = []) {
@@ -213,12 +213,12 @@ export function buildYearEndLines({ expenses = [], bills = [], reminders = [], l
 
   return [
     `Chi tiêu trong năm: ${fmtUSD(total)}`,
-    `Chi tiêu business: ${fmtUSD(business)}`,
+    `Chi tiêu kinh doanh: ${fmtUSD(business)}`,
     `Chi tiêu cá nhân: ${fmtUSD(personal)}`,
     `Hóa đơn đang theo dõi: ${bills.length} / tổng mỗi tháng ${fmtUSD(billTotal)}`,
     `Việc đã hoàn thành: ${doneReminders}`,
     '',
     'Tổng kết theo tháng:',
-    ...rows.map(([m, v]) => `${m}: ${fmtUSD(v.total)} tổng | ${fmtUSD(v.business)} business | ${fmtUSD(v.personal)} cá nhân | ${v.count} dòng`),
+    ...rows.map(([m, v]) => `${m}: ${fmtUSD(v.total)} tổng | ${fmtUSD(v.business)} kinh doanh | ${fmtUSD(v.personal)} cá nhân | ${v.count} dòng`),
   ]
 }

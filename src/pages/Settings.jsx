@@ -7,7 +7,7 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 const copy = {
   vi: {
     title: 'Cài đặt',
-    sub: 'Thông tin căn bản để app hiển thị đúng tên, business và ngôn ngữ.',
+    sub: 'Thông tin căn bản để app hiển thị đúng tên, công việc/tiệm và ngôn ngữ.',
     account: 'Tài khoản',
     displayName: 'Tên hiển thị',
     businessName: 'Tên business / tiệm',
@@ -19,7 +19,7 @@ const copy = {
     saved: 'Đã lưu cài đặt.',
     loading: 'Đang tải…',
     email: 'Email',
-    note: 'App đang ưu tiên nhập tay nhanh, export cho thuế, và nhắc việc cơ bản. Không dùng OCR/upload hình để giữ chi phí thấp.',
+    note: 'App ưu tiên nhập tay nhanh, nhắc việc rõ ràng và tổng kết cuối tháng/cuối năm. Không dùng OCR/upload hình để giữ chi phí thấp.',
   },
   en: {
     title: 'Settings',

@@ -10,7 +10,7 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 const copy = {
   vi: {
     title: 'Hóa đơn',
-    sub: 'Theo dõi hóa đơn cá nhân và business để không quên ngày đến hạn.',
+    sub: 'Theo dõi hóa đơn cá nhân và kinh doanh để không quên ngày đến hạn.',
     add: 'Thêm hóa đơn',
     empty: 'Chưa có hóa đơn nào. Thêm điện, nước, internet, tiền nhà… để app nhắc đúng ngày.',
     due: 'Ngày',
