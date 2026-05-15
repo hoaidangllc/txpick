@@ -1,0 +1,59 @@
+import { todayISO } from '../../lib/lifeStore.js'
+
+export const currentYear = new Date().getFullYear()
+
+export const emptyWorker = {
+  type: '1099',
+  name: '',
+  ssn: '',
+  address: '',
+  work_pay: '',
+  tips: '',
+  tax_year: currentYear,
+  notes: '',
+}
+
+export const emptyIncome = {
+  source: '',
+  category: 'salon_income',
+  amount: '',
+  record_date: todayISO(),
+  notes: '',
+}
+
+export const taxCopy = {
+  vi: {
+    title: 'Thuế cuối năm',
+    sub: 'Dành cho chủ tiệm và business: nhập thông tin thợ W2/1099, tiền làm, tiền tip, income và chi tiêu để cuối năm xuất file đưa cho người làm thuế.',
+    workers: 'Thợ / nhân viên W2 & 1099',
+    addWorker: 'Thêm thợ / nhân viên',
+    income: 'Income của business',
+    addIncome: 'Thêm income',
+    expenses: 'Chi tiêu business',
+    exportWorkers: 'Xuất thợ CSV',
+    exportIncome: 'Xuất income CSV',
+    exportExpenses: 'Xuất chi tiêu CSV',
+    exportPdf: 'Xuất PDF tổng kết',
+    save: 'Lưu', close: 'Đóng', delete: 'Xóa', type: 'Loại', name: 'Tên thợ / nhân viên',
+    ssn: 'SSN hoặc EIN', address: 'Địa chỉ', workPay: 'Tiền làm', tips: 'Tiền tip', total: 'Tổng cộng',
+    year: 'Năm thuế', notes: 'Ghi chú', source: 'Nguồn income', category: 'Loại income', amount: 'Số tiền', date: 'Ngày',
+    emptyWorkers: 'Chưa có thợ hoặc nhân viên nào.', emptyIncome: 'Chưa có income business nào.', emptyExpenses: 'Chưa có chi tiêu business trong năm nay.',
+    businessIncome: 'Income business', workerTotal: 'Tiền trả thợ', businessExpenseTotal: 'Chi tiêu business', netBusiness: 'Ước tính còn lại',
+    warning: 'Thông tin SSN/EIN rất nhạy cảm. Chỉ nhập khi bạn thật sự cần xuất file cho người làm thuế, và bảo vệ tài khoản Google/Supabase kỹ.',
+    runSql: 'Nếu trang này báo thiếu bảng/cột, chạy file supabase/migration_004_tax_worker_income.sql trong Supabase trước.',
+    incomeCategories: { salon_income: 'Income tiệm nail', booth_rent: 'Booth rent', uber: 'Uber', doordash: 'DoorDash', other_business: 'Business khác' },
+  },
+  en: {
+    title: 'Year-End Tax Center',
+    sub: 'For salon owners and business users: enter W2/1099 worker info, SSN/EIN, address, work pay, tips, business income, and expenses so you can export files for your tax preparer.',
+    workers: 'W2 & 1099 workers', addWorker: 'Add worker', income: 'Business income', addIncome: 'Add income', expenses: 'Business expenses',
+    exportWorkers: 'Export workers CSV', exportIncome: 'Export income CSV', exportExpenses: 'Export expenses CSV', exportPdf: 'Export PDF summary',
+    save: 'Save', close: 'Cancel', delete: 'Delete', type: 'Type', name: 'Worker / employee name', ssn: 'SSN or EIN', address: 'Address',
+    workPay: 'Work pay', tips: 'Tips', total: 'Total', year: 'Tax year', notes: 'Notes', source: 'Income source', category: 'Income type', amount: 'Amount', date: 'Date',
+    emptyWorkers: 'No W2 or 1099 workers yet.', emptyIncome: 'No business income yet.', emptyExpenses: 'No business expenses recorded this year.',
+    businessIncome: 'Business income', workerTotal: 'Worker payments', businessExpenseTotal: 'Business expenses', netBusiness: 'Estimated net',
+    warning: 'SSN/EIN is sensitive information. Only enter it if you need it for tax export, and protect your Google/Supabase account carefully.',
+    runSql: 'If this page says tables/columns are missing, run supabase/migration_004_tax_worker_income.sql in Supabase first.',
+    incomeCategories: { salon_income: 'Nail salon income', booth_rent: 'Booth rent', uber: 'Uber', doordash: 'DoorDash', other_business: 'Other business' },
+  },
+}
