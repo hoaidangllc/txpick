@@ -1,8 +1,8 @@
-import { lazy, Suspense } from 'react'
+import { Suspense, lazy } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import AppShell from './components/AppShell.jsx'
+import PageLoader from './components/PageLoader.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
-import PageLoader from './components/common/PageLoader.jsx'
 
 const Landing = lazy(() => import('./pages/Landing.jsx'))
 const Pricing = lazy(() => import('./pages/Pricing.jsx'))
@@ -17,37 +17,29 @@ const Summary = lazy(() => import('./pages/Summary.jsx'))
 const SmartTools = lazy(() => import('./pages/SmartTools.jsx'))
 const TaxCenter = lazy(() => import('./pages/TaxCenter.jsx'))
 
-function LazyPage({ children }) {
-  return <Suspense fallback={<PageLoader />}>{children}</Suspense>
-}
-
-function ProtectedPage({ children }) {
-  return <ProtectedRoute><LazyPage>{children}</LazyPage></ProtectedRoute>
-}
-
 export default function App() {
   return (
-    <LazyPage>
+    <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/onboarding" element={<ProtectedPage><Onboarding /></ProtectedPage>} />
+        <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
         <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
-          <Route path="/today" element={<LazyPage><Today /></LazyPage>} />
-          <Route path="/reminders" element={<LazyPage><Reminders /></LazyPage>} />
-          <Route path="/expenses" element={<LazyPage><Expenses /></LazyPage>} />
-          <Route path="/bills" element={<LazyPage><Bills /></LazyPage>} />
-          <Route path="/summary" element={<LazyPage><Summary /></LazyPage>} />
-          <Route path="/tax" element={<LazyPage><TaxCenter /></LazyPage>} />
-          <Route path="/smart" element={<LazyPage><SmartTools /></LazyPage>} />
+          <Route path="/today" element={<Today />} />
+          <Route path="/reminders" element={<Reminders />} />
+          <Route path="/expenses" element={<Expenses />} />
+          <Route path="/bills" element={<Bills />} />
+          <Route path="/summary" element={<Summary />} />
+          <Route path="/tax" element={<TaxCenter />} />
+          <Route path="/smart" element={<SmartTools />} />
           <Route path="/business" element={<Navigate to="/today" replace />} />
           <Route path="/personal" element={<Navigate to="/today" replace />} />
           <Route path="/ai" element={<Navigate to="/smart" replace />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </LazyPage>
+    </Suspense>
   )
 }
