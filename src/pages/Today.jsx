@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
-  Bell, Plus, Receipt, CalendarDays, Sparkles, CheckCircle2, Trash2,
-  Wallet, Crown, ArrowRight, Smartphone, AlertTriangle,
+  Bell, Plus, Receipt, Sparkles, CheckCircle2, Trash2,
+  Wallet, Crown, ArrowRight, AlertTriangle, WalletCards, Inbox,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import Modal from '../components/Modal.jsx'
@@ -13,42 +13,32 @@ import {
   planLabel,
 } from '../lib/lifeStore.js'
 import { billsDb, expensesDb, remindersDb, useRemoteCollection } from '../lib/db.js'
-import { buildDailyBriefing, buildTodayActionCards, buildTodayFocus, getBillBuckets, getReminderBuckets } from '../lib/assistantIntelligence.js'
-import { ensurePermission, fireDailyBriefingNotification, notificationSupported, startNotificationTicker } from '../lib/notifications.js'
+import { getBillBuckets, getReminderBuckets } from '../lib/assistantIntelligence.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 
 const txt = {
   vi: {
-    title: 'Hôm nay',
-    sub: 'Việc cần nhớ, hóa đơn và chi tiêu trong ngày — gom gọn ở một chỗ.',
-    ad: 'Gói miễn phí có hiển thị một mục quảng cáo nhỏ.',
+    sub: 'Mở app, xem việc cần làm hôm nay, ghi nhanh chi tiêu, rồi quay về với gia đình.',
     remindersToday: 'Việc hôm nay',
     thisMonth: 'Chi tiêu tháng này',
-    business: 'Kinh doanh',
-    personal: 'Cá nhân',
+    billsDue: 'Hóa đơn sắp tới',
     insight: 'Gợi ý hôm nay',
-    cached: 'Từ dữ liệu bạn đã nhập',
-    focus: 'Trọng tâm cần làm',
-    nextActions: 'Việc nên làm trước',
-    briefing: 'Tóm tắt nhanh hôm nay',
-    open: 'Mở',
-    urgent: 'Quá hạn / cần chú ý',
-    notify: 'Bật nhắc trên máy',
-    notifyOn: 'Nhắc trên máy đã bật',
-    notifyOff: 'Nhắc trên máy chưa bật',
-    quick: 'Nhắc nhanh',
+    urgent: 'Cần chú ý ngay',
+    urgentBody: (overdue, dueToday) => `Có ${overdue} việc quá hạn và ${dueToday} mục tới hạn hôm nay. Xử lý nhóm này trước cho nhẹ đầu.`,
+    quick: 'Thêm nhanh bằng câu tự nhiên',
     add: 'Thêm',
     placeholder: 'Ví dụ: nhắc tôi trả tiền điện ngày mai lúc 9 giờ tối',
-    helper: 'Gõ tự nhiên như đang nhắn tin. App tự nhận ngày, giờ và phân loại khi đọc được.',
+    helper: 'Gõ tự nhiên như đang nhắn tin. App tự nhận ngày, giờ và phân loại.',
     today: 'Cần làm hôm nay',
-    noToday: 'Hôm nay chưa có việc nào. Một ngày nhẹ nhàng.',
+    noToday: 'Hôm nay nhẹ nhàng. Bạn không có việc nào tới hạn.',
     noTodayCTA: 'Thêm việc đầu tiên',
-    fastAdd: 'Thêm nhanh',
+    fastAdd: 'Thêm chi tiêu / hóa đơn',
+    fastAddSub: 'Ghi tay một dòng — cuối tháng không phải ngồi nhớ lại.',
     expense: 'Chi tiêu',
-    monthlyBill: 'Hóa đơn hằng tháng',
+    monthlyBill: 'Hóa đơn',
     upcoming: 'Sắp tới',
-    noUpcoming: 'Chưa có việc sắp tới.',
+    noUpcoming: 'Chưa có việc nào sắp tới.',
     noUpcomingCTA: 'Tạo nhắc việc',
     limitReminder: 'Bạn đã đạt giới hạn nhắc việc của gói hiện tại.',
     limitExpense: 'Bạn đã đạt giới hạn chi tiêu của gói hiện tại.',
@@ -72,34 +62,25 @@ const txt = {
     none: '—',
   },
   en: {
-    title: 'Today',
-    sub: 'Reminders, bills, and today’s expenses — all in one calm view.',
-    ad: 'Free plan shows a small ad area. Upgrade to remove it.',
-    remindersToday: 'Reminders today',
-    thisMonth: 'This month',
-    business: 'Business',
-    personal: 'Personal',
-    insight: 'Daily insight',
-    cached: 'Based on your saved data',
-    focus: 'Today focus',
-    nextActions: 'Best next actions',
-    briefing: 'Quick daily briefing',
-    open: 'Open',
-    urgent: 'Overdue / urgent',
-    notify: 'Enable reminders',
-    notifyOn: 'Device reminders enabled',
-    notifyOff: 'Device reminders off',
-    quick: 'Quick reminder',
+    sub: 'Open the app, see what matters today, log a quick expense, and get back to your family.',
+    remindersToday: 'Tasks today',
+    thisMonth: 'Spending this month',
+    billsDue: 'Bills due soon',
+    insight: 'Today highlight',
+    urgent: 'Needs attention',
+    urgentBody: (overdue, dueToday) => `${overdue} overdue and ${dueToday} due today. Clear these first to free up your day.`,
+    quick: 'Quick add — natural language',
     add: 'Add',
     placeholder: 'Example: remind me to pay the electric bill tomorrow at 9 PM',
-    helper: 'Type naturally. The app picks up date, time, and category when it can.',
-    today: 'Today',
+    helper: 'Type the way you would text. The app picks up date, time, and category.',
+    today: 'On your plate today',
     noToday: 'Nothing on your plate today. Enjoy the calm.',
     noTodayCTA: 'Add your first task',
-    fastAdd: 'Fast add',
+    fastAdd: 'Log an expense or bill',
+    fastAddSub: 'One quick line now means no scrambling at month-end.',
     expense: 'Expense',
-    monthlyBill: 'Monthly bill',
-    upcoming: 'Upcoming',
+    monthlyBill: 'Bill',
+    upcoming: 'Coming up',
     noUpcoming: 'Nothing upcoming yet.',
     noUpcomingCTA: 'Create a reminder',
     limitReminder: 'You reached the reminder limit for your plan.',
@@ -150,48 +131,25 @@ export default function Today() {
   const [quickText, setQuickText] = useState('')
   const [expenseOpen, setExpenseOpen] = useState(false)
   const [billOpen, setBillOpen] = useState(false)
-  const [notifyState, setNotifyState] = useState(() => (notificationSupported() ? Notification.permission : 'unsupported'))
   const plan = getPlan(planKey)
 
   const reminderBuckets = useMemo(() => getReminderBuckets(reminders), [reminders])
   const billBuckets = useMemo(() => getBillBuckets(bills), [bills])
-  const focusText = useMemo(
-    () => buildTodayFocus({ reminders, bills, expenses, lang }),
-    [reminders, bills, expenses, lang],
-  )
-  const actionCards = useMemo(
-    () => buildTodayActionCards({ reminders, bills, expenses, lang }),
-    [reminders, bills, expenses, lang],
-  )
-  const dailyBriefing = useMemo(
-    () => buildDailyBriefing({ reminders, bills, expenses, lang }),
-    [reminders, bills, expenses, lang],
-  )
 
   const monthExpenses = useMemo(
     () => expenses.filter((e) => isCurrentMonth(e.date)),
     [expenses],
   )
   const monthTotal = monthExpenses.reduce((s, e) => s + Number(e.amount || 0), 0)
-  const businessTotal = monthExpenses
-    .filter((e) => ['business', 'salon', 'supply'].includes(e.category))
-    .reduce((s, e) => s + Number(e.amount || 0), 0)
-  const personalTotal = monthTotal - businessTotal
   const insight = useMemo(
     () => buildDailyInsight({ reminders, expenses, bills, planKey, lang }),
     [reminders, expenses, bills, planKey, lang],
   )
 
-  useEffect(() => {
-    if (!notificationSupported() || notifyState !== 'granted') return undefined
-    fireDailyBriefingNotification(dailyBriefing, lang)
-    return startNotificationTicker(() => ({ reminders, bills, lang }), 60_000)
-  }, [reminders, bills, lang, notifyState, dailyBriefing])
-
-  const enableNotifications = async () => {
-    const state = await ensurePermission()
-    setNotifyState(state)
-  }
+  const overdueCount = reminderBuckets.overdue.length + billBuckets.overdue.length
+  const dueTodayCount = reminderBuckets.today.length + billBuckets.dueToday.length
+  const hasUrgent = overdueCount > 0 || billBuckets.dueToday.length > 0
+  const billsSoon = billBuckets.dueToday.length + billBuckets.dueSoon.length + billBuckets.overdue.length
 
   const userName = (user?.email?.split('@')[0] || '').replace(/[._-]+/g, ' ').trim()
 
@@ -203,125 +161,51 @@ export default function Today() {
     setQuickText('')
   }
 
+  const loadError = remState.error || expState.error || billState.error
+
   return (
     <div className="container-app py-5 sm:py-8">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wider text-brand-700">
             {todayLabel(c)}
           </p>
-          <h1 className="mt-1 text-3xl sm:text-4xl font-extrabold text-ink-900">
+          <h1 className="mt-1 text-3xl sm:text-4xl font-extrabold text-ink-900 leading-tight">
             {greetingFor(c)}{userName ? `, ${userName}` : ''}.
           </h1>
           <p className="text-ink-500 mt-1 max-w-xl">{c.sub}</p>
         </div>
-        <span className="badge bg-gold-500/10 text-gold-700">
+        <span className="badge bg-gold-500/10 text-gold-700 shrink-0">
           <Crown className="w-3 h-3" /> {planLabel(planKey, lang)}
         </span>
       </div>
 
-      {plan.ads && (
-        <div className="mt-4 rounded-2xl border border-dashed border-ink-200 bg-white p-3 text-center text-xs text-ink-400">
-          {c.ad}
-        </div>
+      {loadError && (
+        <p className="mt-4 text-sm text-rose-600">{loadError}</p>
       )}
 
-      {(remState.error || expState.error || billState.error) && (
-        <p className="mt-4 text-sm text-rose-600">{remState.error || expState.error || billState.error}</p>
-      )}
-
-      <section className="mt-5 grid lg:grid-cols-[1.2fr_0.8fr] gap-3">
-        <div className="card p-4 sm:p-5 border-l-4 border-l-brand-500">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center shrink-0">
-              <AlertTriangle className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="font-bold text-ink-900">{c.focus}</h2>
-              <p className="mt-1 text-sm text-ink-600 leading-relaxed">{focusText}</p>
-              {(reminderBuckets.overdue.length > 0 || billBuckets.overdue.length > 0) && (
-                <p className="mt-2 text-xs font-semibold text-rose-600">
-                  {c.urgent}: {reminderBuckets.overdue.length + billBuckets.overdue.length}
-                </p>
-              )}
-            </div>
+      {/* Single highlight callout — replaces the old Focus + Briefing + Insight stack */}
+      <section className={`mt-5 card p-4 sm:p-5 ${hasUrgent ? 'border-rose-100 bg-rose-50/40' : ''}`}>
+        <div className="flex items-start gap-3">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${hasUrgent ? 'bg-rose-100 text-rose-700' : 'bg-brand-50 text-brand-700'}`}>
+            {hasUrgent ? <AlertTriangle className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
           </div>
-        </div>
-        <div className="card p-4 sm:p-5">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-ink-50 text-ink-700 flex items-center justify-center shrink-0">
-              <Smartphone className="w-5 h-5" />
-            </div>
-            <div className="flex-1">
-              <h2 className="font-bold text-ink-900">{lang === 'vi' ? 'Nhắc trên điện thoại' : 'Device reminders'}</h2>
-              <p className="text-xs text-ink-500">{notifyState === 'granted' ? c.notifyOn : c.notifyOff}</p>
-            </div>
-            <button onClick={enableNotifications} disabled={notifyState === 'granted' || notifyState === 'unsupported'} className="btn-secondary text-xs py-2">
-              {c.notify}
-            </button>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-bold text-ink-900">{hasUrgent ? c.urgent : c.insight}</h2>
+            <p className="mt-1 text-sm text-ink-600 leading-relaxed">
+              {hasUrgent ? c.urgentBody(overdueCount, dueTodayCount) : insight}
+            </p>
           </div>
         </div>
       </section>
 
-
-      <section className="mt-5 grid lg:grid-cols-[0.9fr_1.1fr] gap-3">
-        <div className="card p-4 sm:p-5">
-          <h2 className="font-bold text-ink-900">{c.briefing}</h2>
-          <ul className="mt-3 space-y-2">
-            {dailyBriefing.map((line) => (
-              <li key={line} className="rounded-xl bg-ink-50 px-3 py-2 text-sm text-ink-700">{line}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="card p-4 sm:p-5">
-          <h2 className="font-bold text-ink-900">{c.nextActions}</h2>
-          <div className="mt-3 grid sm:grid-cols-2 gap-2">
-            {actionCards.map((card) => (
-              <Link
-                key={card.id}
-                to={card.href}
-                className={`rounded-2xl border p-3 text-sm transition hover:-translate-y-0.5 ${
-                  card.tone === 'danger'
-                    ? 'border-rose-100 bg-rose-50 text-rose-800'
-                    : card.tone === 'gold'
-                      ? 'border-gold-500/20 bg-gold-500/10 text-gold-700'
-                      : card.tone === 'brand'
-                        ? 'border-brand-100 bg-brand-50 text-brand-800'
-                        : 'border-ink-100 bg-ink-50 text-ink-700'
-                }`}
-              >
-                <p className="font-bold">{card.title}</p>
-                <p className="mt-1 text-xs leading-relaxed opacity-90">{card.body}</p>
-                <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold">{c.open} <ArrowRight className="w-3 h-3" /></span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <section className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
         <StatCard label={c.remindersToday} value={(reminderBuckets.today.length + reminderBuckets.overdue.length) || c.none} icon={Bell} tone="brand" />
         <StatCard label={c.thisMonth} value={monthTotal ? fmtUSD(monthTotal) : c.none} icon={Wallet} />
-        <StatCard label={c.business} value={businessTotal ? fmtUSD(businessTotal) : c.none} icon={Receipt} tone="gold" />
-        <StatCard label={c.personal} value={personalTotal ? fmtUSD(personalTotal) : c.none} icon={CalendarDays} tone="ink" />
+        <StatCard label={c.billsDue} value={billsSoon || c.none} icon={WalletCards} tone={billBuckets.overdue.length ? 'rose' : 'ink'} />
       </section>
 
-      <section className="mt-5 card p-4 sm:p-5">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center shrink-0">
-            <Sparkles className="w-5 h-5" />
-          </div>
-          <div className="flex-1">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="font-bold text-ink-900">{c.insight}</h2>
-              <span className="text-xs text-ink-400">{c.cached}</span>
-            </div>
-            <p className="mt-1 text-sm text-ink-600 leading-relaxed">{insight}</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="mt-5 grid lg:grid-cols-[1.1fr_0.9fr] gap-4">
+      <section className="mt-4 grid lg:grid-cols-[1.1fr_0.9fr] gap-4">
         <div className="card p-4 sm:p-5">
           <h2 className="font-bold text-ink-900 flex items-center gap-2">
             <Bell className="w-4 h-4 text-brand-600" /> {c.quick}
@@ -349,6 +233,7 @@ export default function Today() {
           <h2 className="font-bold text-ink-900 flex items-center gap-2">
             <Receipt className="w-4 h-4 text-brand-600" /> {c.fastAdd}
           </h2>
+          <p className="mt-1 text-xs text-ink-500">{c.fastAddSub}</p>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <button onClick={() => setExpenseOpen(true)} className="btn-secondary justify-start">
               <Plus className="w-4 h-4" /> {c.expense}
@@ -373,8 +258,11 @@ export default function Today() {
 function ReminderList({ items, api, empty, emptyCTA, emptyHref, compact, lang, c }) {
   if (!items.length) {
     return (
-      <div className="py-6 text-center">
-        <p className="text-sm text-ink-400">{empty}</p>
+      <div className="mt-2 rounded-2xl bg-ink-50 border border-ink-100 px-4 py-6 text-center">
+        <div className="mx-auto w-10 h-10 rounded-xl bg-white border border-ink-100 text-ink-400 flex items-center justify-center">
+          <Inbox className="w-5 h-5" />
+        </div>
+        <p className="mt-3 text-sm text-ink-500">{empty}</p>
         {emptyCTA && emptyHref && (
           <Link to={emptyHref} className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:text-brand-800">
             {emptyCTA} <ArrowRight className="w-3.5 h-3.5" />
@@ -387,14 +275,14 @@ function ReminderList({ items, api, empty, emptyCTA, emptyHref, compact, lang, c
     <ul className="mt-2 divide-y divide-ink-100">
       {items.map((r) => (
         <li key={r.id} className="py-3 flex items-start justify-between gap-3">
-          <div>
-            <p className="font-semibold text-ink-900">{r.title}</p>
+          <div className="min-w-0">
+            <p className="font-semibold text-ink-900 truncate">{r.title}</p>
             <p className="text-xs text-ink-500">
               {r.date || c.noDate}{r.time ? ` • ${r.time}` : ''} • {categoryLabel(r.category, lang)}{r.repeat && r.repeat !== 'none' ? ` • ${repeatLabel(r.repeat, lang)}` : ''}
             </p>
             {!compact && r.notes ? <p className="text-xs text-ink-400 mt-1">{r.notes}</p> : null}
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 shrink-0">
             <button onClick={() => api.update(r.id, { done: true, doneAt: new Date().toISOString() })} className="text-brand-600 hover:text-brand-800" aria-label="Done"><CheckCircle2 className="w-5 h-5" /></button>
             <button onClick={() => api.remove(r.id)} className="text-ink-300 hover:text-rose-600" aria-label="Delete"><Trash2 className="w-4 h-4" /></button>
           </div>

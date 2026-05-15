@@ -21,8 +21,7 @@ export default function Login() {
   const redirectAfterLogin = () => {
     const from = location.state?.from?.pathname
     if (from) return navigate(from, { replace: true })
-    if (profile?.type === 'business') return navigate('/business', { replace: true })
-    if (profile?.type === 'personal') return navigate('/personal', { replace: true })
+    if (profile?.type) return navigate('/today', { replace: true })
     navigate('/onboarding', { replace: true })
   }
 

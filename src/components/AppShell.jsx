@@ -9,7 +9,6 @@ import {
   WalletCards,
   BriefcaseBusiness,
   Settings,
-  Menu,
 } from 'lucide-react'
 import Logo from './Logo.jsx'
 import LanguageToggle from './LanguageToggle.jsx'
@@ -27,13 +26,13 @@ const navItems = [
   { to: '/settings', icon: Settings, en: 'Settings', vi: 'Cài đặt' },
 ]
 
-// Mobile stays one row: daily-use pages only. Other pages remain available from header/settings links.
+// Mobile bottom bar: only the 5 pages used daily. Smart + Settings live in the header.
 const mobileNav = [
   { to: '/today', icon: CalendarDays, en: 'Today', vi: 'Hôm nay' },
-  { to: '/reminders', icon: Bell, en: 'Tasks', vi: 'Nhắc' },
-  { to: '/expenses', icon: Receipt, en: 'Spend', vi: 'Chi' },
-  { to: '/bills', icon: WalletCards, en: 'Bills', vi: 'Bill' },
-  { to: '/summary', icon: FileText, en: 'Review', vi: 'Tổng' },
+  { to: '/reminders', icon: Bell, en: 'Tasks', vi: 'Nhắc việc' },
+  { to: '/expenses', icon: Receipt, en: 'Expenses', vi: 'Chi tiêu' },
+  { to: '/bills', icon: WalletCards, en: 'Bills', vi: 'Hóa đơn' },
+  { to: '/summary', icon: FileText, en: 'Review', vi: 'Tổng kết' },
 ]
 
 export default function AppShell() {
@@ -48,11 +47,11 @@ export default function AppShell() {
 
   const logoutLabel = lang === 'vi' ? 'Đăng xuất' : 'Log out'
   const settingsLabel = lang === 'vi' ? 'Cài đặt' : 'Settings'
-  const moreLabel = lang === 'vi' ? 'Gợi ý' : 'Smart'
+  const smartLabel = lang === 'vi' ? 'Gợi ý' : 'Smart'
 
   return (
     <div className="min-h-screen flex flex-col bg-ink-50">
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-ink-100">
+      <header className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-ink-100">
         <div className="container-app flex items-center justify-between h-16">
           <Logo />
 
@@ -73,17 +72,17 @@ export default function AppShell() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1 sm:gap-2">
             <LanguageToggle />
             <NavLink
               to="/smart"
               className={({ isActive }) =>
                 `lg:hidden btn-ghost !px-2 !py-2 ${isActive ? 'text-brand-700 bg-brand-50' : ''}`
               }
-              title={moreLabel}
-              aria-label={moreLabel}
+              title={smartLabel}
+              aria-label={smartLabel}
             >
-              <Menu className="w-4 h-4" />
+              <Sparkles className="w-4 h-4" />
             </NavLink>
             <NavLink
               to="/settings"
@@ -95,7 +94,7 @@ export default function AppShell() {
             >
               <Settings className="w-4 h-4" />
             </NavLink>
-            <span className="hidden sm:block text-xs text-ink-500 max-w-[160px] truncate">{user?.email}</span>
+            <span className="hidden sm:block text-xs text-ink-500 max-w-[160px] truncate ml-1">{user?.email}</span>
             <button onClick={handleLogout} className="btn-ghost !px-2 !py-2" title={logoutLabel} aria-label={logoutLabel}>
               <LogOut className="w-4 h-4" />
             </button>
@@ -103,7 +102,7 @@ export default function AppShell() {
         </div>
       </header>
 
-      <main className="flex-1 pb-20 lg:pb-10">
+      <main className="flex-1 pb-24 lg:pb-10">
         <Outlet />
       </main>
 
@@ -121,10 +120,10 @@ export default function AppShell() {
             >
               {({ isActive }) => (
                 <>
-                  <span className={`w-9 h-7 rounded-full flex items-center justify-center transition ${isActive ? 'bg-brand-50' : ''}`}>
+                  <span className={`w-10 h-7 rounded-full flex items-center justify-center transition ${isActive ? 'bg-brand-50' : ''}`}>
                     <item.icon className="w-5 h-5" />
                   </span>
-                  <span className="leading-none truncate max-w-[64px]">{lang === 'vi' ? item.vi : item.en}</span>
+                  <span className="leading-none truncate max-w-[72px]">{lang === 'vi' ? item.vi : item.en}</span>
                 </>
               )}
             </NavLink>

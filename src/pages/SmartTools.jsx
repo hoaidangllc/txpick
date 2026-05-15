@@ -1,6 +1,5 @@
-import { Sparkles, Zap, ShieldCheck, Bell, CalendarCheck, FileText, Crown } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { buildDailyInsight, getPlan, planLabel } from '../lib/lifeStore.js'
+import { Sparkles, Bell, CalendarCheck, FileText, ShieldCheck } from 'lucide-react'
+import { buildDailyInsight } from '../lib/lifeStore.js'
 import { billsDb, expensesDb, remindersDb, useRemoteCollection } from '../lib/db.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
@@ -8,64 +7,43 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 const copy = {
   vi: {
     title: 'Gợi ý hôm nay',
-    sub: 'Một câu ngắn để bạn biết hôm nay cần chú ý gì. AI chỉ dùng nhẹ và có giới hạn, để app luôn nhanh, rẻ và dễ kiểm soát.',
-    plan: 'Gói hiện tại',
-    actions: 'Lượt gợi ý hôm nay',
-    mode: 'Cách hoạt động',
-    controlled: 'Tiết kiệm chi phí',
-    preview: 'Gợi ý hiện tại',
-    settings: 'Cài đặt gói',
-    settingsSub: 'Đổi gói để thử mức giới hạn khác. Có thể đổi lại bất cứ lúc nào.',
-    seePricing: 'Xem bảng giá',
-    howTitle: 'AI trong app này dùng để làm gì?',
+    sub: 'Một câu ngắn để bạn biết hôm nay cần chú ý gì. AI chỉ dùng nhẹ — hiểu câu nhắc, gợi ý ngắn và tóm tắt. Không chat tự do, không tư vấn thuế.',
+    preview: 'Tóm tắt hôm nay',
+    cached: 'Dựa trên dữ liệu bạn đã nhập',
+    howTitle: 'AI trong app này làm gì',
     h1: 'Hiểu câu nhắc tự nhiên',
     h1Text: 'Ví dụ: "nhắc tôi trả tiền điện ngày mai lúc 9 giờ tối". App tự nhận tiêu đề, ngày, giờ và phân loại.',
-    h2: 'Gợi ý việc còn thiếu',
-    h2Text: 'Nhắc bạn nếu chưa nhập chi tiêu tháng này, có hóa đơn sắp tới, hoặc còn việc chưa làm trong hôm nay.',
-    h3: 'Tổng kết ngắn',
-    h3Text: 'Tóm tắt nhanh trong ngày và trong tháng để mở app là biết cần làm gì tiếp theo.',
+    h2: 'Nhắc việc còn thiếu',
+    h2Text: 'Nhắc nhẹ khi có hóa đơn sắp tới hạn, chi tiêu chưa nhập, hoặc còn việc trong hôm nay.',
+    h3: 'Tóm tắt ngắn',
+    h3Text: 'Một câu trong ngày và một câu trong tháng — đủ để mở app là biết làm gì tiếp.',
     noteTitle: 'Giới hạn rõ ràng',
-    note: 'TX Life chỉ dùng gợi ý thông minh nhẹ: hiểu câu nhắc, nhắc việc còn thiếu và tóm tắt nhanh. App không tư vấn thuế, không scan hình và không mở chat tự do.',
-    free: 'Miễn phí',
-    basic: 'Pro Cơ Bản — $1.99/tháng',
-    premium: 'Pro Plus — $4.99/tháng',
+    note: 'TX Life giữ AI thật nhẹ: hiểu câu nhắc, gợi ý ngắn và tóm tắt. Không scan hình, không chatbot, không tư vấn thuế.',
   },
   en: {
-    title: 'Daily insight',
-    sub: 'A short note about what to pay attention to today. AI stays light and limited so the app remains fast, affordable, and predictable.',
-    plan: 'Current plan',
-    actions: 'Insight actions today',
-    mode: 'Mode',
-    controlled: 'Cost controlled',
-    preview: 'Current insight',
-    settings: 'Plan settings',
-    settingsSub: 'Switch plans to try different limits. You can switch back anytime.',
-    seePricing: 'See pricing',
+    title: 'Today insight',
+    sub: 'A short note about what to pay attention to today. Light AI only — natural reminder parsing, short hints, and quick summaries. No open chat, no tax advice.',
+    preview: 'Today summary',
+    cached: 'Based on the data you have entered',
     howTitle: 'How AI is used here',
     h1: 'Understand natural reminders',
     h1Text: 'Example: "remind me to pay the electric bill tomorrow at 9 PM." The app detects title, date, time, and category.',
-    h2: 'Spot what may be missing',
-    h2Text: 'It can point out missing monthly expenses, bills coming due, or unfinished reminders for today.',
+    h2: 'Spot what is missing',
+    h2Text: 'A gentle nudge when a bill is coming due, an expense is unlogged, or a task is still open today.',
     h3: 'Short summaries',
-    h3Text: 'A quick daily and monthly summary so opening the app immediately tells you what to do next.',
+    h3Text: 'One sentence for the day, one for the month — enough to know what to do next when you open the app.',
     noteTitle: 'Clear limits',
-    note: 'TX Life uses light smart assistance only: natural reminders, missing-task hints, and short summaries. It does not include tax advice, receipt scanning, or open-ended chat.',
-    free: 'Free',
-    basic: 'Pro Basic — $1.99/mo',
-    premium: 'Pro Plus — $4.99/mo',
+    note: 'TX Life keeps AI light: natural reminders, short hints, and summaries. No receipt scanning, no chatbot, no tax advice.',
   },
 }
 
 export default function SmartTools() {
   const { lang } = useLang()
   const c = copy[lang]
-  const { user, profile, updateProfile } = useAuth()
-  const planKey = profile?.plan_key || (profile?.is_pro ? 'premium' : 'free')
+  const { user } = useAuth()
   const [reminders] = useRemoteCollection(user?.id, remindersDb)
   const [expenses] = useRemoteCollection(user?.id, expensesDb)
   const [bills] = useRemoteCollection(user?.id, billsDb)
-  const plan = getPlan(planKey)
-  const usage = { used: 0, limit: plan.aiDailyLimit }
 
   return (
     <div className="container-app py-6 sm:py-8">
@@ -73,52 +51,29 @@ export default function SmartTools() {
         <h1 className="text-3xl font-extrabold text-ink-900 flex items-center gap-2">
           <Sparkles className="w-7 h-7 text-gold-600" /> {c.title}
         </h1>
-        <p className="text-ink-500 mt-1 max-w-3xl">{c.sub}</p>
+        <p className="text-ink-500 mt-1 max-w-2xl">{c.sub}</p>
       </div>
 
-      <section className="mt-5 grid sm:grid-cols-3 gap-4">
-        <Info title={c.plan} value={planLabel(planKey, lang)} icon={Crown} />
-        <Info title={c.actions} value={`${usage.used}/${usage.limit}`} icon={Zap} />
-        <Info title={c.mode} value={c.controlled} icon={ShieldCheck} />
+      <section className="mt-5 card p-4 sm:p-5">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <div className="flex-1">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="font-bold text-ink-900">{c.preview}</h2>
+              <span className="text-xs text-ink-400">{c.cached}</span>
+            </div>
+            <p className="mt-1 text-sm text-ink-600 leading-relaxed">
+              {buildDailyInsight({ reminders, expenses, bills, lang })}
+            </p>
+          </div>
+        </div>
       </section>
 
-      <div className="mt-5 card p-5">
-        <h2 className="font-bold text-ink-900 flex items-center gap-2">
-          <Zap className="w-4 h-4 text-brand-600" /> {c.preview}
-        </h2>
-        <p className="mt-2 text-sm text-ink-600 leading-relaxed">
-          {buildDailyInsight({ reminders, expenses, bills, lang })}
-        </p>
-      </div>
-
-      <div className="mt-5 card p-5">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="font-bold text-ink-900">{c.settings}</h2>
-            <p className="text-sm text-ink-500 mt-1">{c.settingsSub}</p>
-          </div>
-          <Link to="/pricing" className="btn-secondary text-sm">{c.seePricing}</Link>
-        </div>
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
-          {[{ key: 'free', label: c.free }, { key: 'basic', label: c.basic }, { key: 'premium', label: c.premium }].map((p) => (
-            <button
-              key={p.key}
-              onClick={() => updateProfile?.({ is_pro: p.key !== 'free', plan_key: p.key })}
-              className={`px-3 py-3 rounded-xl border text-left transition ${
-                planKey === p.key
-                  ? 'border-brand-500 bg-brand-50 text-brand-700 font-semibold'
-                  : 'border-ink-200 bg-white text-ink-700 hover:border-ink-300'
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-5 card p-5">
+      <div className="mt-5 card p-4 sm:p-5">
         <h2 className="font-bold text-ink-900">{c.howTitle}</h2>
-        <div className="mt-4 grid md:grid-cols-3 gap-3">
+        <div className="mt-4 grid sm:grid-cols-3 gap-3">
           <Feature icon={Bell} title={c.h1} text={c.h1Text} />
           <Feature icon={CalendarCheck} title={c.h2} text={c.h2Text} />
           <Feature icon={FileText} title={c.h3} text={c.h3Text} />
@@ -134,18 +89,6 @@ export default function SmartTools() {
           </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-function Info({ title, value, icon: Icon }) {
-  return (
-    <div className="card p-5">
-      <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-wider font-semibold text-ink-500">{title}</p>
-        {Icon && <Icon className="w-4 h-4 text-ink-400" />}
-      </div>
-      <p className="mt-2 text-2xl font-extrabold text-ink-900">{value}</p>
     </div>
   )
 }

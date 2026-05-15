@@ -12,19 +12,19 @@ const copy = {
     back: 'Quay lại',
     today: 'Về Hôm nay',
     title: 'Chọn gói phù hợp với cách bạn dùng mỗi ngày',
-    sub: 'Bắt đầu miễn phí. Nâng cấp khi bạn muốn theo dõi nhiều hơn, bỏ quảng cáo và xuất tổng kết cuối tháng/cuối năm gọn hơn.',
+    sub: 'Bắt đầu miễn phí. Nâng cấp khi muốn theo dõi nhiều hơn, bỏ quảng cáo và xuất tổng kết cuối tháng/cuối năm gọn hơn.',
     bill: 'Trả theo tháng • hủy bất cứ lúc nào',
     popular: 'Phù hợp nhất cho chủ tiệm / gig work',
     current: 'Gói đang chọn',
     pickFree: 'Dùng miễn phí',
     pickPaid: 'Chọn gói này',
-    coming: 'Thanh toán sẽ được bật sau',
-    comingText: 'Hiện tại app cho chọn gói để test trải nghiệm. Stripe/payment sẽ gắn sau khi sản phẩm ổn định. App không tư vấn thuế và không thay thế người làm thuế.',
+    confirmTitle: 'Đã đổi gói',
+    confirmText: 'App đã cập nhật giới hạn theo gói mới. Bạn có thể đổi lại bất cứ lúc nào.',
     close: 'Đóng',
     selected: 'Bạn đã chọn',
     plans: [
       { key: 'free', name: 'Free', price: '$0', priceUnit: '', sub: 'Đủ để bắt đầu dùng mỗi ngày',
-        features: ['Trang Hôm nay', 'Nhắc việc cơ bản', 'Chi tiêu cá nhân cơ bản', 'Hóa đơn hằng tháng', 'Tổng kết đơn giản', 'Có quảng cáo nhỏ'],
+        features: ['Trang Hôm nay', 'Nhắc việc cơ bản', 'Chi tiêu cá nhân cơ bản', 'Hóa đơn hằng tháng', 'Tổng kết đơn giản'],
         bestFor: 'Người mới muốn thử app trước.' },
       { key: 'basic', name: 'Pro Basic', price: '$1.99', priceUnit: '/tháng', sub: 'Cho cá nhân muốn app gọn và không quảng cáo',
         features: ['Không quảng cáo', 'Nhiều nhắc việc hơn', 'Nhiều dòng chi tiêu hơn', 'Tổng kết tháng rõ hơn', 'Xuất CSV cơ bản', 'Gợi ý thông minh nhẹ'],
@@ -37,20 +37,20 @@ const copy = {
   en: {
     back: 'Back',
     today: 'Go to Today',
-    title: 'Choose the plan that fits your daily routine',
+    title: 'Pick the plan that fits your daily routine',
     sub: 'Start free. Upgrade when you want more tracking, no ads, and cleaner month-end/year-end summaries.',
     bill: 'Billed monthly • cancel anytime',
     popular: 'Best for business owners / gig work',
-    current: 'Selected plan',
+    current: 'Current plan',
     pickFree: 'Use free',
     pickPaid: 'Choose this plan',
-    coming: 'Payment coming soon',
-    comingText: 'Plan selection is available now for testing the app experience. Stripe/payment will be connected after the product is stable. This app does not provide tax advice or replace a tax professional.',
+    confirmTitle: 'Plan updated',
+    confirmText: 'Limits have been updated to match the new plan. You can switch back anytime.',
     close: 'Close',
-    selected: 'You selected',
+    selected: 'You picked',
     plans: [
       { key: 'free', name: 'Free', price: '$0', priceUnit: '', sub: 'Enough to start using it daily',
-        features: ['Today page', 'Basic reminders', 'Basic personal expenses', 'Monthly bills', 'Simple summary', 'Small ad area'],
+        features: ['Today page', 'Basic reminders', 'Basic personal expenses', 'Monthly bills', 'Simple summary'],
         bestFor: 'New users who want to try the app first.' },
       { key: 'basic', name: 'Pro Basic', price: '$1.99', priceUnit: '/mo', sub: 'For personal users who want a cleaner app',
         features: ['No ads', 'More reminders', 'More expense entries', 'Clearer monthly summary', 'Basic CSV export', 'Light smart insights'],
@@ -136,8 +136,8 @@ export default function Pricing() {
         </div>
       </main>
 
-      <Modal open={Boolean(modalPlan)} onClose={() => setModalPlan(null)} title={modalPlan ? `${c.selected}: ${modalPlan.name}` : c.coming} footer={<><button className="btn-secondary" onClick={() => setModalPlan(null)}>{c.close}</button><button className="btn-primary" onClick={() => navigate('/today')}>{c.today}</button></>}>
-        <p className="text-sm text-ink-600">{c.comingText}</p>
+      <Modal open={Boolean(modalPlan)} onClose={() => setModalPlan(null)} title={modalPlan ? `${c.selected}: ${modalPlan.name}` : c.confirmTitle} footer={<><button className="btn-secondary" onClick={() => setModalPlan(null)}>{c.close}</button><button className="btn-primary" onClick={() => navigate('/today')}>{c.today}</button></>}>
+        <p className="text-sm text-ink-600">{c.confirmText}</p>
         <div className="mt-4 rounded-2xl bg-brand-50 border border-brand-100 p-4">
           <p className="font-bold text-brand-900">{selected.name} {selected.price}{selected.priceUnit}</p>
           <ul className="mt-2 space-y-1 text-sm text-brand-800">

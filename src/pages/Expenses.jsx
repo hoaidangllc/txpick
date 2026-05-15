@@ -13,23 +13,27 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 const copy = {
   vi: {
     title: 'Chi tiêu',
-    sub: 'Ghi tay nhanh gọn — không cần scan hình, app vẫn nhẹ và dễ dùng mỗi ngày.',
+    sub: 'Ghi tay một dòng cho mỗi khoản — nhẹ, nhanh và dễ dùng mỗi ngày.',
     add: 'Thêm', thisMonth: 'Tháng này', business: 'Kinh doanh', personal: 'Cá nhân / khác',
     list: 'Danh sách chi tiêu',
-    empty: 'Chưa có chi tiêu nào. Nhập khoản đầu tiên để theo dõi cả tháng.',
+    emptyTitle: 'Chưa có chi tiêu nào',
+    empty: 'Ghi khoản đầu tiên để app tổng kết tháng giúp bạn.',
     modal: 'Thêm chi tiêu', close: 'Đóng', save: 'Lưu',
     name: 'Tên chi tiêu', amount: 'Số tiền', category: 'Phân loại', date: 'Ngày', note: 'Ghi chú',
     none: '—',
+    loading: 'Đang tải…',
   },
   en: {
     title: 'Expenses',
-    sub: 'Fast manual entry — no photo scan, keeping the app light and affordable.',
+    sub: 'One line per expense — light, quick, and easy to keep up with every day.',
     add: 'Add', thisMonth: 'This month', business: 'Business', personal: 'Personal / Other',
     list: 'Expense list',
-    empty: 'No expenses yet. Add your first to start tracking the month.',
+    emptyTitle: 'No expenses yet',
+    empty: 'Log your first expense and the app will total the month for you.',
     modal: 'Add expense', close: 'Cancel', save: 'Save',
     name: 'Title', amount: 'Amount', category: 'Category', date: 'Date', note: 'Note',
     none: '—',
+    loading: 'Loading…',
   },
 }
 
@@ -66,20 +70,20 @@ export default function Expenses() {
       <div className="mt-5 card p-5">
         <h2 className="font-bold text-ink-900">{c.list}</h2>
         {state.loading ? (
-          <p className="py-10 text-center text-sm text-ink-400">Đang tải…</p>
+          <p className="py-10 text-center text-sm text-ink-400">{c.loading}</p>
         ) : state.error ? (
           <p className="py-10 text-center text-sm text-rose-600">{state.error}</p>
         ) : items.length === 0 ? (
-          <p className="py-10 text-center text-sm text-ink-400">{c.empty}</p>
+          <EmptyExpenses c={c} onAdd={() => setOpen(true)} />
         ) : (
           <ul className="mt-3 divide-y divide-ink-100">
             {items.map((e) => (
               <li key={e.id} className="py-3 flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-semibold text-ink-900">{e.title}</p>
+                <div className="min-w-0">
+                  <p className="font-semibold text-ink-900 truncate">{e.title}</p>
                   <p className="text-xs text-ink-500">{e.date} • {categoryLabel(e.category, lang, EXPENSE_CATEGORIES)}</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 shrink-0">
                   <span className="font-bold text-ink-900">{fmtUSD(e.amount)}</span>
                   <button onClick={() => api.remove(e.id)} className="text-ink-300 hover:text-rose-600" aria-label="Delete"><Trash2 className="w-4 h-4" /></button>
                 </div>
@@ -90,6 +94,21 @@ export default function Expenses() {
       </div>
 
       <ExpenseModal open={open} onClose={() => setOpen(false)} onSave={(item) => { api.add(item); setOpen(false) }} c={c} lang={lang} />
+    </div>
+  )
+}
+
+function EmptyExpenses({ c, onAdd }) {
+  return (
+    <div className="py-10 text-center">
+      <div className="mx-auto w-14 h-14 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center">
+        <Receipt className="w-6 h-6" />
+      </div>
+      <h3 className="mt-3 font-bold text-ink-900">{c.emptyTitle}</h3>
+      <p className="mt-1 text-sm text-ink-500 max-w-md mx-auto">{c.empty}</p>
+      <button onClick={onAdd} className="btn-primary mt-4">
+        <Plus className="w-4 h-4" /> {c.add}
+      </button>
     </div>
   )
 }

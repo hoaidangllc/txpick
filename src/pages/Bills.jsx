@@ -9,10 +9,11 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 
 const copy = {
   vi: {
-    title: 'Hóa đơn',
-    sub: 'Theo dõi hóa đơn cá nhân và kinh doanh để không quên ngày đến hạn.',
+    title: 'Hóa đơn hằng tháng',
+    sub: 'Nhập một lần, app nhắc đúng ngày. Điện, nước, internet, tiền nhà, bảo hiểm — gom chung một chỗ.',
     add: 'Thêm hóa đơn',
-    empty: 'Chưa có hóa đơn nào. Thêm điện, nước, internet, tiền nhà… để app nhắc đúng ngày.',
+    emptyTitle: 'Chưa có hóa đơn nào',
+    empty: 'Thêm điện, nước, internet, tiền nhà… để app nhắc đúng ngày mỗi tháng.',
     due: 'Ngày',
     paid: 'Đã thanh toán',
     unpaid: 'Chưa thanh toán',
@@ -32,10 +33,11 @@ const copy = {
     loading: 'Đang tải…',
   },
   en: {
-    title: 'Bills',
-    sub: 'Track personal and business bills so due dates never slip.',
+    title: 'Monthly bills',
+    sub: 'Enter once, get reminded on time. Power, water, internet, rent, insurance — all in one place.',
     add: 'Add bill',
-    empty: 'No bills yet. Add power, water, internet, rent… and the app will remind you on time.',
+    emptyTitle: 'No bills yet',
+    empty: 'Add power, water, internet, rent… and the app will remind you each month.',
     due: 'Day',
     paid: 'Paid',
     unpaid: 'Unpaid',
@@ -89,18 +91,18 @@ export default function Bills() {
         ) : state.error ? (
           <p className="py-10 text-center text-sm text-rose-600">{state.error}</p>
         ) : items.length === 0 ? (
-          <p className="py-10 text-center text-sm text-ink-400">{c.empty}</p>
+          <EmptyBills c={c} onAdd={() => setOpen(true)} />
         ) : (
           <ul className="divide-y divide-ink-100">
             {items.map((b) => (
               <li key={b.id} className="py-3 flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-semibold text-ink-900">{b.name || b.title}</p>
+                <div className="min-w-0">
+                  <p className="font-semibold text-ink-900 truncate">{b.name || b.title}</p>
                   <p className="text-xs text-ink-500">
                     {c.due} {b.dueDay} • {categoryLabel(b.category, lang)} • {b.paid ? c.paid : c.unpaid}
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 shrink-0">
                   <span className="font-bold text-ink-900">{fmtUSD(b.amount)}</span>
                   {b.paid ? (
                     <button
@@ -132,6 +134,21 @@ export default function Bills() {
       </div>
 
       <BillModal open={open} onClose={() => setOpen(false)} onSave={(item) => { api.add(item); setOpen(false) }} c={c} lang={lang} />
+    </div>
+  )
+}
+
+function EmptyBills({ c, onAdd }) {
+  return (
+    <div className="py-10 text-center">
+      <div className="mx-auto w-14 h-14 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center">
+        <WalletCards className="w-6 h-6" />
+      </div>
+      <h3 className="mt-3 font-bold text-ink-900">{c.emptyTitle}</h3>
+      <p className="mt-1 text-sm text-ink-500 max-w-md mx-auto">{c.empty}</p>
+      <button onClick={onAdd} className="btn-primary mt-4">
+        <Plus className="w-4 h-4" /> {c.add}
+      </button>
     </div>
   )
 }

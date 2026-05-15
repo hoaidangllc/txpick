@@ -56,6 +56,11 @@
   }
 }
 
+/* Safe-bottom padding helper for mobile bottom nav (iOS home indicator) */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
 /* Hero gradient background */
 .hero-gradient {
   background:

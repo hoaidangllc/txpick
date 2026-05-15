@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Bell, CheckCircle2, Plus, Trash2, RotateCcw } from 'lucide-react'
+import { Bell, CheckCircle2, Plus, Trash2, RotateCcw, Inbox } from 'lucide-react'
 import Modal from '../components/Modal.jsx'
 import {
   CATEGORIES, todayISO, parseNaturalReminder,
@@ -12,11 +12,12 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 const copy = {
   vi: {
     title: 'Nhắc việc',
-    sub: 'Việc một lần, việc lặp lại, nhắc cho gia đình và nhắc hóa đơn — gom chung một chỗ.',
+    sub: 'Việc một lần, việc lặp lại, nhắc hóa đơn và nhắc cho gia đình — gom chung một chỗ.',
     active: 'Đang cần nhớ',
     done: 'Đã xong gần đây',
     new: 'Tạo mới',
-    emptyActive: 'Chưa có việc nào. Thêm việc đầu tiên để bắt đầu.',
+    emptyActiveTitle: 'Chưa có việc nào',
+    emptyActive: 'Thêm việc đầu tiên để bắt đầu.',
     emptyDone: 'Khi bạn hoàn thành việc, nó sẽ hiện ở đây.',
     noDate: 'Chưa chọn ngày',
     modal: 'Tạo nhắc việc',
@@ -28,14 +29,16 @@ const copy = {
     titleField: 'Nội dung cần nhớ',
     date: 'Ngày', time: 'Giờ', category: 'Phân loại', repeat: 'Lặp lại', notes: 'Ghi chú',
     none: 'Một lần', daily: 'Hằng ngày', weekly: 'Hằng tuần', monthly: 'Hằng tháng',
+    loading: 'Đang tải…',
   },
   en: {
     title: 'Reminders',
-    sub: 'One-time tasks, recurring tasks, family reminders, and bill reminders — all in one place.',
+    sub: 'One-time tasks, recurring tasks, bill reminders, and family nudges — all in one place.',
     active: 'Active',
     done: 'Done recently',
     new: 'New',
-    emptyActive: 'Nothing here yet. Add your first reminder to get started.',
+    emptyActiveTitle: 'Nothing here yet',
+    emptyActive: 'Add your first reminder to get started.',
     emptyDone: 'Completed reminders will appear here.',
     noDate: 'No date',
     modal: 'New reminder',
@@ -47,6 +50,7 @@ const copy = {
     titleField: 'Title',
     date: 'Date', time: 'Time', category: 'Category', repeat: 'Repeat', notes: 'Notes',
     none: 'One time', daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly',
+    loading: 'Loading…',
   },
 }
 
@@ -75,7 +79,7 @@ export default function Reminders() {
 
       {state.error && <p className="mt-4 text-sm text-rose-600">{state.error}</p>}
       <section className="mt-5 grid lg:grid-cols-2 gap-4">
-        <ReminderCard title={c.active} items={active} api={api} empty={state.loading ? 'Loading…' : c.emptyActive} c={c} lang={lang} />
+        <ReminderCard title={c.active} items={active} api={api} emptyTitle={c.emptyActiveTitle} empty={state.loading ? c.loading : c.emptyActive} onAdd={() => setOpen(true)} addLabel={c.new} c={c} lang={lang} />
         <ReminderCard title={c.done} items={done} api={api} empty={c.emptyDone} done c={c} lang={lang} />
       </section>
 
@@ -84,23 +88,34 @@ export default function Reminders() {
   )
 }
 
-function ReminderCard({ title, items, api, empty, done, c, lang }) {
+function ReminderCard({ title, items, api, emptyTitle, empty, done, onAdd, addLabel, c, lang }) {
   return (
     <div className="card p-5">
       <h2 className="font-bold text-ink-900">{title}</h2>
       {items.length === 0 ? (
-        <p className="py-10 text-center text-sm text-ink-400">{empty}</p>
+        <div className="py-8 text-center">
+          <div className="mx-auto w-12 h-12 rounded-2xl bg-ink-50 border border-ink-100 text-ink-400 flex items-center justify-center">
+            <Inbox className="w-5 h-5" />
+          </div>
+          {emptyTitle && <h3 className="mt-3 font-bold text-ink-900">{emptyTitle}</h3>}
+          <p className="mt-1 text-sm text-ink-500">{empty}</p>
+          {onAdd && addLabel && (
+            <button onClick={onAdd} className="btn-primary mt-4">
+              <Plus className="w-4 h-4" /> {addLabel}
+            </button>
+          )}
+        </div>
       ) : (
         <ul className="mt-3 divide-y divide-ink-100">
           {items.map((r) => (
             <li key={r.id} className="py-3 flex items-start justify-between gap-3">
-              <div>
-                <p className="font-semibold text-ink-900">{r.title}</p>
+              <div className="min-w-0">
+                <p className="font-semibold text-ink-900 truncate">{r.title}</p>
                 <p className="text-xs text-ink-500">
                   {r.date || c.noDate}{r.time ? ` • ${r.time}` : ''} • {categoryLabel(r.category, lang)}{r.repeat && r.repeat !== 'none' ? ` • ${repeatLabel(r.repeat, lang)}` : ''}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 shrink-0">
                 {done ? (
                   <button onClick={() => api.update(r.id, { done: false, doneAt: null })} className="text-brand-600 hover:text-brand-800" aria-label="Reopen"><RotateCcw className="w-4 h-4" /></button>
                 ) : (
