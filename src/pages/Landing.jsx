@@ -10,48 +10,56 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 
 const copy = {
   vi: {
-    login: 'Đăng nhập', start: 'Bắt đầu miễn phí',
-    badge: 'App quản lý đời sống hằng ngày cho người Việt ở Mỹ',
-    title: 'Mở mỗi ngày. Nhớ ít hơn. Quản lý gọn hơn.',
-    sub: 'Nhắc việc, hóa đơn hằng tháng, chi tiêu cá nhân, chi tiêu kinh doanh và tổng kết cuối năm — một nơi đơn giản, dùng được mỗi ngày.',
-    note: 'Không AI chat tự do. Không scan hóa đơn. Không tư vấn thuế. Chỉ tập trung vào những việc bạn dùng mỗi ngày.',
-    socialProof: 'Miễn phí mãi mãi cho gói cơ bản • Không cần thẻ tín dụng',
-    featuresTitle: 'Mọi thứ cần thiết, gói gọn trong một app',
-    featuresSub: 'Cá nhân và kinh doanh dùng chung trang Hôm nay. Phân loại rõ ràng để cuối tháng và cuối năm dễ xem lại.',
-    f1: ['Trang Hôm nay', 'Mở app là thấy việc cần làm, hóa đơn sắp tới, chi tiêu trong tháng và một gợi ý ngắn cho hôm nay.'],
-    f2: ['Nhắc việc', 'Thêm nhanh bằng câu tự nhiên. Hỗ trợ việc lặp lại, nhắc hóa đơn và nhắc cho người trong gia đình.'],
-    f3: ['Chi tiêu', 'Ghi nhanh chi tiêu cá nhân và kinh doanh. Nhập tay cho nhẹ, rẻ và dễ kiểm soát.'],
-    f4: ['Tổng kết', 'Gom số liệu theo tháng và theo năm để đưa cho người làm thuế. App không thay thế chuyên gia thuế.'],
-    v1: ['Gói miễn phí vẫn dùng tốt', 'Có trang Hôm nay, nhắc việc, chi tiêu cơ bản và giới hạn rõ ràng.'],
-    v2: ['AI dùng vừa đủ', 'Hỗ trợ hiểu câu nhắc tự nhiên và tạo gợi ý ngắn. Không mở chatbot tự do.'],
-    v3: ['Kiểm soát chi phí', 'Gợi ý trong ngày được lưu lại; app không gọi AI mỗi lần bạn mở.'],
-    mockToday: 'HÔM NAY', mockReminders: '3 việc cần nhớ', mockBill: 'Trả tiền điện — 9 giờ tối',
-    mockMonth: 'CHI TIÊU THÁNG NÀY', mockExpense: 'Kinh doanh + cá nhân',
-    mockInsight: 'GỢI Ý HÔM NAY', mockTip: 'Bạn có 2 hóa đơn sắp tới hạn. Ghi chi tiêu hôm nay để cuối tháng đỡ phải nhớ.',
-    finalTitle: 'Bắt đầu nhẹ nhàng. Mở mỗi ngày.',
-    finalSub: 'Tạo tài khoản miễn phí trong chưa tới 30 giây.',
+    login: 'Đăng nhập',
+    start: 'Bắt đầu miễn phí',
+    badge: 'App quản lý đời sống hàng ngày',
+    title: 'Nhớ ít hơn. Sống gọn hơn.',
+    sub: 'TX Life gom nhắc việc, hóa đơn, chi tiêu và tổng kết vào một nơi dễ dùng mỗi ngày.',
+    trustLine: 'Bắt đầu miễn phí. Ghi nhanh. Nhắc đúng lúc. Cuối tháng nhìn lại rõ ràng.',
+    featuresTitle: 'Đủ những thứ cần nhớ, không làm bạn rối thêm',
+    featuresSub: 'Mở app là biết hôm nay cần làm gì, tiền đi đâu và việc nào sắp tới hạn.',
+    f1: ['Hôm nay', 'Một màn hình gọn để xem việc cần làm, hóa đơn sắp tới, chi tiêu trong tháng và gợi ý ngắn cho ngày mới.'],
+    f2: ['Nhắc việc', 'Tạo nhắc nhanh bằng câu tự nhiên. Phù hợp cho việc cá nhân, gia đình, bill và việc lặp lại.'],
+    f3: ['Chi tiêu', 'Ghi nhanh tiền cá nhân và business mà không cần biến app thành phần mềm kế toán nặng nề.'],
+    f4: ['Tổng kết', 'Cuối tháng, cuối năm có số liệu gọn để xem lại hoặc gửi cho người làm thuế.'],
+    v1: ['Dễ dùng mỗi ngày', 'Ít nút, ít màn hình, tập trung vào những việc bạn thật sự cần mở app để xử lý.'],
+    v2: ['Gợi ý vừa đủ', 'App giúp nhắc những việc dễ quên và đưa ra gợi ý ngắn, không làm bạn bị ngợp.'],
+    v3: ['Dữ liệu rõ ràng', 'Việc, bill và chi tiêu được gom đúng chỗ để cuối tháng không phải lục lại trí nhớ.'],
+    mockToday: 'HÔM NAY',
+    mockReminders: '3 việc cần nhớ',
+    mockBill: 'Trả tiền điện — 9 giờ tối',
+    mockMonth: 'CHI TIÊU THÁNG NÀY',
+    mockExpense: 'Cá nhân + business',
+    mockInsight: 'GỢI Ý HÔM NAY',
+    mockTip: 'Có 2 hóa đơn sắp tới hạn. Ghi chi tiêu hôm nay để cuối tháng nhẹ đầu hơn.',
+    finalTitle: 'Bắt đầu từ hôm nay.',
+    finalSub: 'Tạo tài khoản miễn phí và giữ mọi thứ quan trọng trong một nơi gọn gàng.',
   },
   en: {
-    login: 'Log in', start: 'Start free',
-    badge: 'A daily-life app for Vietnamese families in the U.S.',
-    title: 'Open it daily. Remember less. Stay organized.',
-    sub: 'Reminders, monthly bills, personal expenses, business expenses, and year-end summaries — one calm place you’ll actually open every day.',
-    note: 'No open-ended AI chat. No receipt scanning. No tax advice. Just the things you’ll actually use every day.',
-    socialProof: 'Free forever on the basic plan • No credit card required',
-    featuresTitle: 'Everything important — in one simple app',
-    featuresSub: 'Personal and business share a single Today page. Categories keep your monthly and yearly review clean.',
-    f1: ['Today page', 'Open the app and see today’s tasks, upcoming bills, monthly spending, and a short daily insight.'],
-    f2: ['Reminders', 'Quick natural-language reminders. Supports recurring tasks, bill reminders, and family reminders.'],
-    f3: ['Expenses', 'Manual entry for personal and business. Keeps the app lightweight, affordable, and easy to control.'],
-    f4: ['Summary', 'Monthly and yearly totals you can share with your tax preparer. The app doesn’t replace a tax professional.'],
-    v1: ['Free works', 'Today page, reminders, basic expenses, and clear limits.'],
-    v2: ['Light AI only', 'Natural reminder parsing and short daily insights — no open-ended chatbot.'],
-    v3: ['Cost controlled', 'Daily insight is cached; the app doesn’t call AI every time you open it.'],
-    mockToday: 'TODAY', mockReminders: '3 reminders', mockBill: 'Pay electric bill — 9 PM',
-    mockMonth: 'THIS MONTH', mockExpense: 'Business + personal',
-    mockInsight: 'TODAY’S INSIGHT', mockTip: 'You have 2 bills coming up. Log today’s expenses so month-end is easier.',
-    finalTitle: 'Start small. Open it every day.',
-    finalSub: 'Create a free account in under 30 seconds.',
+    login: 'Log in',
+    start: 'Start free',
+    badge: 'A daily life management app',
+    title: 'Remember less. Live lighter.',
+    sub: 'TX Life brings reminders, bills, expenses, and summaries into one simple place you can use every day.',
+    trustLine: 'Start free. Add quickly. Get reminded on time. Review the month with clarity.',
+    featuresTitle: 'The important things, without the clutter',
+    featuresSub: 'Open the app and know what matters today, where money went, and what is coming due.',
+    f1: ['Today', 'A clean daily view for tasks, upcoming bills, monthly spending, and one useful insight.'],
+    f2: ['Reminders', 'Create reminders with natural language. Good for personal, family, bill, and recurring tasks.'],
+    f3: ['Expenses', 'Track personal and business spending without turning the app into heavy accounting software.'],
+    f4: ['Summary', 'Monthly and yearly numbers organized clearly so review time is easier.'],
+    v1: ['Made for daily use', 'Fewer screens, fewer distractions, and a clear focus on what you actually need to handle.'],
+    v2: ['Light guidance', 'Helpful nudges for easy-to-forget tasks, without overwhelming you.'],
+    v3: ['Clear records', 'Tasks, bills, and spending stay organized so month-end does not depend on memory.'],
+    mockToday: 'TODAY',
+    mockReminders: '3 things to remember',
+    mockBill: 'Pay electric bill — 9 PM',
+    mockMonth: 'THIS MONTH',
+    mockExpense: 'Personal + business',
+    mockInsight: 'TODAY’S NUDGE',
+    mockTip: 'You have 2 bills coming up. Log today’s spending so month-end feels lighter.',
+    finalTitle: 'Start today.',
+    finalSub: 'Create a free account and keep the important things in one calm place.',
   },
 }
 
@@ -70,23 +78,32 @@ export default function Landing() {
           </div>
         </div>
       </header>
+
       <section className="hero-gradient pt-32 pb-20 sm:pt-40 sm:pb-28">
         <div className="container-app">
           <div className="max-w-3xl mx-auto text-center animate-fade-up">
             <span className="badge bg-brand-50 text-brand-700 mb-5">
               <Sparkles className="w-3.5 h-3.5" /> {c.badge}
             </span>
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold text-ink-900 leading-[1.05]">{c.title}</h1>
-            <p className="mt-5 text-lg sm:text-xl text-ink-600 max-w-2xl mx-auto">{c.sub}</p>
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold text-ink-900 leading-[1.05]">
+              {c.title}
+            </h1>
+            <p className="mt-5 text-lg sm:text-xl text-ink-600 max-w-2xl mx-auto">
+              {c.sub}
+            </p>
             <div className="mt-8 flex justify-center">
-              <Link to="/signup" className="btn-primary">{c.start} <ArrowRight className="w-4 h-4" /></Link>
+              <Link to="/signup" className="btn-primary">
+                {c.start} <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
-            <p className="mt-3 text-xs text-ink-400">{c.socialProof}</p>
-            <p className="mt-2 text-xs text-ink-400">{c.note}</p>
+            <p className="mt-4 text-sm text-ink-400 max-w-xl mx-auto">
+              {c.trustLine}
+            </p>
           </div>
           <HeroMock c={c} />
         </div>
       </section>
+
       <section className="py-20">
         <div className="container-app">
           <div className="max-w-2xl mx-auto text-center">
@@ -101,6 +118,7 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
       <section className="py-16 bg-ink-50 border-y border-ink-100">
         <div className="container-app grid sm:grid-cols-3 gap-6">
           <Value icon={WalletCards} title={c.v1[0]} text={c.v1[1]} />
@@ -108,13 +126,16 @@ export default function Landing() {
           <Value icon={Shield} title={c.v3[0]} text={c.v3[1]} />
         </div>
       </section>
+
       <section className="py-20">
         <div className="container-app">
           <div className="card max-w-3xl mx-auto p-8 sm:p-10 text-center">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-ink-900">{c.finalTitle}</h2>
             <p className="mt-2 text-ink-600">{c.finalSub}</p>
             <div className="mt-6 flex justify-center">
-              <Link to="/signup" className="btn-primary">{c.start} <ArrowRight className="w-4 h-4" /></Link>
+              <Link to="/signup" className="btn-primary">
+                {c.start} <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
         </div>
