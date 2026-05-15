@@ -115,9 +115,6 @@ const copy = {
   },
 }
 
-function money(value) {
-  return Number(value || 0)
-}
 
 
 export { currentYear, emptyWorker, emptyIncome, copy }
