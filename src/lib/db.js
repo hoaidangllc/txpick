@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase, SUPABASE_CONFIGURED } from './supabase.js'
+import { authDisplayName } from './userDisplay.js'
 
 function requireUserId(userId) {
   if (!userId) throw new Error('Missing user session. Please sign in again.')
@@ -217,7 +218,7 @@ export async function upsertProfile(user, patch = {}) {
   const payload = {
     id: user.id,
     email: user.email,
-    display_name: patch.display_name || patch.displayName || user.email?.split('@')[0] || '',
+    display_name: patch.display_name || patch.displayName || authDisplayName(user) || user.email?.split('@')[0] || '',
     type: patch.type || 'personal',
     business_name: patch.business_name || patch.businessName || null,
     is_pro: Boolean(patch.is_pro ?? patch.isPro ?? false),

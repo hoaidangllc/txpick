@@ -158,6 +158,19 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray
 }
 
+
+async function getVapidPublicKey() {
+  const viteKey = import.meta.env.VITE_WEB_PUSH_PUBLIC_KEY
+  if (viteKey) return viteKey
+  try {
+    const res = await fetch('/api/push/public-key')
+    const json = await res.json().catch(() => ({}))
+    return res.ok ? (json.publicKey || '') : ''
+  } catch {
+    return ''
+  }
+}
+
 async function postJson(url, body) {
   const { data } = SUPABASE_CONFIGURED ? await supabase.auth.getSession() : { data: { session: null } }
   const token = data?.session?.access_token
@@ -191,9 +204,9 @@ export async function enableBackgroundReminders() {
     return { ok: false, status: permission, message: 'Notification permission was not granted.' }
   }
 
-  const publicKey = import.meta.env.VITE_WEB_PUSH_PUBLIC_KEY
+  const publicKey = await getVapidPublicKey()
   if (!publicKey) {
-    return { ok: false, status: 'missing_key', message: 'Missing VITE_WEB_PUSH_PUBLIC_KEY.' }
+    return { ok: false, status: 'missing_key', message: 'Phone reminders are not configured yet.' }
   }
 
   const reg = await navigator.serviceWorker.ready

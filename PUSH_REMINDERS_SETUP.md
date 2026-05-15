@@ -33,6 +33,8 @@ Frontend/Vercel:
 ```env
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
+WEB_PUSH_PUBLIC_KEY=your-public-vapid-key
+# Optional fallback for fully static frontend builds:
 VITE_WEB_PUSH_PUBLIC_KEY=your-public-vapid-key
 ```
 

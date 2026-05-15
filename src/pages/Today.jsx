@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Bell, Plus, Receipt, Sparkles, CheckCircle2, Trash2,
   Wallet, Crown, ArrowRight, AlertTriangle, WalletCards, Inbox,
@@ -13,6 +13,8 @@ import {
   planLabel,
 } from '../lib/lifeStore.js'
 import { billsDb, expensesDb, remindersDb, useRemoteCollection } from '../lib/db.js'
+import { enableBackgroundReminders, getPushStatus } from '../lib/notifications.js'
+import { getUserDisplayName } from '../lib/userDisplay.js'
 import { getBillBuckets, getReminderBuckets } from '../lib/assistantIntelligence.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
@@ -59,6 +61,13 @@ const txt = {
     greetNight: 'Khuya rồi, chúc bạn ngủ ngon',
     weekday: ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'],
     monthFmt: (d) => `${d.getDate()} tháng ${d.getMonth() + 1}, ${d.getFullYear()}`,
+    phonePromptTitle: 'Bật nhắc trên điện thoại',
+    phonePromptBody: 'Cài app vào màn hình chính và bật thông báo để nhắc việc vẫn báo khi bạn không mở app.',
+    phonePromptButton: 'Bật nhắc ngay',
+    phonePromptOn: 'Đã bật nhắc trên thiết bị này.',
+    phonePromptUnsupported: 'Thiết bị/trình duyệt này chưa hỗ trợ nhắc nền. Hãy thử sau khi cài app vào màn hình chính.',
+    phonePromptDenied: 'Bạn đã chặn thông báo. Mở quyền notification trong cài đặt máy để bật lại.',
+    phonePromptNotReady: 'Nhắc trên điện thoại chưa sẵn sàng trên bản deploy này.',
     none: '—',
   },
   en: {
@@ -102,6 +111,13 @@ const txt = {
     greetNight: 'It’s late — rest well',
     weekday: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
     monthFmt: (d) => d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+    phonePromptTitle: 'Enable phone reminders',
+    phonePromptBody: 'Install the app and enable notifications so reminders can alert you even when the app is closed.',
+    phonePromptButton: 'Enable reminders',
+    phonePromptOn: 'Phone reminders are enabled on this device.',
+    phonePromptUnsupported: 'This device/browser does not support background reminders yet. Try after installing the app.',
+    phonePromptDenied: 'Notifications are blocked. Allow notifications in phone/browser settings to enable this.',
+    phonePromptNotReady: 'Phone reminders are not ready on this deployment yet.',
     none: '—',
   },
 }
@@ -131,6 +147,9 @@ export default function Today() {
   const [quickText, setQuickText] = useState('')
   const [expenseOpen, setExpenseOpen] = useState(false)
   const [billOpen, setBillOpen] = useState(false)
+  const [push, setPush] = useState({ supported: false, permission: 'default', subscribed: false })
+  const [pushBusy, setPushBusy] = useState(false)
+  const [pushMessage, setPushMessage] = useState('')
   const plan = getPlan(planKey)
 
   const reminderBuckets = useMemo(() => getReminderBuckets(reminders), [reminders])
@@ -151,7 +170,7 @@ export default function Today() {
   const hasUrgent = overdueCount > 0 || billBuckets.dueToday.length > 0
   const billsSoon = billBuckets.dueToday.length + billBuckets.dueSoon.length + billBuckets.overdue.length
 
-  const userName = (user?.email?.split('@')[0] || '').replace(/[._-]+/g, ' ').trim()
+  const userName = getUserDisplayName(user, profile)
 
   const addQuickReminder = () => {
     if (!quickText.trim()) return
@@ -162,6 +181,31 @@ export default function Today() {
   }
 
   const loadError = remState.error || expState.error || billState.error
+
+
+  useEffect(() => {
+    let alive = true
+    getPushStatus().then((status) => { if (alive) setPush(status) }).catch(() => undefined)
+    return () => { alive = false }
+  }, [])
+
+  async function enablePhoneReminder() {
+    setPushBusy(true)
+    setPushMessage('')
+    try {
+      const result = await enableBackgroundReminders()
+      const status = await getPushStatus()
+      setPush(status)
+      if (result.ok) setPushMessage(c.phonePromptOn)
+      else if (result.status === 'denied') setPushMessage(c.phonePromptDenied)
+      else if (result.status === 'unsupported') setPushMessage(c.phonePromptUnsupported)
+      else setPushMessage(c.phonePromptNotReady)
+    } catch {
+      setPushMessage(c.phonePromptNotReady)
+    } finally {
+      setPushBusy(false)
+    }
+  }
 
   return (
     <div className="container-app py-5 sm:py-8">
@@ -198,6 +242,25 @@ export default function Today() {
           </div>
         </div>
       </section>
+
+
+      {!push.subscribed && (
+        <section className="mt-4 card p-4 sm:p-5 border-brand-100 bg-brand-50/60">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-white text-brand-700 shadow-soft">
+              <Bell className="w-5 h-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="font-bold text-ink-900">{c.phonePromptTitle}</h2>
+              <p className="mt-1 text-sm text-ink-600 leading-relaxed">{push.supported ? c.phonePromptBody : c.phonePromptUnsupported}</p>
+              {pushMessage && <p className="mt-2 text-xs font-semibold text-brand-800">{pushMessage}</p>}
+            </div>
+          </div>
+          <button className="btn-primary w-full sm:w-auto mt-4" onClick={enablePhoneReminder} disabled={pushBusy || !push.supported}>
+            <Bell className="w-4 h-4" /> {pushBusy ? '…' : c.phonePromptButton}
+          </button>
+        </section>
+      )}
 
       <section className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
         <StatCard label={c.remindersToday} value={(reminderBuckets.today.length + reminderBuckets.overdue.length) || c.none} icon={Bell} tone="brand" />

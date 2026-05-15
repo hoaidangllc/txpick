@@ -4,6 +4,7 @@ import { getProfile, upsertProfile } from '../lib/db.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { disableBackgroundReminders, enableBackgroundReminders, getPushStatus, sendTestPush } from '../lib/notifications.js'
+import { getUserDisplayName } from '../lib/userDisplay.js'
 
 const copy = {
   vi: {
@@ -34,6 +35,7 @@ const copy = {
     pushDisabled: 'Đã tắt trên thiết bị này.',
     testSent: 'Đã gửi thông báo thử.',
     pushSetupError: 'Không bật được. Kiểm tra quyền thông báo của trình duyệt rồi thử lại.',
+    pushNotReady: 'Nhắc trên điện thoại chưa sẵn sàng trên bản deploy này. Kiểm tra lại cấu hình Web Push rồi thử lại.',
   },
   en: {
     title: 'Settings',
@@ -63,6 +65,7 @@ const copy = {
     pushDisabled: 'Disabled on this device.',
     testSent: 'Test notification sent.',
     pushSetupError: 'Could not enable. Check notification permission in your browser and try again.',
+    pushNotReady: 'Phone reminders are not ready on this deployment yet. Check Web Push setup and try again.',
   },
 }
 
@@ -90,7 +93,7 @@ export default function Settings() {
         const row = await getProfile(user.id)
         if (!alive) return
         setForm({
-          display_name: row?.display_name || profile?.display_name || user.email?.split('@')[0] || '',
+          display_name: row?.display_name || getUserDisplayName(user, profile) || '',
           business_name: row?.business_name || profile?.business_name || '',
           type: row?.type || profile?.type || 'personal',
           locale: row?.locale || profile?.locale || lang,
@@ -103,7 +106,7 @@ export default function Settings() {
     }
     load()
     return () => { alive = false }
-  }, [user?.id, user?.email, profile?.display_name, profile?.business_name, profile?.type, profile?.locale, lang])
+  }, [user, profile, lang])
 
   useEffect(() => {
     let alive = true
@@ -140,7 +143,7 @@ export default function Settings() {
       const result = await enableBackgroundReminders()
       await refreshPushStatus()
       if (result.ok) setPushMessage(c.pushEnabled)
-      else setPushError(result.status === 'denied' ? c.permissionDenied : (result.message || c.pushSetupError))
+      else setPushError(result.status === 'denied' ? c.permissionDenied : (result.status === 'missing_key' ? c.pushNotReady : (result.message || c.pushSetupError)))
     } catch (err) {
       setPushError(err.message || c.pushSetupError)
     } finally {

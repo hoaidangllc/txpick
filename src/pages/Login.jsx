@@ -44,7 +44,7 @@ export default function Login() {
     }
     const { error: err } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin + '/onboarding' },
+      options: { redirectTo: window.location.origin + '/today' },
     })
     if (err) setError(err.message)
   }

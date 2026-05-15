@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { getProfile, upsertProfile } from '../lib/db.js'
+import { authDisplayName, isEmailFallbackName } from '../lib/userDisplay.js'
 
 const AuthContext = createContext({
   user: null,
@@ -23,7 +24,15 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      const row = await getProfile(nextUser.id)
+      let row = await getProfile(nextUser.id)
+      const oauthName = authDisplayName(nextUser)
+
+      if (!row) {
+        row = await upsertProfile(nextUser, { display_name: oauthName || undefined })
+      } else if (oauthName && isEmailFallbackName(row.display_name, nextUser)) {
+        row = await upsertProfile(nextUser, { ...row, display_name: oauthName })
+      }
+
       setProfile(row)
       return row
     } catch (err) {
