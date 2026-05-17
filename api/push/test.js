@@ -98,7 +98,7 @@ export default async function handler(req, res) {
     }
 
     const logKey = `test:${user.id}:${Date.now()}`
-    await supabase.from('push_notification_logs').insert({
+    const { error: logError } = await supabase.from('push_notification_logs').insert({
       profile_id: user.id,
       reminder_id: reminders?.[0]?.id || null,
       dedupe_key: logKey,
@@ -106,7 +106,11 @@ export default async function handler(req, res) {
       status: sent ? 'sent' : 'failed',
       delivered_count: sent,
       error: sent ? null : (errors[0] || 'No notification delivered'),
-    }).catch(() => undefined)
+    })
+
+    if (logError) {
+      console.warn('TXPick push test sent, but log save failed:', logError.message || logError)
+    }
 
     if (!sent) {
       return sendJson(res, 500, {
