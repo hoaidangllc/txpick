@@ -1,7 +1,7 @@
 import { sendPush } from '../_push.js'
 import { getServiceClient, requireCronAuth, sendJson } from '../_supabase.js'
 
-const LOOKBACK_MINUTES = Number(process.env.REMINDER_LOOKBACK_MINUTES || 8)
+const LOOKBACK_MINUTES = Number(process.env.REMINDER_LOOKBACK_MINUTES || 15)
 
 function asDate(value) {
   const d = new Date(value)
@@ -90,7 +90,7 @@ function pushPayload(reminder) {
   const timeText = time ? ` • ${time}` : ''
   return {
     title: `${categoryIcon(reminder.category)} ${title}`,
-    body: notes || `Đến giờ làm việc này${timeText}. Mở TXPick để xem chi tiết.`,
+    body: notes || `TXPick nhắc bạn kiểm tra việc này ngay bây giờ.`,
     tag: `reminder-${reminder.id}`,
     url: '/reminders',
     data: { reminderId: reminder.id, category: reminder.category || 'personal' },
