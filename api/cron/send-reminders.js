@@ -1,7 +1,7 @@
 import { sendPush } from '../_push.js'
 import { getServiceClient, requireCronAuth, sendJson } from '../_supabase.js'
 
-const LOOKBACK_MINUTES = Number(process.env.REMINDER_LOOKBACK_MINUTES || 15)
+const LOOKBACK_MINUTES = Number(process.env.REMINDER_LOOKBACK_MINUTES || 1440)
 
 function asDate(value) {
   const d = new Date(value)
