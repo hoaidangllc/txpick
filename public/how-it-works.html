@@ -1,9 +1,431 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>How TXPick Works | TXPick</title><meta name="description" content="Learn how TXPick helps you create reminders, enable phone notifications, track bills, and organize daily life."><link rel="canonical" href="https://txpick.com/how-it-works.html">
-<style>
-  body{font-family:Inter,Arial,sans-serif;margin:0;color:#0f172a;background:#f8fafc;line-height:1.7}
-  .wrap{max-width:920px;margin:0 auto;padding:36px 20px 64px}
-  .card{background:#fff;border:1px solid #e2e8f0;border-radius:24px;padding:28px;box-shadow:0 16px 40px rgba(15,23,42,.06)}
-  a{color:#047857;text-decoration:none;font-weight:700}.muted{color:#64748b}.pill{display:inline-block;background:#ecfdf5;color:#047857;border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px}h1{font-size:42px;line-height:1.08;margin:18px 0}h2{margin-top:34px}li{margin:8px 0}.cta{display:inline-block;margin-top:18px;background:#059669;color:white;padding:12px 18px;border-radius:14px}</style>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"How TXPick Works","description":"Learn how TXPick helps you create reminders, enable phone notifications, track bills, and organize daily life.","publisher":{"@type":"Organization","name":"TXPick"},"mainEntityOfPage":"https://txpick.com/how-it-works.html"}</script></head><body><main class="wrap"><p><a href="/">← TXPick</a></p><section class="card"><span class="pill">TXPick Guide</span>
-<h1>How TXPick Works</h1><p class="muted">TXPick is built to be simple: add what you need to remember, turn on notifications, and check Today.</p><h2>1. Add a reminder or bill</h2><p>Create reminders for tasks, bills, appointments, medicine, payroll, or business items.</p><h2>2. Enable phone notifications</h2><p>Install TXPick as a PWA on iPhone or Android, then allow notifications so reminders can appear on your phone.</p><h2>3. Use Today as your daily home</h2><p>The Today page helps you see what matters now: reminders, bills, expenses, and useful notes.</p>
-<p><a class="cta" href="/signup">Start free</a></p></section></main></body></html>
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <title>How TXPick Works | Reminder, Bill, Payroll & Daily Life App</title>
+  <meta name="description" content="How to use TXPick: add a reminder or bill, turn on phone notifications, and open Today to see what matters now." />
+  <link rel="canonical" href="https://txpick.com/how-it-works.html" />
+
+  <link rel="alternate" hreflang="en" href="https://txpick.com/how-it-works.html" />
+  <link rel="alternate" hreflang="vi" href="https://txpick.com/how-it-works.html" />
+  <link rel="alternate" hreflang="x-default" href="https://txpick.com/how-it-works.html" />
+
+  <meta property="og:title" content="How TXPick Works" />
+  <meta property="og:description" content="A simple guide to reminders, bills, payroll, and daily life with TXPick." />
+  <meta property="og:url" content="https://txpick.com/how-it-works.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:image" content="https://txpick.com/icon-512.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="How TXPick Works" />
+  <meta name="twitter:description" content="A simple guide to reminders, bills, payroll, and daily life with TXPick." />
+  <meta name="twitter:image" content="https://txpick.com/icon-512.png" />
+
+  <meta name="theme-color" content="#10b981" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How TXPick Works",
+    "description": "A simple guide to reminders, bills, payroll, and daily life with TXPick.",
+    "url": "https://txpick.com/how-it-works.html",
+    "inLanguage": ["en-US", "vi-VN"],
+    "step": [
+      { "@type": "HowToStep", "name": "Add your first reminder or bill", "url": "https://txpick.com/" },
+      { "@type": "HowToStep", "name": "Turn on phone notifications", "url": "https://txpick.com/" },
+      { "@type": "HowToStep", "name": "Open Today to see what matters now", "url": "https://txpick.com/today" }
+    ],
+    "publisher": { "@type": "Organization", "name": "TXPick", "url": "https://txpick.com/" }
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-soft: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --muted-soft: #94a3b8;
+      --line: #e2e8f0;
+      --line-soft: #eef2f7;
+      --brand: #10b981;
+      --brand-dark: #047857;
+      --brand-soft: #ecfdf5;
+      --shadow-sm: 0 4px 12px rgba(15, 23, 42, .04);
+      --shadow-lg: 0 24px 56px rgba(15, 23, 42, .10);
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); }
+    body {
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      color: var(--text); line-height: 1.65;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+    h1, h2, h3 { font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; letter-spacing: -0.025em; }
+    a { color: inherit; text-decoration: none; }
+    img, svg { max-width: 100%; display: block; }
+    .wrap { width: 100%; max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+    header {
+      position: sticky; top: 0; z-index: 30;
+      background: rgba(255, 255, 255, .92);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav { height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .brand { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 1.1rem; color: var(--text); }
+    .brand-mark {
+      width: 32px; height: 32px; display: grid; place-items: center;
+      border-radius: 10px; color: white; font-weight: 800; font-size: .9rem;
+      background: linear-gradient(135deg, var(--brand), #34d399);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, .25);
+    }
+    .nav-actions { display: flex; align-items: center; gap: 8px; }
+    .lang-switch {
+      display: inline-flex; padding: 3px; background: var(--bg-soft);
+      border: 1px solid var(--line); border-radius: 999px;
+    }
+    .lang-switch button {
+      border: 0; background: transparent; color: var(--muted);
+      font-weight: 700; padding: 6px 11px; border-radius: 999px;
+      cursor: pointer; font-size: .82rem; transition: background .15s, color .15s;
+    }
+    .lang-switch button:hover { color: var(--text); }
+    html[data-lang="vi"] [data-lang-btn="vi"],
+    html[data-lang="en"] [data-lang-btn="en"] { background: var(--brand); color: white; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      min-height: 42px; padding: 9px 16px; border-radius: 12px;
+      font-weight: 700; font-size: .92rem; border: 1px solid transparent;
+      cursor: pointer; transition: transform .15s, box-shadow .15s, background .15s;
+      white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--brand); color: white; box-shadow: 0 8px 20px rgba(16, 185, 129, .22); }
+    .btn-primary:hover { background: var(--brand-dark); }
+    .btn-secondary { background: white; border-color: var(--line); color: var(--text); }
+    .btn-secondary:hover { border-color: var(--muted-soft); background: var(--bg-soft); }
+
+    .hero {
+      padding: 40px 0 24px;
+      background:
+        radial-gradient(60% 50% at 50% 0%, rgba(16, 185, 129, .12) 0%, transparent 60%),
+        linear-gradient(180deg, #ffffff 0%, var(--bg-soft) 100%);
+      text-align: center;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 6px 12px; border-radius: 999px;
+      background: var(--brand-soft); color: var(--brand-dark);
+      font-weight: 700; font-size: .82rem; margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(1.85rem, 6vw, 3.2rem);
+      line-height: 1.1; font-weight: 800; letter-spacing: -0.03em;
+    }
+    .lead {
+      font-size: clamp(1rem, 2.3vw, 1.15rem);
+      color: var(--muted); max-width: 640px; margin: 18px auto 0; line-height: 1.6;
+    }
+
+    main { padding-bottom: 64px; }
+
+    .step-list { margin-top: 40px; display: grid; gap: 16px; }
+    .step-card {
+      background: white; border: 1px solid var(--line); border-radius: var(--radius-lg);
+      padding: 22px; box-shadow: var(--shadow-sm);
+      display: grid; grid-template-columns: 44px 1fr; gap: 16px; align-items: flex-start;
+    }
+    .step-num {
+      width: 44px; height: 44px; border-radius: 999px; background: var(--brand);
+      color: white; display: grid; place-items: center; font-weight: 800; font-size: 1.05rem;
+    }
+    .step-card h2 { margin: 0 0 6px; font-size: 1.15rem; font-weight: 800; }
+    .step-card p { margin: 0; color: var(--muted); font-size: .98rem; }
+    .step-card .tip {
+      margin-top: 10px; padding: 10px 12px;
+      background: var(--brand-soft); color: var(--brand-dark);
+      border-radius: 12px; font-size: .9rem; font-weight: 600;
+    }
+
+    .faq { margin-top: 56px; display: grid; gap: 12px; }
+    .faq-title { font-size: clamp(1.4rem, 4vw, 1.9rem); font-weight: 800; margin: 0 0 8px; }
+    .faq details {
+      background: white; border: 1px solid var(--line); border-radius: 18px;
+      padding: 14px 18px; box-shadow: var(--shadow-sm);
+    }
+    .faq summary {
+      cursor: pointer; font-weight: 700; font-size: 1rem;
+      list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after { content: "+"; color: var(--brand); font-weight: 800; font-size: 1.2rem; }
+    .faq details[open] summary::after { content: "\2212"; }
+    .faq p { margin: 12px 0 0; color: var(--muted); font-size: .95rem; }
+
+    .cta-box {
+      margin-top: 56px; padding: 28px; border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, var(--brand), #34d399);
+      color: white; box-shadow: var(--shadow-lg);
+      display: flex; flex-direction: column; gap: 16px; align-items: flex-start;
+    }
+    .cta-box h2 { margin: 0; font-size: clamp(1.4rem, 4vw, 1.9rem); font-weight: 800; line-height: 1.2; }
+    .cta-box p { margin: 0; opacity: .94; font-size: 1rem; }
+    .cta-box .btn { background: white; color: var(--brand-dark); align-self: stretch; justify-content: center; }
+
+    footer { border-top: 1px solid var(--line); padding: 22px 0 28px; color: var(--muted); font-size: .9rem; }
+    .foot { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+    .foot-links { display: flex; flex-wrap: wrap; gap: 14px; }
+    .foot-links a:hover { color: var(--text); }
+
+    .vi, .en { display: none; }
+    html[data-lang="en"] .en { display: revert; }
+    html[data-lang="vi"] .vi { display: revert; }
+
+    @media (min-width: 700px) {
+      .nav { height: 68px; }
+      .brand { font-size: 1.25rem; }
+      .brand-mark { width: 36px; height: 36px; }
+      .hero { padding: 64px 0 36px; }
+      .step-list { gap: 18px; }
+      .step-card { padding: 26px; gap: 20px; }
+      .cta-box { flex-direction: row; justify-content: space-between; align-items: center; padding: 36px; }
+      .cta-box .btn { align-self: auto; }
+      .foot { flex-direction: row; justify-content: space-between; align-items: center; }
+    }
+    @media (max-width: 380px) {
+      .wrap { padding: 0 14px; }
+      .nav-actions { gap: 6px; }
+      .lang-switch button { padding: 5px 8px; font-size: .75rem; }
+      .step-card { grid-template-columns: 1fr; }
+      .step-num { width: 36px; height: 36px; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="/" aria-label="TXPick home">
+      <span class="brand-mark">T</span>
+      <span>TXPick</span>
+    </a>
+    <div class="nav-actions">
+      <div class="lang-switch" role="tablist" aria-label="Language">
+        <button type="button" data-lang-btn="en" role="tab" aria-label="English">EN</button>
+        <button type="button" data-lang-btn="vi" role="tab" aria-label="Tieng Viet">VI</button>
+      </div>
+      <a class="btn btn-primary" href="/">
+        <span class="en">Open app</span>
+        <span class="vi">Mở app</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="eyebrow">
+        <span class="en">TXPick guide</span>
+        <span class="vi">Hướng dẫn TXPick</span>
+      </span>
+      <h1>
+        <span class="en">How TXPick works</span>
+        <span class="vi">Cách dùng TXPick</span>
+      </h1>
+      <p class="lead">
+        <span class="en">Three quick steps to start using TXPick for reminders, bills, payroll, and daily tasks — no setup wizard, no learning curve.</span>
+        <span class="vi">Ba bước nhanh để bắt đầu dùng TXPick cho nhắc việc, hóa đơn, payroll và việc hằng ngày — không cần học, mở là dùng được.</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="step-list">
+      <article class="step-card">
+        <div class="step-num">1</div>
+        <div>
+          <h2>
+            <span class="en">Add your first reminder or bill</span>
+            <span class="vi">Thêm nhắc việc hoặc hóa đơn đầu tiên</span>
+          </h2>
+          <p>
+            <span class="en">Type naturally — like "remind me to pay the electric bill tomorrow at 9 PM" — and TXPick reads the date, time, and category for you. Add monthly bills once and they repeat automatically.</span>
+            <span class="vi">Gõ tự nhiên như "nhắc tôi trả tiền điện ngày mai 9 giờ tối" — TXPick sẽ tự đọc ngày, giờ và phân loại. Thêm hóa đơn hằng tháng một lần, app tự lặp lại.</span>
+          </p>
+          <div class="tip">
+            <span class="en">Tip: Reminders, bills, expenses, and payroll all live in one app.</span>
+            <span class="vi">Mẹo: Nhắc việc, hóa đơn, chi tiêu và payroll đều ở chung một app.</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="step-card">
+        <div class="step-num">2</div>
+        <div>
+          <h2>
+            <span class="en">Turn on phone notifications</span>
+            <span class="vi">Bật thông báo trên điện thoại</span>
+          </h2>
+          <p>
+            <span class="en">On iPhone, add TXPick to your Home Screen first (Share → Add to Home Screen), then open it from the icon and tap "Enable reminders". On Android/Samsung, allow notifications when the browser asks.</span>
+            <span class="vi">Trên iPhone: bấm Share → Add to Home Screen, sau đó mở app từ icon và bấm "Bật nhắc ngay". Trên Android/Samsung: cho phép thông báo khi trình duyệt hỏi.</span>
+          </p>
+          <div class="tip">
+            <span class="en">Once on, your phone alerts you even when the app is closed.</span>
+            <span class="vi">Sau khi bật, điện thoại sẽ báo cả khi app đang đóng.</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="step-card">
+        <div class="step-num">3</div>
+        <div>
+          <h2>
+            <span class="en">Open Today to see what matters now</span>
+            <span class="vi">Mở trang Hôm nay để biết việc cần làm</span>
+          </h2>
+          <p>
+            <span class="en">The Today page shows your tasks for today, bills coming up, monthly spending, and a short note about what needs attention. One screen, no clutter.</span>
+            <span class="vi">Trang Hôm nay cho thấy việc cần làm trong ngày, hóa đơn sắp tới, chi tiêu trong tháng và một ghi chú ngắn về việc cần chú ý. Một màn hình, không rối.</span>
+          </p>
+          <div class="tip">
+            <span class="en">Open it once a day — you're done.</span>
+            <span class="vi">Mở một lần mỗi ngày là đủ.</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <section class="faq">
+      <h2 class="faq-title">
+        <span class="en">Common questions</span>
+        <span class="vi">Câu hỏi thường gặp</span>
+      </h2>
+
+      <details>
+        <summary>
+          <span class="en">Is TXPick free?</span>
+          <span class="vi">TXPick có miễn phí không?</span>
+        </summary>
+        <p>
+          <span class="en">Yes. Start free, no credit card needed. Core reminders, bills, expenses, and Today view stay free.</span>
+          <span class="vi">Có. Bắt đầu miễn phí, không cần thẻ tín dụng. Nhắc việc, hóa đơn, chi tiêu và trang Hôm nay luôn miễn phí.</span>
+        </p>
+      </details>
+
+      <details>
+        <summary>
+          <span class="en">Does it work on iPhone?</span>
+          <span class="vi">Có dùng được trên iPhone không?</span>
+        </summary>
+        <p>
+          <span class="en">Yes. Open txpick.com in Safari, tap Share → Add to Home Screen, then open TXPick from the new icon. Notifications work only when launched from the Home Screen icon.</span>
+          <span class="vi">Có. Mở txpick.com bằng Safari, bấm Share → Add to Home Screen, sau đó mở TXPick từ icon mới. Thông báo chỉ chạy khi mở từ icon Home Screen.</span>
+        </p>
+      </details>
+
+      <details>
+        <summary>
+          <span class="en">Will I really get a notification when a bill is due?</span>
+          <span class="vi">Có thật sự nhận thông báo khi hóa đơn đến hạn không?</span>
+        </summary>
+        <p>
+          <span class="en">Yes. After you enable phone reminders, TXPick sends a push notification when a reminder or bill is due — even if the app is closed.</span>
+          <span class="vi">Có. Sau khi bật nhắc trên điện thoại, TXPick sẽ gửi thông báo đẩy khi nhắc việc hoặc hóa đơn tới hạn — kể cả khi app đóng.</span>
+        </p>
+      </details>
+
+      <details>
+        <summary>
+          <span class="en">Can I use it for my small business?</span>
+          <span class="vi">Tôi có thể dùng cho business nhỏ không?</span>
+        </summary>
+        <p>
+          <span class="en">Yes. Switch to Business mode in the header. You can track payroll, supplies, shop expenses, 1099/W-2 records, and weekly tasks separately from personal items.</span>
+          <span class="vi">Có. Đổi sang chế độ Business ở header. Bạn có thể theo dõi payroll, supplies, chi phí tiệm, hồ sơ 1099/W-2 và việc hằng tuần — tách riêng khỏi việc cá nhân.</span>
+        </p>
+      </details>
+
+      <details>
+        <summary>
+          <span class="en">Where is my data stored?</span>
+          <span class="vi">Dữ liệu của tôi lưu ở đâu?</span>
+        </summary>
+        <p>
+          <span class="en">In your own account, secured by Supabase Auth + Row Level Security. Only you can see your data. See the <a href="/privacy" style="color:var(--brand-dark);font-weight:700;">Privacy page</a> for details.</span>
+          <span class="vi">Trong tài khoản của bạn, bảo vệ bằng Supabase Auth + Row Level Security. Chỉ bạn thấy được dữ liệu của mình. Xem chi tiết ở <a href="/privacy" style="color:var(--brand-dark);font-weight:700;">trang Bảo mật</a>.</span>
+        </p>
+      </details>
+    </section>
+
+    <div class="cta-box">
+      <div>
+        <h2>
+          <span class="en">Ready to try TXPick?</span>
+          <span class="vi">Sẵn sàng dùng thử TXPick?</span>
+        </h2>
+        <p>
+          <span class="en">Free to start. No credit card. Add your first reminder in under a minute.</span>
+          <span class="vi">Miễn phí. Không cần thẻ tín dụng. Thêm nhắc việc đầu tiên trong chưa tới một phút.</span>
+        </p>
+      </div>
+      <a class="btn" href="/">
+        <span class="en">Open TXPick</span>
+        <span class="vi">Mở TXPick</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>© <span id="year"></span> TXPick</span>
+    <div class="foot-links">
+      <a href="/"><span class="en">Home</span><span class="vi">Trang chủ</span></a>
+      <a href="/what-is-txpick.html"><span class="en">What is TXPick</span><span class="vi">TXPick là gì</span></a>
+      <a href="/privacy"><span class="en">Privacy</span><span class="vi">Bảo mật</span></a>
+      <a href="/terms"><span class="en">Terms</span><span class="vi">Điều khoản</span></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var saved = null;
+  try { saved = localStorage.getItem('txpick_lang'); } catch (e) {}
+  var browser = (navigator.language || '').toLowerCase().indexOf('vi') === 0 ? 'vi' : 'en';
+  var lang = (saved === 'vi' || saved === 'en') ? saved : browser;
+  root.setAttribute('data-lang', lang);
+  root.setAttribute('lang', lang === 'vi' ? 'vi' : 'en');
+  document.querySelectorAll('[data-lang-btn]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var next = btn.getAttribute('data-lang-btn');
+      try { localStorage.setItem('txpick_lang', next); } catch (e) {}
+      root.setAttribute('data-lang', next);
+      root.setAttribute('lang', next === 'vi' ? 'vi' : 'en');
+    });
+  });
+  var y = document.getElementById('year');
+  if (y) y.textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
