@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /today
+Disallow: /personal
+Disallow: /business
+Disallow: /reminders
+Disallow: /expenses
+Disallow: /bills
+Disallow: /summary
+Disallow: /tax
+Disallow: /smart
+Disallow: /settings
+Disallow: /admin/
+Disallow: /pricing
+Disallow: /ai
+
+Sitemap: https://txpick.com/sitemap.xml

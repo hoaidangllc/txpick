@@ -4,9 +4,9 @@ export const translations = {
     taglineMain: 'Một nơi gọn gàng để nhớ việc, ghi chi tiêu và tổng kết cuối năm.',
     taglineSub: 'Dành cho người Việt ở Mỹ — nhắc việc, hóa đơn, chi tiêu cá nhân và kinh doanh.',
     welcome: 'Chào mừng bạn quay lại.',
-    nav: { login: 'Đăng nhập', logout: 'Đăng xuất', pricing: 'Phản hồi', getStarted: 'Bắt đầu', today: 'Hôm nay' },
+    nav: { login: 'Đăng nhập', logout: 'Đăng xuất', feedback: 'Góp ý', pricing: 'Bảng giá', getStarted: 'Bắt đầu', today: 'Hôm nay' },
     footer: {
-      tagline: 'App sắp xếp việc hằng ngày cho người Việt ở Mỹ.',
+      tagline: 'App sắp xếp việc hằng ngày cho gia đình và chủ business bận rộn.',
       rights: 'Mọi quyền được bảo lưu.',
       contact: 'Liên hệ',
       privacy: 'Bảo mật',
@@ -29,9 +29,9 @@ export const translations = {
     taglineMain: 'A calm home for reminders, expenses, and year-end summaries.',
     taglineSub: 'Built for Vietnamese families in the U.S. — reminders, bills, personal and business expenses.',
     welcome: 'Welcome back.',
-    nav: { login: 'Log in', logout: 'Log out', pricing: 'Feedback', getStarted: 'Get started', today: 'Today' },
+    nav: { login: 'Log in', logout: 'Log out', feedback: 'Feedback', pricing: 'Pricing', getStarted: 'Get started', today: 'Today' },
     footer: {
-      tagline: 'A daily-life app for Vietnamese families in the U.S.',
+      tagline: 'A daily organizer for busy families and business owners.',
       rights: 'All rights reserved.',
       contact: 'Contact',
       privacy: 'Privacy',

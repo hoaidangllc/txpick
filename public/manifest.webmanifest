@@ -1,13 +1,21 @@
 {
   "name": "TXPick",
   "short_name": "TXPick",
-  "description": "TXPick helps you organize reminders, bills, expenses, business records, 1099/W-2 info, and year-end summaries.",
+  "description": "A simple daily app for reminders, phone notifications, bills, expenses, business records, and year-end summaries.",
+  "id": "/",
   "start_url": "/today",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f8fafc",
   "theme_color": "#10b981",
+  "categories": [
+    "productivity",
+    "utilities",
+    "business"
+  ],
+  "lang": "en-US",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/icon-192.png",

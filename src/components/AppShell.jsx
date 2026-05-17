@@ -30,7 +30,7 @@ const personalNav = [
 ]
 
 const businessNav = [
-  { to: '/business', icon: BriefcaseBusiness, en: 'Business', vi: 'Business' },
+  { to: '/business', icon: BriefcaseBusiness, en: 'Business', vi: 'Kinh doanh' },
   { to: '/tax', icon: FileText, en: '1099 / W-2', vi: '1099 / W-2' },
   { to: '/reminders', icon: Bell, en: 'Reminders', vi: 'Nhắc việc' },
   { to: '/summary', icon: Receipt, en: 'Reports', vi: 'Tổng kết' },
@@ -58,12 +58,12 @@ export default function AppShell() {
   }
 
   const logoutLabel = lang === 'vi' ? 'Đăng xuất' : 'Log out'
-  const workspaceLabel = isBusiness ? (profile?.business_name || (lang === 'vi' ? 'Business' : 'Business')) : (lang === 'vi' ? 'Cá nhân' : 'Personal')
-  const switchLabel = isBusiness ? (lang === 'vi' ? 'Đổi sang Cá nhân' : 'Switch to Personal') : (lang === 'vi' ? 'Đổi sang Business' : 'Switch to Business')
+  const workspaceLabel = isBusiness ? (profile?.business_name || (lang === 'vi' ? 'Kinh doanh' : 'Business')) : (lang === 'vi' ? 'Cá nhân' : 'Personal')
+  const switchLabel = isBusiness ? (lang === 'vi' ? 'Đổi sang Cá nhân' : 'Switch to Personal') : (lang === 'vi' ? 'Đổi sang Kinh doanh' : 'Switch to Business')
   const switchTarget = isBusiness ? 'personal' : 'business'
   const [quickOpen, setQuickOpen] = useState(false)
   const quick = lang === 'vi' ? {
-    title: 'Thêm nhanh', reminder: 'Nhắc việc', expense: 'Chi tiêu', bill: 'Hóa đơn', business: 'Business / Thuế', close: 'Đóng', sub: 'Chọn việc cần thêm. Mục này giúp bạn ghi nhanh mà không phải đi nhiều bước.'
+    title: 'Thêm nhanh', reminder: 'Nhắc việc', expense: 'Chi tiêu', bill: 'Hóa đơn', business: 'Kinh doanh / Thuế', close: 'Đóng', sub: 'Chọn việc cần thêm. Mục này giúp bạn ghi nhanh mà không phải đi nhiều bước.'
   } : {
     title: 'Quick Add', reminder: 'Reminder', expense: 'Expense', bill: 'Bill', business: 'Business / Tax', close: 'Close', sub: 'Choose what you want to add. This keeps common actions one tap away.'
   }

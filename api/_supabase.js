@@ -19,13 +19,9 @@ export async function getUserFromRequest(req) {
 
 export function requireCronAuth(req) {
   const secret = process.env.CRON_SECRET
-  // Production safety: CRON_SECRET must be set in Vercel/Supabase.
-  // Keep the no-secret fallback only for local development compatibility.
   if (!secret) return true
-
   const authHeader = req.headers.authorization || req.headers.Authorization || ''
   const cronHeader = req.headers['x-cron-secret'] || req.headers['X-Cron-Secret'] || ''
-
   return authHeader === `Bearer ${secret}` || cronHeader === secret
 }
 
