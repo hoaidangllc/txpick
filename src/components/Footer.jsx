@@ -16,6 +16,8 @@ export default function Footer() {
           <p className="font-semibold text-ink-700 mb-2">{t.footer.contact}</p>
           <a href="mailto:hello@txpick.app" className="hover:text-ink-900">hello@txpick.app</a>
           <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+            <a href="/what-is-txpick.html" className="hover:text-ink-900">TXPick</a>
+            <a href="/how-it-works.html" className="hover:text-ink-900">Guide</a>
             <Link to="/feedback" className="hover:text-ink-900">{t.nav.feedback}</Link>
             <Link to="/privacy" className="hover:text-ink-900">{t.footer.privacy}</Link>
             <Link to="/terms" className="hover:text-ink-900">{t.footer.terms}</Link>

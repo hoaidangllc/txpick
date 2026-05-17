@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
+Allow: /what-is-txpick.html
+Allow: /how-it-works.html
+Allow: /guides/
 Disallow: /today
 Disallow: /personal
 Disallow: /business
