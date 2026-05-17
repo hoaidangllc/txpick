@@ -1,18 +1,37 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-  <title>What is TXPick? | Reminder, Bills, Payroll & Daily Life App</title>
-  <meta name="description" content="TXPick helps busy people manage reminders, bills, payroll, expenses, and daily life in one simple app. English and Vietnamese support." />
+  <title>What is TXPick? | Simple Reminder, Bill, Payroll & Daily Life App</title>
+  <meta name="description" content="TXPick is a simple reminder, bill, payroll, expense, and daily life app. Works on iPhone and Samsung." />
   <link rel="canonical" href="https://txpick.com/what-is-txpick.html" />
 
+  <link rel="alternate" hreflang="en" href="https://txpick.com/what-is-txpick.html" />
+  <link rel="alternate" hreflang="vi" href="https://txpick.com/what-is-txpick.html" />
+  <link rel="alternate" hreflang="x-default" href="https://txpick.com/what-is-txpick.html" />
+
   <meta property="og:title" content="What is TXPick?" />
-  <meta property="og:description" content="Never forget bills, payroll, reminders, or daily tasks again. TXPick keeps life and business organized in one simple app." />
+  <meta property="og:description" content="Simple reminder, bill, payroll, expense, and daily life app." />
   <meta property="og:url" content="https://txpick.com/what-is-txpick.html" />
   <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://txpick.com/icon-512.png" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="What is TXPick?" />
+  <meta name="twitter:description" content="Simple reminder, bill, payroll, expense, and daily life app." />
+  <meta name="twitter:image" content="https://txpick.com/icon-512.png" />
+
+  <meta name="theme-color" content="#10b981" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap"
+    rel="stylesheet"
+  />
 
   <script type="application/ld+json">
   {
@@ -20,7 +39,8 @@
     "@type": "WebPage",
     "name": "What is TXPick?",
     "url": "https://txpick.com/what-is-txpick.html",
-    "description": "TXPick helps busy people manage reminders, bills, payroll, expenses, and daily life in one simple app.",
+    "description": "Simple reminder, bill, payroll, expense, and daily life app.",
+    "inLanguage": ["en-US", "vi-VN"],
     "isPartOf": {
       "@type": "WebSite",
       "name": "TXPick",
@@ -31,649 +51,425 @@
 
   <style>
     :root {
-      --bg: #f8fafc;
-      --card: #ffffff;
+      --bg: #ffffff;
+      --bg-soft: #f8fafc;
       --text: #0f172a;
       --muted: #64748b;
+      --muted-soft: #94a3b8;
       --line: #e2e8f0;
-      --brand: #2563eb;
-      --brand-dark: #1d4ed8;
-      --soft: #eff6ff;
-      --green: #16a34a;
-      --shadow: 0 18px 50px rgba(15, 23, 42, .10);
-      --radius: 24px;
+      --line-soft: #eef2f7;
+      --brand: #10b981;
+      --brand-dark: #047857;
+      --brand-soft: #ecfdf5;
+      --shadow-sm: 0 4px 12px rgba(15, 23, 42, .04);
+      --shadow-lg: 0 24px 56px rgba(15, 23, 42, .10);
+      --radius-lg: 24px;
+      --radius-xl: 32px;
     }
-
     * { box-sizing: border-box; }
-
+    html, body { margin: 0; padding: 0; background: var(--bg); }
     body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(37, 99, 235, .14), transparent 32rem),
-        radial-gradient(circle at top right, rgba(22, 163, 74, .10), transparent 28rem),
-        var(--bg);
-      color: var(--text);
-      line-height: 1.65;
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      color: var(--text); line-height: 1.6;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
     }
-
+    h1, h2, h3 { font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; letter-spacing: -0.025em; }
     a { color: inherit; text-decoration: none; }
-
-    .wrap {
-      width: min(1120px, calc(100% - 32px));
-      margin: 0 auto;
-    }
+    img, svg { max-width: 100%; display: block; }
+    .wrap { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 
     header {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      backdrop-filter: blur(14px);
-      background: rgba(248, 250, 252, .86);
-      border-bottom: 1px solid rgba(226, 232, 240, .9);
+      position: sticky; top: 0; z-index: 30;
+      background: rgba(255, 255, 255, .92);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
     }
-
-    .nav {
-      height: 72px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
+    .nav { height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .brand { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 1.1rem; color: var(--text); }
+    .brand-mark {
+      width: 32px; height: 32px; display: grid; place-items: center;
+      border-radius: 10px; color: white; font-weight: 800; font-size: .9rem;
+      background: linear-gradient(135deg, var(--brand), #34d399);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, .25);
     }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 900;
-      letter-spacing: -0.03em;
-      font-size: 1.25rem;
-    }
-
-    .logo {
-      width: 38px;
-      height: 38px;
-      display: grid;
-      place-items: center;
-      border-radius: 14px;
-      color: white;
-      background: linear-gradient(135deg, var(--brand), #22c55e);
-      box-shadow: 0 10px 22px rgba(37, 99, 235, .28);
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
+    .nav-actions { display: flex; align-items: center; gap: 8px; }
     .lang-switch {
-      display: flex;
-      padding: 4px;
-      background: white;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      box-shadow: 0 8px 20px rgba(15, 23, 42, .06);
+      display: inline-flex; padding: 3px; background: var(--bg-soft);
+      border: 1px solid var(--line); border-radius: 999px;
     }
-
     .lang-switch button {
-      border: 0;
-      background: transparent;
-      color: var(--muted);
-      font-weight: 800;
-      padding: 8px 12px;
-      border-radius: 999px;
-      cursor: pointer;
+      border: 0; background: transparent; color: var(--muted);
+      font-weight: 700; padding: 6px 11px; border-radius: 999px;
+      cursor: pointer; font-size: .82rem; transition: background .15s, color .15s;
     }
-
-    .lang-switch button.active {
-      background: var(--brand);
-      color: white;
-    }
+    .lang-switch button:hover { color: var(--text); }
+    html[data-lang="vi"] [data-lang-btn="vi"],
+    html[data-lang="en"] [data-lang-btn="en"] { background: var(--brand); color: white; }
 
     .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 42px;
-      padding: 10px 16px;
-      border-radius: 999px;
-      font-weight: 850;
-      border: 1px solid transparent;
-      transition: transform .15s ease, box-shadow .15s ease;
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      min-height: 42px; padding: 9px 16px; border-radius: 12px;
+      font-weight: 700; font-size: .92rem; border: 1px solid transparent;
+      cursor: pointer; transition: transform .15s, box-shadow .15s, background .15s;
+      white-space: nowrap;
     }
-
     .btn:hover { transform: translateY(-1px); }
-
-    .btn-primary {
-      background: var(--brand);
-      color: white;
-      box-shadow: 0 12px 26px rgba(37, 99, 235, .22);
-    }
-
-    .btn-secondary {
-      background: white;
-      border-color: var(--line);
-      color: var(--text);
-    }
-
-    main { padding: 56px 0 80px; }
+    .btn-primary { background: var(--brand); color: white; box-shadow: 0 8px 20px rgba(16, 185, 129, .22); }
+    .btn-primary:hover { background: var(--brand-dark); }
+    .btn-secondary { background: white; border-color: var(--line); color: var(--text); }
+    .btn-secondary:hover { border-color: var(--muted-soft); background: var(--bg-soft); }
 
     .hero {
-      display: grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap: 28px;
-      align-items: center;
+      position: relative; padding: 48px 0 36px;
+      background:
+        radial-gradient(60% 50% at 50% 0%, rgba(16, 185, 129, .12) 0%, transparent 60%),
+        radial-gradient(40% 40% at 90% 20%, rgba(245, 158, 11, .08) 0%, transparent 60%),
+        linear-gradient(180deg, #ffffff 0%, var(--bg-soft) 100%);
     }
-
+    .hero-grid { display: grid; grid-template-columns: 1fr; gap: 32px; align-items: center; }
     .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: var(--soft);
-      color: var(--brand-dark);
-      font-weight: 850;
-      font-size: .9rem;
-      margin-bottom: 18px;
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 6px 12px; border-radius: 999px;
+      background: var(--brand-soft); color: var(--brand-dark);
+      font-weight: 700; font-size: .82rem; margin-bottom: 16px;
+    }
+    h1 { margin: 0; font-size: clamp(1.85rem, 6vw, 3.6rem); line-height: 1.1; font-weight: 800; letter-spacing: -0.03em; }
+    .lead { font-size: clamp(1rem, 2.5vw, 1.18rem); color: var(--muted); max-width: 580px; margin: 18px 0 0; line-height: 1.6; }
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+    .hero-actions .btn { flex: 1 1 auto; min-width: 0; }
+    .trust { margin-top: 22px; display: flex; flex-direction: column; gap: 8px; color: var(--muted); font-size: .92rem; }
+    .trust-row { display: flex; align-items: center; gap: 8px; }
+    .trust-row .ti {
+      width: 22px; height: 22px; display: grid; place-items: center;
+      border-radius: 7px; background: var(--brand-soft); color: var(--brand-dark);
+      font-size: .8rem; flex: 0 0 22px;
     }
 
-    h1 {
-      margin: 0;
-      font-size: clamp(2.25rem, 6vw, 4.8rem);
-      line-height: .98;
-      letter-spacing: -0.065em;
-      max-width: 820px;
+    .phone {
+      background: #0f172a; border-radius: 36px; padding: 14px;
+      box-shadow: var(--shadow-lg); max-width: 340px; margin: 8px auto 0; width: 100%;
     }
+    .phone-screen { background: linear-gradient(180deg, #ffffff, var(--bg-soft)); border-radius: 26px; padding: 18px 16px; }
+    .screen-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; color: var(--muted); font-weight: 700; font-size: .78rem; }
+    .today-card { background: white; border: 1px solid var(--line); border-radius: 18px; padding: 14px; box-shadow: var(--shadow-sm); margin-bottom: 10px; }
+    .today-card h3 { margin: 0 0 4px; font-size: 1rem; font-weight: 800; }
+    .today-card p { margin: 0; color: var(--muted); font-size: .85rem; }
+    .task { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line-soft); }
+    .task:first-of-type { border-top: 0; padding-top: 4px; }
+    .task-icon { width: 32px; height: 32px; flex: 0 0 32px; display: grid; place-items: center; border-radius: 10px; background: var(--brand-soft); font-size: 1.05rem; }
+    .task-body { min-width: 0; }
+    .task-body strong { display: block; font-size: .92rem; font-weight: 700; }
+    .task-body small { color: var(--muted); font-size: .78rem; }
 
-    .lead {
-      font-size: clamp(1.05rem, 2vw, 1.28rem);
-      color: var(--muted);
-      max-width: 720px;
-      margin: 22px 0 0;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 28px;
-    }
-
-    .trust {
-      margin-top: 24px;
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-weight: 700;
-      font-size: .95rem;
-    }
-
-    .trust span {
-      display: inline-flex;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .phone-card {
-      background: #0f172a;
-      color: white;
-      border-radius: 34px;
-      padding: 16px;
-      box-shadow: var(--shadow);
-      max-width: 420px;
-      margin-left: auto;
-    }
-
-    .phone-screen {
-      background: linear-gradient(180deg, #f8fafc, #eef2ff);
-      color: var(--text);
-      border-radius: 26px;
-      padding: 20px;
-      min-height: 520px;
-    }
-
-    .screen-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
-      color: var(--muted);
-      font-weight: 800;
-      font-size: .85rem;
-    }
-
-    .today-card {
-      background: white;
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      padding: 18px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, .08);
-      margin-bottom: 14px;
-    }
-
-    .today-card h3 {
-      margin: 0 0 10px;
-      font-size: 1.15rem;
-    }
-
-    .task {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      padding: 12px 0;
-      border-top: 1px solid #eef2f7;
-    }
-
-    .task:first-of-type { border-top: 0; }
-    .task-icon {
-      width: 34px;
-      height: 34px;
-      display: grid;
-      place-items: center;
-      border-radius: 12px;
-      background: var(--soft);
-      flex: 0 0 auto;
-    }
-
-    .task strong { display: block; }
-    .task small { color: var(--muted); }
-
-    .section {
-      margin-top: 64px;
-    }
-
-    .section-title {
-      max-width: 780px;
-      margin-bottom: 24px;
-    }
-
-    .section-title h2 {
-      font-size: clamp(1.8rem, 4vw, 3rem);
-      line-height: 1.05;
-      letter-spacing: -0.045em;
-      margin: 0 0 12px;
-    }
-
-    .section-title p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 1.08rem;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .card {
-      background: rgba(255, 255, 255, .86);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 22px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, .06);
-    }
-
-    .card .icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      background: var(--soft);
-      font-size: 1.3rem;
-      margin-bottom: 14px;
-    }
-
-    .card h3 {
-      margin: 0 0 8px;
-      font-size: 1.1rem;
-    }
-
-    .card p {
-      margin: 0;
-      color: var(--muted);
-    }
-
-    .split {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      align-items: stretch;
-    }
-
-    .check-list {
-      list-style: none;
-      padding: 0;
-      margin: 14px 0 0;
-    }
-
-    .check-list li {
-      display: flex;
-      gap: 10px;
-      padding: 9px 0;
-      color: var(--text);
-      font-weight: 700;
-    }
-
-    .check-list li::before {
-      content: "✓";
-      color: var(--green);
-      font-weight: 900;
-    }
+    main { padding-bottom: 64px; }
+    section { padding: 48px 0; }
+    .section-head { max-width: 700px; margin: 0 auto 28px; text-align: center; }
+    .section-head h2 { margin: 0 0 10px; font-size: clamp(1.55rem, 4vw, 2.4rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.025em; }
+    .section-head p { margin: 0; color: var(--muted); font-size: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .feature { background: white; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-sm); }
+    .feature .icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--brand-soft); color: var(--brand-dark); font-size: 1.4rem; margin-bottom: 12px; }
+    .feature h3 { margin: 0 0 6px; font-size: 1.1rem; font-weight: 800; }
+    .feature p { margin: 0; color: var(--muted); font-size: .95rem; }
+    .split { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .split .feature h2 { margin: 0 0 8px; font-size: 1.3rem; font-weight: 800; }
+    .check-list { list-style: none; padding: 0; margin: 12px 0 0; }
+    .check-list li { display: flex; gap: 9px; align-items: flex-start; padding: 7px 0; font-size: .95rem; color: var(--text); }
+    .check-list li::before { content: "\2713"; color: var(--brand); font-weight: 800; flex: 0 0 16px; line-height: 1.5; }
+    .steps { display: grid; grid-template-columns: 1fr; gap: 12px; max-width: 720px; margin: 0 auto; }
+    .step { background: white; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px 20px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow-sm); }
+    .step-num { flex: 0 0 36px; width: 36px; height: 36px; border-radius: 999px; background: var(--brand); color: white; display: grid; place-items: center; font-weight: 800; }
+    .step p { margin: 0; font-weight: 600; font-size: .98rem; }
 
     .cta-box {
-      margin-top: 64px;
-      padding: 34px;
-      border-radius: 30px;
-      background: linear-gradient(135deg, #1d4ed8, #16a34a);
-      color: white;
-      box-shadow: var(--shadow);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 22px;
+      margin-top: 32px; padding: 28px; border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, var(--brand), #34d399);
+      color: white; box-shadow: var(--shadow-lg);
+      display: flex; flex-direction: column; gap: 16px; align-items: flex-start;
     }
+    .cta-box h2 { margin: 0; font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 800; line-height: 1.2; }
+    .cta-box p { margin: 0; opacity: .94; font-size: 1rem; }
+    .cta-box .btn { background: white; color: var(--brand-dark); align-self: stretch; justify-content: center; }
 
-    .cta-box h2 {
-      margin: 0 0 8px;
-      font-size: clamp(1.8rem, 4vw, 3rem);
-      letter-spacing: -0.045em;
-      line-height: 1.05;
-    }
-
-    .cta-box p {
-      margin: 0;
-      opacity: .92;
-      font-size: 1.05rem;
-    }
-
-    .cta-box .btn {
-      background: white;
-      color: #1d4ed8;
-      flex: 0 0 auto;
-    }
-
-    footer {
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      padding: 28px 0;
-      font-size: .95rem;
-    }
+    footer { border-top: 1px solid var(--line); padding: 22px 0 28px; color: var(--muted); font-size: .9rem; }
+    .foot { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+    .foot-links { display: flex; flex-wrap: wrap; gap: 14px; }
+    .foot-links a:hover { color: var(--text); }
 
     .vi, .en { display: none; }
     html[data-lang="en"] .en { display: revert; }
     html[data-lang="vi"] .vi { display: revert; }
 
-    html[data-lang="vi"] [data-lang-btn="vi"],
-    html[data-lang="en"] [data-lang-btn="en"] {
-      background: var(--brand);
-      color: white;
+    @media (min-width: 700px) {
+      .nav { height: 68px; }
+      .brand { font-size: 1.25rem; }
+      .brand-mark { width: 36px; height: 36px; }
+      .hero { padding: 72px 0 56px; }
+      .hero-grid { grid-template-columns: 1.15fr .85fr; gap: 40px; }
+      .lead { margin: 22px 0 0; }
+      .hero-actions .btn { flex: 0 0 auto; }
+      .trust { flex-direction: row; flex-wrap: wrap; gap: 16px; }
+      .phone { max-width: 380px; margin-left: auto; }
+      section { padding: 64px 0; }
+      .grid-3 { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+      .split { grid-template-columns: 1fr 1fr; gap: 18px; }
+      .steps { grid-template-columns: repeat(3, 1fr); }
+      .cta-box { flex-direction: row; justify-content: space-between; align-items: center; padding: 36px; }
+      .cta-box .btn { align-self: auto; }
+      .foot { flex-direction: row; justify-content: space-between; align-items: center; }
     }
-
-    @media (max-width: 860px) {
-      .nav {
-        height: auto;
-        padding: 12px 0;
-        align-items: flex-start;
-      }
-
-      .brand span { font-size: 1.05rem; }
-      .hero { grid-template-columns: 1fr; }
-      .phone-card { margin: 10px auto 0; width: 100%; }
-      .grid { grid-template-columns: 1fr; }
-      .split { grid-template-columns: 1fr; }
-      .cta-box {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-
-    @media (max-width: 540px) {
-      .wrap { width: min(100% - 22px, 1120px); }
-      main { padding-top: 34px; }
-      .nav-actions {
-        width: 100%;
-        justify-content: space-between;
-      }
-      .nav {
-        flex-direction: column;
-      }
-      .btn {
-        width: 100%;
-      }
-      .nav-actions .btn-secondary {
-        display: none;
-      }
-      .lang-switch {
-        width: 100%;
-      }
-      .lang-switch button {
-        flex: 1;
-      }
-      .hero-actions .btn {
-        width: 100%;
-      }
-      .phone-screen {
-        min-height: auto;
-      }
-      .card, .cta-box {
-        padding: 20px;
-      }
+    @media (max-width: 380px) {
+      .wrap { padding: 0 14px; }
+      .nav-actions { gap: 6px; }
+      .lang-switch button { padding: 5px 8px; font-size: .75rem; }
+      .btn { padding: 9px 12px; font-size: .85rem; }
     }
   </style>
 </head>
-
 <body>
 <header>
   <div class="wrap nav">
     <a class="brand" href="/" aria-label="TXPick home">
-      <span class="logo">T</span>
+      <span class="brand-mark">T</span>
       <span>TXPick</span>
     </a>
-
     <div class="nav-actions">
-      <div class="lang-switch" aria-label="Language switcher">
-        <button type="button" data-lang-btn="en">EN</button>
-        <button type="button" data-lang-btn="vi">VI</button>
+      <div class="lang-switch" role="tablist" aria-label="Language">
+        <button type="button" data-lang-btn="en" role="tab" aria-label="English">EN</button>
+        <button type="button" data-lang-btn="vi" role="tab" aria-label="Tieng Viet">VI</button>
       </div>
-      <a class="btn btn-secondary" href="/how-it-works.html">
-        <span class="en">How it works</span>
-        <span class="vi">Cách hoạt động</span>
-      </a>
       <a class="btn btn-primary" href="/">
-        <span class="en">Start Free</span>
-        <span class="vi">Dùng miễn phí</span>
+        <span class="en">Open app</span>
+        <span class="vi">Mở app</span>
       </a>
     </div>
   </div>
 </header>
 
 <main>
-  <section class="wrap hero">
-    <div>
-      <div class="eyebrow">
-        <span class="en">Simple reminders for busy life</span>
-        <span class="vi">Nhắc việc đơn giản cho cuộc sống bận rộn</span>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">
+          <span class="en">Reminders · Bills · Expenses · Daily life</span>
+          <span class="vi">Nhắc việc · Hóa đơn · Chi tiêu · Việc hằng ngày</span>
+        </span>
+        <h1>
+          <span class="en">A simple app for reminders, bills, payroll, and daily life.</span>
+          <span class="vi">App đơn giản cho nhắc việc, hóa đơn, payroll và việc hằng ngày.</span>
+        </h1>
+        <p class="lead">
+          <span class="en">TXPick keeps your bills, payroll, appointments, expenses, and to-dos in one place — so you don’t have to keep it all in your head.</span>
+          <span class="vi">TXPick giữ giùm bạn hóa đơn, payroll, lịch hẹn, chi tiêu và việc hằng ngày — để bạn không phải nhớ hết trong đầu.</span>
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="/">
+            <span class="en">Start free</span>
+            <span class="vi">Bắt đầu miễn phí</span>
+          </a>
+          <a class="btn btn-secondary" href="/how-it-works.html">
+            <span class="en">How it works</span>
+            <span class="vi">Cách dùng</span>
+          </a>
+        </div>
+        <div class="trust">
+          <div class="trust-row"><span class="ti">📱</span><span class="en">Works on iPhone &amp; Samsung</span><span class="vi">Dùng được trên iPhone &amp; Samsung</span></div>
+          <div class="trust-row"><span class="ti">🔔</span><span class="en">Phone reminders on time</span><span class="vi">Nhắc đúng giờ trên điện thoại</span></div>
+          <div class="trust-row"><span class="ti">💳</span><span class="en">Free to start, no credit card</span><span class="vi">Miễn phí, không cần thẻ tín dụng</span></div>
+        </div>
       </div>
+      <aside class="phone" aria-label="TXPick Today preview">
+        <div class="phone-screen">
+          <div class="screen-top">
+            <span>TXPick · Today</span>
+            <span>9:30 AM</span>
+          </div>
+          <div class="today-card">
+            <h3>
+              <span class="en">Good morning</span>
+              <span class="vi">Chào buổi sáng</span>
+            </h3>
+            <p>
+              <span class="en">Here is what matters today.</span>
+              <span class="vi">Đây là việc cần làm hôm nay.</span>
+            </p>
+          </div>
+          <div class="today-card">
+            <div class="task">
+              <div class="task-icon">🔔</div>
+              <div class="task-body">
+                <strong class="en">Doctor appointment</strong>
+                <strong class="vi">Lịch hẹn bác sĩ</strong>
+                <small class="en">Tomorrow · 8:00 AM</small>
+                <small class="vi">Ngày mai · 8:00 sáng</small>
+              </div>
+            </div>
+            <div class="task">
+              <div class="task-icon">💵</div>
+              <div class="task-body">
+                <strong class="en">Electric bill due</strong>
+                <strong class="vi">Hóa đơn điện đến hạn</strong>
+                <small class="en">Friday · $84.20</small>
+                <small class="vi">Thứ Sáu · $84.20</small>
+              </div>
+            </div>
+            <div class="task">
+              <div class="task-icon">👥</div>
+              <div class="task-body">
+                <strong class="en">Payroll reminder</strong>
+                <strong class="vi">Nhắc trả lương</strong>
+                <small class="en">Friday · 4 workers</small>
+                <small class="vi">Thứ Sáu · 4 thợ</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
 
-      <h1>
-        <span class="en">Never forget bills, payroll, reminders, or daily tasks again.</span>
-        <span class="vi">Đừng quên bill, payroll, lịch hẹn hay việc quan trọng nữa.</span>
-      </h1>
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <h2>
+          <span class="en">What TXPick is for</span>
+          <span class="vi">TXPick giúp được gì?</span>
+        </h2>
+        <p>
+          <span class="en">It’s not a complicated productivity system. It’s a simple helper for the things busy people actually forget.</span>
+          <span class="vi">Không phải hệ thống phức tạp. TXPick là app đơn giản giúp bạn nhớ những việc dễ quên khi bận.</span>
+        </p>
+      </div>
+      <div class="grid-3">
+        <article class="feature">
+          <div class="icon">🔔</div>
+          <h3><span class="en">Daily reminders</span><span class="vi">Nhắc việc hằng ngày</span></h3>
+          <p><span class="en">Appointments, medicine, family tasks, school pickups, and recurring routines.</span><span class="vi">Lịch hẹn, uống thuốc, việc gia đình, đón con, và việc lặp lại hằng tuần.</span></p>
+        </article>
+        <article class="feature">
+          <div class="icon">💳</div>
+          <h3><span class="en">Bills &amp; expenses</span><span class="vi">Hóa đơn &amp; chi tiêu</span></h3>
+          <p><span class="en">Track bills and daily spending so the month doesn’t get out of hand.</span><span class="vi">Theo dõi hóa đơn và chi tiêu để cuối tháng không bị rối.</span></p>
+        </article>
+        <article class="feature">
+          <div class="icon">💼</div>
+          <h3><span class="en">Payroll &amp; business</span><span class="vi">Payroll &amp; việc business</span></h3>
+          <p><span class="en">Reminders for payroll, supplies, worker notes, and weekly business tasks.</span><span class="vi">Nhắc trả lương, supplies, ghi chú thợ và việc trong tiệm hằng tuần.</span></p>
+        </article>
+      </div>
+    </div>
+  </section>
 
-      <p class="lead">
-        <span class="en">TXPick helps busy people manage reminders, bills, expenses, payroll, and everyday life in one simple app.</span>
-        <span class="vi">TXPick giúp người bận rộn quản lý nhắc việc, bill, chi tiêu, payroll và cuộc sống hằng ngày trong một app đơn giản.</span>
-      </p>
+  <section style="background:var(--bg-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>
+          <span class="en">Built for personal life and small business</span>
+          <span class="vi">Cho cả cuộc sống cá nhân và business nhỏ</span>
+        </h2>
+        <p>
+          <span class="en">Two simple views for the two sides of a busy life.</span>
+          <span class="vi">Hai chế độ cho hai mặt của cuộc sống bận rộn.</span>
+        </p>
+      </div>
+      <div class="split">
+        <article class="feature">
+          <h2><span class="en">Personal</span><span class="vi">Cá nhân</span></h2>
+          <p style="color:var(--muted);margin:0;font-size:.95rem;"><span class="en">When life gets busy, TXPick keeps the important reminders in one place.</span><span class="vi">Khi bận rộn, TXPick giữ các việc quan trọng trong một chỗ.</span></p>
+          <ul class="check-list">
+            <li><span class="en">Doctor appointments &amp; medicine</span><span class="vi">Lịch hẹn bác sĩ &amp; uống thuốc</span></li>
+            <li><span class="en">Family and school reminders</span><span class="vi">Nhắc việc gia đình và trường học</span></li>
+            <li><span class="en">Power, water, internet, rent</span><span class="vi">Điện, nước, internet, tiền nhà</span></li>
+            <li><span class="en">Daily and monthly spending</span><span class="vi">Chi tiêu trong ngày và trong tháng</span></li>
+          </ul>
+        </article>
+        <article class="feature">
+          <h2><span class="en">Small business</span><span class="vi">Business nhỏ</span></h2>
+          <p style="color:var(--muted);margin:0;font-size:.95rem;"><span class="en">Busy owners use TXPick to remember payroll, supplies, bills, and shop tasks.</span><span class="vi">Chủ tiệm dùng TXPick để nhớ payroll, supplies, hóa đơn và việc trong tiệm.</span></p>
+          <ul class="check-list">
+            <li><span class="en">Payroll dates &amp; worker notes</span><span class="vi">Ngày trả lương &amp; ghi chú thợ</span></li>
+            <li><span class="en">Supplies and shop expenses</span><span class="vi">Supplies và chi phí tiệm</span></li>
+            <li><span class="en">Weekly and monthly tasks</span><span class="vi">Việc hằng tuần và hằng tháng</span></li>
+            <li><span class="en">Records ready before tax season</span><span class="vi">Hồ sơ gọn trước mùa thuế</span></li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
 
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="/">
-          <span class="en">Start Free</span>
-          <span class="vi">Bắt đầu miễn phí</span>
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <h2>
+          <span class="en">Three simple steps</span>
+          <span class="vi">Ba bước đơn giản</span>
+        </h2>
+        <p>
+          <span class="en">No setup wizard, no learning curve.</span>
+          <span class="vi">Không cần học, mở là dùng được.</span>
+        </p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <p><span class="en">Add your first reminder or bill</span><span class="vi">Thêm nhắc việc hoặc hóa đơn đầu tiên</span></p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <p><span class="en">Turn on phone notifications</span><span class="vi">Bật thông báo trên điện thoại</span></p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <p><span class="en">Open Today to see what matters now</span><span class="vi">Mở trang Hôm nay để biết việc cần làm</span></p>
+        </div>
+      </div>
+      <div class="cta-box">
+        <div>
+          <h2><span class="en">Start with one reminder.</span><span class="vi">Bắt đầu từ một nhắc việc.</span></h2>
+          <p><span class="en">Free to start. No credit card. Add your first reminder and let TXPick handle the remembering.</span><span class="vi">Miễn phí. Không cần thẻ tín dụng. Thêm nhắc việc đầu tiên và để TXPick lo phần ghi nhớ.</span></p>
+        </div>
+        <a class="btn" href="/">
+          <span class="en">Open TXPick</span>
+          <span class="vi">Mở TXPick</span>
         </a>
-        <a class="btn btn-secondary" href="/feedback">
-          <span class="en">Send Feedback</span>
-          <span class="vi">Gửi góp ý</span>
-        </a>
-      </div>
-
-      <div class="trust">
-        <span>🔔 <span class="en">Reminder notifications</span><span class="vi">Thông báo nhắc việc</span></span>
-        <span>💵 <span class="en">Bills & payroll</span><span class="vi">Bill & payroll</span></span>
-        <span>📱 <span class="en">Works as a PWA app</span><span class="vi">Cài như app trên điện thoại</span></span>
       </div>
     </div>
-
-    <aside class="phone-card" aria-label="TXPick Today preview">
-      <div class="phone-screen">
-        <div class="screen-top">
-          <span>TXPick Today</span>
-          <span>12:55 AM</span>
-        </div>
-
-        <div class="today-card">
-          <h3>
-            <span class="en">Good evening</span>
-            <span class="vi">Chào buổi tối</span>
-          </h3>
-          <p style="margin:0;color:var(--muted)">
-            <span class="en">Here are the important things to remember.</span>
-            <span class="vi">Đây là những việc quan trọng cần nhớ.</span>
-          </p>
-        </div>
-
-        <div class="today-card">
-          <div class="task">
-            <div class="task-icon">🔔</div>
-            <div>
-              <strong class="en">Doctor appointment tomorrow</strong>
-              <strong class="vi">Lịch hẹn bác sĩ ngày mai</strong>
-              <small class="en">Reminder at 8:00 AM</small>
-              <small class="vi">Nhắc lúc 8:00 sáng</small>
-            </div>
-          </div>
-          <div class="task">
-            <div class="task-icon">💵</div>
-            <div>
-              <strong class="en">Electric bill due Friday</strong>
-              <strong class="vi">Bill điện đến hạn thứ Sáu</strong>
-              <small class="en">Stay ahead of monthly bills</small>
-              <small class="vi">Không quên bill hằng tháng</small>
-            </div>
-          </div>
-          <div class="task">
-            <div class="task-icon">👥</div>
-            <div>
-              <strong class="en">Payroll reminder</strong>
-              <strong class="vi">Nhắc payroll</strong>
-              <small class="en">For small business owners</small>
-              <small class="vi">Dành cho chủ business nhỏ</small>
-            </div>
-          </div>
-        </div>
-      </div>
-    </aside>
-  </section>
-
-  <section class="wrap section">
-    <div class="section-title">
-      <h2>
-        <span class="en">What can TXPick help with?</span>
-        <span class="vi">TXPick giúp được gì?</span>
-      </h2>
-      <p>
-        <span class="en">It is not a complicated productivity system. It is a simple helper for the things busy people actually forget.</span>
-        <span class="vi">Đây không phải hệ thống phức tạp. TXPick là app đơn giản giúp bạn nhớ những việc người bận rộn thường hay quên.</span>
-      </p>
-    </div>
-
-    <div class="grid">
-      <article class="card">
-        <div class="icon">🔔</div>
-        <h3><span class="en">Daily reminders</span><span class="vi">Nhắc việc hằng ngày</span></h3>
-        <p><span class="en">Remember appointments, medicine, family tasks, and important errands.</span><span class="vi">Nhớ lịch hẹn, uống thuốc, việc gia đình và các việc quan trọng.</span></p>
-      </article>
-
-      <article class="card">
-        <div class="icon">💳</div>
-        <h3><span class="en">Bills & expenses</span><span class="vi">Bill & chi tiêu</span></h3>
-        <p><span class="en">Track bills and daily spending so your month does not get messy.</span><span class="vi">Theo dõi bill và chi tiêu để cuối tháng không bị rối.</span></p>
-      </article>
-
-      <article class="card">
-        <div class="icon">💼</div>
-        <h3><span class="en">Small business tasks</span><span class="vi">Việc cho business nhỏ</span></h3>
-        <p><span class="en">Use reminders for payroll, supplies, worker notes, and business tasks.</span><span class="vi">Dùng để nhắc payroll, đồ supplies, ghi chú thợ và công việc business.</span></p>
-      </article>
-    </div>
-  </section>
-
-  <section class="wrap section split">
-    <article class="card">
-      <h2><span class="en">For personal life</span><span class="vi">Cho cuộc sống cá nhân</span></h2>
-      <p><span class="en">When life gets busy, TXPick keeps your important reminders in one place.</span><span class="vi">Khi cuộc sống bận rộn, TXPick giúp gom các việc quan trọng vào một chỗ.</span></p>
-      <ul class="check-list">
-        <li><span class="en">Doctor appointments</span><span class="vi">Lịch hẹn bác sĩ</span></li>
-        <li><span class="en">Medicine reminders</span><span class="vi">Nhắc uống thuốc</span></li>
-        <li><span class="en">Family tasks</span><span class="vi">Việc gia đình</span></li>
-        <li><span class="en">Monthly bills</span><span class="vi">Bill hằng tháng</span></li>
-      </ul>
-    </article>
-
-    <article class="card">
-      <h2><span class="en">For small business</span><span class="vi">Cho business nhỏ</span></h2>
-      <p><span class="en">Busy owners can use TXPick to remember payroll, expenses, bills, and work tasks.</span><span class="vi">Chủ business bận rộn có thể dùng TXPick để nhớ payroll, chi tiêu, bill và việc trong tiệm.</span></p>
-      <ul class="check-list">
-        <li><span class="en">Payroll reminders</span><span class="vi">Nhắc payroll</span></li>
-        <li><span class="en">Business expenses</span><span class="vi">Chi tiêu business</span></li>
-        <li><span class="en">Worker notes</span><span class="vi">Ghi chú thợ/nhân viên</span></li>
-        <li><span class="en">Supplies and due dates</span><span class="vi">Supplies và ngày đến hạn</span></li>
-      </ul>
-    </article>
-  </section>
-
-  <section class="wrap cta-box">
-    <div>
-      <h2><span class="en">Start with one reminder.</span><span class="vi">Bắt đầu với một nhắc việc.</span></h2>
-      <p><span class="en">Add your first reminder, enable notifications, and let TXPick help you remember what matters.</span><span class="vi">Thêm nhắc việc đầu tiên, bật thông báo, và để TXPick giúp bạn nhớ những việc quan trọng.</span></p>
-    </div>
-    <a class="btn" href="/">
-      <span class="en">Open TXPick</span>
-      <span class="vi">Mở TXPick</span>
-    </a>
   </section>
 </main>
 
 <footer>
-  <div class="wrap">
-    <span>© TXPick</span>
-    <span style="margin-left:12px"><a href="/privacy">Privacy</a></span>
-    <span style="margin-left:12px"><a href="/terms">Terms</a></span>
+  <div class="wrap foot">
+    <span>© <span id="year"></span> TXPick</span>
+    <div class="foot-links">
+      <a href="/"><span class="en">Home</span><span class="vi">Trang chủ</span></a>
+      <a href="/how-it-works.html"><span class="en">How it works</span><span class="vi">Cách dùng</span></a>
+      <a href="/privacy"><span class="en">Privacy</span><span class="vi">Bảo mật</span></a>
+      <a href="/terms"><span class="en">Terms</span><span class="vi">Điều khoản</span></a>
+    </div>
   </div>
 </footer>
 
 <script>
-  (function () {
-    const saved = localStorage.getItem('txpick_lang');
-    const browserLang = (navigator.language || '').toLowerCase().startsWith('vi') ? 'vi' : 'en';
-    const lang = saved || browserLang;
-    document.documentElement.setAttribute('data-lang', lang);
-
-    document.querySelectorAll('[data-lang-btn]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const next = btn.getAttribute('data-lang-btn');
-        localStorage.setItem('txpick_lang', next);
-        document.documentElement.setAttribute('data-lang', next);
-      });
+(function () {
+  var root = document.documentElement;
+  var saved = null;
+  try { saved = localStorage.getItem('txpick_lang'); } catch (e) {}
+  var browser = (navigator.language || '').toLowerCase().indexOf('vi') === 0 ? 'vi' : 'en';
+  var lang = (saved === 'vi' || saved === 'en') ? saved : browser;
+  root.setAttribute('data-lang', lang);
+  root.setAttribute('lang', lang === 'vi' ? 'vi' : 'en');
+  document.querySelectorAll('[data-lang-btn]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var next = btn.getAttribute('data-lang-btn');
+      try { localStorage.setItem('txpick_lang', next); } catch (e) {}
+      root.setAttribute('data-lang', next);
+      root.setAttribute('lang', next === 'vi' ? 'vi' : 'en');
     });
-  })();
+  });
+  var y = document.getElementById('year');
+  if (y) y.textContent = new Date().getFullYear();
+})();
 </script>
 </body>
 </html>

@@ -12,98 +12,98 @@ const copy = {
   vi: {
     login: 'Đăng nhập',
     start: 'Bắt đầu miễn phí',
-    badge: 'Nhắc việc, bill và cuộc sống hằng ngày',
-    title: 'Đừng quên bill, lương, nhắc việc và những việc quan trọng nữa.',
-    sub: 'TXPick giúp người bận rộn quản lý nhắc việc, hóa đơn, chi tiêu, việc gia đình và việc business trong một app đơn giản.',
-    trustLine: 'Dễ dùng trên iPhone và Samsung. Cài như app PWA, nhận thông báo trên điện thoại, không cần thẻ tín dụng để bắt đầu.',
-    primaryUse: 'TXPick dùng để làm gì?',
-    primaryUseSub: 'Một nơi gọn để nhớ những việc dễ quên khi bạn bận làm cả ngày.',
+    badge: 'Nhắc việc · Hóa đơn · Chi tiêu · Công việc hằng ngày',
+    title: 'Nhắc bill, payroll, công việc và chi tiêu — gọn trong một app.',
+    sub: 'TXPick giúp bạn nhớ hóa đơn, payroll, lịch hẹn, chi tiêu và việc hằng ngày, để bạn không phải ôm hết trong đầu.',
+    trustLine: 'Dùng trên iPhone và Samsung. Cài lên màn hình chính, bật thông báo, không cần thẻ tín dụng.',
+    primaryUse: 'TXPick giúp được gì?',
+    primaryUseSub: 'Bốn việc đơn giản, ngày nào cũng cần, app giữ giùm bạn.',
     useItems: [
-      ['Nhắc việc đúng lúc', 'Tạo reminder cho thuốc, lịch hẹn, gia đình, công việc hoặc việc lặp lại.'],
-      ['Nhắc bill và ngày tới hạn', 'Giữ các hóa đơn, khoản cần trả và việc tài chính cá nhân trong một chỗ.'],
-      ['Theo dõi chi tiêu', 'Ghi nhanh chi tiêu cá nhân và business để cuối tháng dễ xem lại.'],
-      ['Hỗ trợ chủ business nhỏ', 'Nhắc payroll, chi phí tiệm, việc giấy tờ và những việc dễ bị quên khi bận.'],
+      ['Nhắc việc đúng giờ', 'Lịch hẹn, uống thuốc, đón con, việc gia đình hoặc việc lặp lại — đặt một lần, app nhắc đúng giờ.'],
+      ['Hóa đơn & ngày đến hạn', 'Điện, nước, internet, tiền nhà, bảo hiểm — gom chung một chỗ, không lo trễ hạn.'],
+      ['Chi tiêu trong tháng', 'Ghi một dòng cho mỗi khoản. Cuối tháng có số gọn để xem lại.'],
+      ['Payroll & việc business', 'Nhắc trả lương, đồ supplies, deadline tiệm, giấy tờ trước mùa thuế.'],
     ],
-    busyTitle: 'Bận làm cả ngày? TXPick giúp bạn bớt sợ quên.',
-    busySub: 'Dành cho cuộc sống thật: chủ tiệm, người chạy việc, gia đình bận rộn, người có nhiều bill, nhiều lịch và nhiều thứ phải nhớ.',
+    busyTitle: 'Bận cả ngày? Để TXPick nhớ giùm bạn.',
+    busySub: 'Dành cho người làm việc thật: chủ tiệm, người chạy việc, gia đình bận rộn, người có nhiều bill và nhiều lịch phải nhớ.',
     busyCards: [
-      ['Personal life', 'Lịch bác sĩ, uống thuốc, việc gia đình, bill điện nước, việc cần làm hôm nay.'],
-      ['Business life', 'Payroll, supply, chi phí tiệm, việc cuối tuần, giấy tờ cần nhớ trước mùa thuế.'],
-      ['Phone reminders', 'Cài app lên Home Screen và nhận thông báo như một app thật.'],
+      ['Cá nhân', 'Lịch bác sĩ, uống thuốc, việc gia đình, bill điện nước, việc cần làm hôm nay.'],
+      ['Business', 'Payroll, supplies, chi phí tiệm, deadline cuối tuần, giấy tờ trước mùa thuế.'],
+      ['Trên điện thoại', 'Cài lên màn hình chính, nhận thông báo nhắc việc như một app thật.'],
     ],
-    howTitle: 'Cách dùng rất đơn giản',
+    howTitle: 'Dùng rất đơn giản',
     howSteps: [
-      ['1', 'Tạo nhắc việc hoặc bill đầu tiên'],
+      ['1', 'Thêm nhắc việc hoặc hóa đơn đầu tiên'],
       ['2', 'Bật thông báo trên điện thoại'],
       ['3', 'Mở trang Hôm nay để biết việc gì cần làm'],
     ],
     featuresTitle: 'Đủ những thứ cần nhớ, không làm bạn rối thêm',
-    featuresSub: 'Mở app là biết hôm nay cần làm gì, tiền đi đâu và việc nào sắp tới hạn.',
-    f1: ['Hôm nay', 'Một màn hình gọn để xem việc cần làm, hóa đơn sắp tới, chi tiêu trong tháng và gợi ý ngắn cho ngày mới.'],
-    f2: ['Nhắc việc', 'Gõ tự nhiên để tạo nhắc việc nhanh cho gia đình, hóa đơn, thuốc, lịch hẹn và việc lặp lại.'],
-    f3: ['Chi tiêu', 'Ghi nhanh tiền cá nhân và business mà không cần biến app thành phần mềm kế toán nặng nề.'],
+    featuresSub: 'Mở app là biết hôm nay cần làm gì, tiền đi đâu, hóa đơn nào sắp tới hạn.',
+    f1: ['Hôm nay', 'Một màn hình gọn cho việc cần làm, hóa đơn sắp tới và chi tiêu trong tháng.'],
+    f2: ['Nhắc việc', 'Gõ tự nhiên để tạo nhắc việc cho gia đình, hóa đơn, thuốc, lịch hẹn và việc lặp lại.'],
+    f3: ['Chi tiêu', 'Ghi nhanh tiền cá nhân và business, không biến app thành kế toán nặng nề.'],
     f4: ['Tổng kết', 'Cuối tháng, cuối năm có số liệu gọn để xem lại hoặc gửi cho người làm thuế.'],
-    v1: ['Dễ dùng mỗi ngày', 'Ít nút, ít màn hình, tập trung vào những việc bạn thật sự cần mở app để xử lý.'],
-    v2: ['Gợi ý vừa đủ', 'App giúp nhắc những việc dễ quên và đưa ra gợi ý ngắn, không làm bạn bị ngợp.'],
-    v3: ['Dữ liệu rõ ràng', 'Việc, bill và chi tiêu được gom đúng chỗ để cuối tháng không phải lục lại trí nhớ.'],
+    v1: ['Dễ dùng mỗi ngày', 'Ít nút, ít màn hình, tập trung vào việc bạn thật sự cần xử lý.'],
+    v2: ['Nhắc đúng lúc', 'Nhắc đúng giờ ngay trên điện thoại, không cần mở app cũng biết.'],
+    v3: ['Dữ liệu rõ ràng', 'Việc, hóa đơn và chi tiêu được gom đúng chỗ, không phải lục lại trí nhớ.'],
     mockToday: 'HÔM NAY',
     mockReminders: '3 việc cần nhớ',
     mockBill: 'Trả tiền điện — 9 giờ tối',
     mockMonth: 'CHI TIÊU THÁNG NÀY',
     mockExpense: 'Cá nhân + business',
-    mockInsight: 'GỢI Ý HÔM NAY',
-    mockTip: 'Có 2 hóa đơn sắp tới hạn. Ghi chi tiêu hôm nay để cuối tháng nhẹ đầu hơn.',
-    learnMore: 'Tìm hiểu TXPick',
-    finalTitle: 'Bắt đầu từ một reminder đầu tiên.',
-    finalSub: 'Tạo tài khoản miễn phí, bật thông báo và để TXPick giúp bạn nhớ những việc quan trọng.',
+    mockInsight: 'LƯU Ý HÔM NAY',
+    mockTip: '2 hóa đơn sắp tới hạn. Ghi chi tiêu hôm nay để cuối tháng đỡ rối.',
+    learnMore: 'TXPick là gì?',
+    finalTitle: 'Bắt đầu từ một nhắc việc.',
+    finalSub: 'Tạo tài khoản miễn phí, bật thông báo và để TXPick lo phần ghi nhớ.',
   },
   en: {
     login: 'Log in',
     start: 'Start free',
-    badge: 'Reminders, bills, and daily life',
-    title: 'Never forget bills, payroll, reminders, or important tasks again.',
-    sub: 'TXPick helps busy people manage reminders, bills, expenses, family tasks, and small business life in one simple app.',
-    trustLine: 'Works on iPhone and Samsung as a PWA. Add it to your Home Screen, enable phone notifications, and start free.',
-    primaryUse: 'What is TXPick for?',
-    primaryUseSub: 'A simple place to remember the things that are easy to miss when life gets busy.',
+    badge: 'Reminders · Bills · Expenses · Daily life',
+    title: 'Reminders for bills, payroll, tasks, and spending — in one simple app.',
+    sub: 'TXPick keeps your bills, payroll, appointments, expenses, and daily to-dos in one place, so you don’t have to keep it all in your head.',
+    trustLine: 'Works on iPhone and Samsung. Add to your Home Screen, turn on notifications, no credit card needed.',
+    primaryUse: 'What TXPick is for',
+    primaryUseSub: 'Four simple things you deal with every day — handled in one place.',
     useItems: [
-      ['Timed reminders', 'Create reminders for medicine, appointments, family, work, and recurring tasks.'],
-      ['Bills and due dates', 'Keep bills, payments, and personal money reminders in one clear place.'],
-      ['Expense tracking', 'Log personal and business spending quickly so month-end review is easier.'],
-      ['Small business help', 'Remember payroll, supplies, salon expenses, paperwork, and weekly business tasks.'],
+      ['On-time reminders', 'Appointments, medicine, school pickups, family tasks, or recurring routines — set once, get reminded on time.'],
+      ['Bills & due dates', 'Power, water, internet, rent, insurance — all in one place, never miss a due date.'],
+      ['Monthly spending', 'One line per expense. End-of-month review without the scramble.'],
+      ['Payroll & business', 'Payroll, supplies, shop deadlines, and paperwork before tax season.'],
     ],
-    busyTitle: 'Busy all day? TXPick helps you stop worrying about what you forgot.',
-    busySub: 'Built for real life: small business owners, gig workers, busy families, and anyone juggling bills, appointments, tasks, and records.',
+    busyTitle: 'Busy day? Let TXPick remember it for you.',
+    busySub: 'Built for real life: small business owners, gig workers, busy families, and anyone juggling bills, appointments, and records.',
     busyCards: [
-      ['Personal life', 'Doctor appointments, medicine, family tasks, utility bills, and today’s reminders.'],
-      ['Business life', 'Payroll, supplies, shop expenses, weekend tasks, and records you may need later.'],
-      ['Phone reminders', 'Add TXPick to your Home Screen and receive notifications like a real app.'],
+      ['Personal', 'Doctor appointments, medicine, family tasks, utility bills, and today’s to-dos.'],
+      ['Business', 'Payroll, supplies, shop expenses, weekend tasks, and records before tax time.'],
+      ['On your phone', 'Add to Home Screen and get reminders like a real app.'],
     ],
-    howTitle: 'How it works',
+    howTitle: 'Three simple steps',
     howSteps: [
       ['1', 'Add your first reminder or bill'],
-      ['2', 'Enable phone notifications'],
+      ['2', 'Turn on phone notifications'],
       ['3', 'Open Today to see what matters now'],
     ],
     featuresTitle: 'The important things, without the clutter',
-    featuresSub: 'Open the app and know what matters today, where money went, and what is coming due.',
-    f1: ['Today', 'A clean daily view for tasks, upcoming bills, monthly spending, and one useful insight.'],
-    f2: ['Reminders', 'Create reminders by typing naturally. Good for family, bills, medicine, appointments, and recurring tasks.'],
+    featuresSub: 'Open the app and see what matters today, where the money went, and what’s coming due.',
+    f1: ['Today', 'A clean daily view for tasks, upcoming bills, and monthly spending.'],
+    f2: ['Reminders', 'Type naturally to add reminders for family, bills, medicine, appointments, and recurring routines.'],
     f3: ['Expenses', 'Track personal and business spending without turning the app into heavy accounting software.'],
-    f4: ['Summary', 'Monthly and yearly numbers organized clearly so review time is easier.'],
+    f4: ['Summary', 'Monthly and yearly numbers, organized so review time is easier.'],
     v1: ['Made for daily use', 'Fewer screens, fewer distractions, and a clear focus on what you actually need to handle.'],
-    v2: ['Light guidance', 'Helpful nudges for easy-to-forget tasks, without overwhelming you.'],
-    v3: ['Clear records', 'Tasks, bills, and spending stay organized so month-end does not depend on memory.'],
+    v2: ['Reminded on time', 'Phone notifications when bills, tasks, or appointments are due — no need to open the app.'],
+    v3: ['Clear records', 'Tasks, bills, and spending stay organized so month-end doesn’t depend on memory.'],
     mockToday: 'TODAY',
     mockReminders: '3 things to remember',
     mockBill: 'Pay electric bill — 9 PM',
     mockMonth: 'THIS MONTH',
     mockExpense: 'Personal + business',
-    mockInsight: 'TODAY’S NUDGE',
-    mockTip: 'You have 2 bills coming up. Log today’s spending so month-end feels lighter.',
-    learnMore: 'Learn what TXPick does',
+    mockInsight: 'TODAY’S NOTE',
+    mockTip: '2 bills coming up. Log today’s spending so month-end is lighter.',
+    learnMore: 'What is TXPick?',
     finalTitle: 'Start with one reminder.',
-    finalSub: 'Create a free account, enable notifications, and let TXPick help you remember the important things.',
+    finalSub: 'Create a free account, turn on notifications, and let TXPick handle the remembering.',
   },
 }
 
@@ -113,34 +113,34 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-white">
       <header className="absolute top-0 inset-x-0 z-20">
-        <div className="container-app flex items-center justify-between h-16">
+        <div className="container-app flex items-center justify-between h-16 gap-2">
           <Logo />
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             <LanguageToggle />
             <a href="/what-is-txpick.html" className="hidden md:inline-flex btn-ghost text-sm">{c.learnMore}</a>
             <Link to="/login" className="hidden sm:inline-flex btn-ghost text-sm">{c.login}</Link>
-            <Link to="/signup" className="btn-primary text-sm !px-4 !py-2">{c.start}</Link>
+            <Link to="/signup" className="btn-primary text-sm !px-3 sm:!px-4 !py-2">{c.start}</Link>
           </div>
         </div>
       </header>
 
-      <section className="hero-gradient pt-32 pb-20 sm:pt-40 sm:pb-28">
+      <section className="hero-gradient pt-24 pb-16 sm:pt-36 sm:pb-24">
         <div className="container-app">
           <div className="max-w-4xl mx-auto text-center animate-fade-up">
             <span className="badge bg-brand-50 text-brand-700 mb-5">
               <Sparkles className="w-3.5 h-3.5" /> {c.badge}
             </span>
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold text-ink-900 leading-[1.05]">
+            <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold text-ink-900 leading-[1.1] sm:leading-[1.05]">
               {c.title}
             </h1>
-            <p className="mt-5 text-lg sm:text-xl text-ink-600 max-w-3xl mx-auto">
+            <p className="mt-5 text-base sm:text-xl text-ink-600 max-w-3xl mx-auto">
               {c.sub}
             </p>
             <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3">
               <Link to="/signup" className="btn-primary">
                 {c.start} <ArrowRight className="w-4 h-4" />
               </Link>
-              <a href="/how-it-works.html" className="btn-secondary">
+              <a href="/what-is-txpick.html" className="btn-secondary">
                 {c.learnMore}
               </a>
             </div>

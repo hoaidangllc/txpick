@@ -76,8 +76,10 @@ export default function AppShell() {
   return (
     <div className="min-h-screen flex flex-col bg-ink-50">
       <header className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-ink-100">
-        <div className="container-app flex items-center justify-between h-16">
-          <Logo />
+        <div className="container-app flex items-center justify-between h-16 gap-2">
+          <div className="shrink-0">
+            <Logo />
+          </div>
 
           <nav className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => (
@@ -96,23 +98,23 @@ export default function AppShell() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 min-w-0">
             <button
               type="button"
               onClick={switchWorkspace}
-              className="inline-flex items-center gap-1.5 rounded-full border border-ink-100 bg-white hover:bg-brand-50 hover:text-brand-700 px-2.5 sm:px-3 py-2 sm:py-1.5 text-xs font-bold text-ink-700 shadow-sm transition"
+              className="inline-flex items-center gap-1.5 rounded-full border border-ink-100 bg-white hover:bg-brand-50 hover:text-brand-700 px-2 sm:px-3 py-2 sm:py-1.5 text-xs font-bold text-ink-700 shadow-sm transition shrink-0"
               title={switchLabel}
               aria-label={switchLabel}
             >
               {isBusiness ? <BriefcaseBusiness className="w-3.5 h-3.5" /> : <UserRound className="w-3.5 h-3.5" />}
               <span className="hidden sm:inline max-w-[140px] truncate">{workspaceLabel}</span>
-              <span className="sm:hidden">{isBusiness ? 'Biz' : (lang === 'vi' ? 'Tôi' : 'Me')}</span>
+              <span className="sm:hidden text-[11px]">{isBusiness ? 'Biz' : (lang === 'vi' ? 'Tôi' : 'Me')}</span>
             </button>
             <LanguageToggle />
             <NavLink
               to="/settings"
               className={({ isActive }) =>
-                `lg:hidden inline-flex items-center justify-center rounded-full border border-ink-100 bg-white w-9 h-9 text-ink-600 shadow-sm transition hover:bg-brand-50 hover:text-brand-700 ${isActive ? 'ring-2 ring-brand-200 text-brand-700' : ''}`
+                `lg:hidden inline-flex items-center justify-center rounded-full border border-ink-100 bg-white w-9 h-9 text-ink-600 shadow-sm transition hover:bg-brand-50 hover:text-brand-700 shrink-0 ${isActive ? 'ring-2 ring-brand-200 text-brand-700' : ''}`
               }
               title={lang === 'vi' ? 'Cài đặt' : 'Settings'}
               aria-label={lang === 'vi' ? 'Cài đặt' : 'Settings'}
@@ -120,7 +122,7 @@ export default function AppShell() {
               <Settings className="w-4 h-4" />
             </NavLink>
             <NavLink to="/settings" className="hidden sm:block text-xs text-ink-500 max-w-[160px] truncate ml-1 hover:text-brand-700">{profile?.display_name || user?.user_metadata?.full_name || user?.email}</NavLink>
-            <button onClick={handleLogout} className="btn-ghost !px-2 !py-2" title={logoutLabel} aria-label={logoutLabel}>
+            <button onClick={handleLogout} className="btn-ghost !px-2 !py-2 shrink-0" title={logoutLabel} aria-label={logoutLabel}>
               <LogOut className="w-4 h-4" />
             </button>
           </div>
@@ -131,11 +133,11 @@ export default function AppShell() {
         <Outlet />
       </main>
 
-      <div className="lg:hidden fixed bottom-24 right-4 z-40">
+      <div className="lg:hidden fixed right-4 z-40 fab-above-nav">
         <button
           type="button"
           onClick={() => setQuickOpen(true)}
-          className="w-12 h-12 rounded-full bg-brand-600 text-white shadow-soft flex items-center justify-center active:scale-95 transition"
+          className="w-14 h-14 rounded-full bg-brand-600 text-white shadow-soft flex items-center justify-center active:scale-95 transition"
           aria-label={quick.title}
           title={quick.title}
         >

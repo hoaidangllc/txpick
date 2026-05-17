@@ -61,6 +61,11 @@
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
+/* Floating action button — sits above bottom nav, respects iOS safe area */
+.fab-above-nav {
+  bottom: calc(5rem + env(safe-area-inset-bottom, 0));
+}
+
 /* Hero gradient background */
 .hero-gradient {
   background:
