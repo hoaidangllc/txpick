@@ -30,18 +30,19 @@ const copy = {
     permissionDenied: 'Bạn đã chặn thông báo. Vào cài đặt của điện thoại/trình duyệt để cho phép lại.',
     enablePush: 'Bật nhắc việc trên máy này',
     disablePush: 'Tạm tắt thông báo trên máy này',
-    testPush: 'Gửi test notification',
+    testPush: 'Gửi thông báo thử',
     enableAndTest: 'Bật & gửi test ngay',
     checkStatus: 'Kiểm tra trạng thái',
     pushEnabled: 'Xong. Máy này đã đăng ký nhận nhắc việc từ TXPick.',
     pushDisabled: 'Đã tạm tắt nhắc nền trên máy này.',
-    testSent: 'Đã gửi test notification. Khóa màn hình và kiểm tra Notification Center.',
-    pushSetupError: 'Chưa gửi được notification. Xem chi tiết bên dưới để biết kẹt ở bước nào.',
-    pushNotReady: 'Chưa bật được nhắc nền lúc này. Xem chi tiết bên dưới rồi thử lại.',
-    diagnosticTitle: 'Chi tiết kiểm tra',
-    noDiagnostics: 'Chưa có kiểm tra nào. Bấm “Bật & gửi test ngay” hoặc “Kiểm tra trạng thái”.',
-    serverSubscriptions: 'Subscription trong Supabase',
-    recentLogs: 'Log gửi gần đây',
+    testSent: 'Đã gửi thông báo thử. Khóa màn hình và kiểm tra thông báo trên điện thoại.',
+    pushSetupError: 'Chưa gửi được notification. Vui lòng bấm “Kiểm tra trạng thái” rồi thử lại.',
+    pushNotReady: 'Chưa bật được nhắc nền lúc này. Hãy kiểm tra quyền thông báo trên điện thoại rồi thử lại.',
+    diagnosticTitle: 'Trạng thái nhắc việc',
+    noDiagnostics: 'Bấm “Kiểm tra trạng thái” để xem điện thoại đã sẵn sàng nhận nhắc việc chưa.',
+    readyText: 'Máy này đã sẵn sàng nhận nhắc việc từ TXPick.',
+    notReadyText: 'Máy này chưa sẵn sàng nhận nhắc việc. Hãy bật thông báo rồi thử lại.',
+    lastChecked: 'Lần kiểm tra cuối',
     quickLinks: 'Liên kết nhanh',
     feedback: 'Gửi góp ý',
     privacy: 'Quyền riêng tư',
@@ -70,18 +71,19 @@ const copy = {
     permissionDenied: 'Notifications are blocked. Open browser/phone settings to allow notifications again.',
     enablePush: 'Enable reminders on this device',
     disablePush: 'Pause notifications on this device',
-    testPush: 'Send test notification',
+    testPush: 'Send test alert',
     enableAndTest: 'Enable & send test now',
     checkStatus: 'Check status',
     pushEnabled: 'Done. This device is registered for TXPick reminders.',
     pushDisabled: 'Notifications are paused on this device.',
-    testSent: 'Test notification sent. Lock your phone and check Notification Center.',
-    pushSetupError: 'Could not send a notification. See the details below to find where it got stuck.',
-    pushNotReady: 'Could not enable background reminders right now. Review the details below and try again.',
-    diagnosticTitle: 'Setup details',
-    noDiagnostics: 'No checks yet. Tap “Enable & send test now” or “Check status”.',
-    serverSubscriptions: 'Supabase subscriptions',
-    recentLogs: 'Recent send logs',
+    testSent: 'Test alert sent. Lock your phone and check the notification.',
+    pushSetupError: 'Could not send a notification. Tap “Check status” and try again.',
+    pushNotReady: 'Could not enable phone reminders right now. Check phone notification permission and try again.',
+    diagnosticTitle: 'Reminder status',
+    noDiagnostics: 'Tap “Check status” to see whether this phone is ready for reminders.',
+    readyText: 'This device is ready to receive TXPick reminders.',
+    notReadyText: 'This device is not ready yet. Enable notifications and try again.',
+    lastChecked: 'Last checked',
     quickLinks: 'Quick links',
     feedback: 'Send feedback',
     privacy: 'Privacy Policy',
@@ -122,6 +124,7 @@ export default function Settings() {
   const [pushMessage, setPushMessage] = useState('')
   const [pushError, setPushError] = useState('')
   const [diagnostics, setDiagnostics] = useState(null)
+  const [lastChecked, setLastChecked] = useState('')
 
   useEffect(() => {
     let alive = true
@@ -178,6 +181,7 @@ export default function Settings() {
   function setDiagnosticFromParts(parts) {
     const steps = statusStepsFrom(parts)
     setDiagnostics({ ...parts, steps })
+    setLastChecked(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))
   }
 
   async function disablePush() {
@@ -242,7 +246,7 @@ export default function Settings() {
       let server = null
       try { server = await checkServerPushStatus() } catch {}
       setDiagnosticFromParts({ local, server, errorCode: err.code, errorMessage: err.message })
-      setPushError(err.message ? `${c.pushSetupError} ${err.message}` : c.pushSetupError)
+      setPushError(c.pushSetupError)
     } finally {
       setPushBusy(false)
     }
@@ -313,7 +317,7 @@ export default function Settings() {
 
         {pushMessage && <p className="mt-4 text-sm font-semibold text-emerald-700">{pushMessage}</p>}
         {pushError && <p className="mt-4 text-sm font-semibold text-rose-700">{pushError}</p>}
-        <PushDiagnostics c={c} diagnostics={diagnostics} />
+        <PushDiagnostics c={c} diagnostics={diagnostics} lastChecked={lastChecked} />
       </section>
 
       <section className="mt-5 card p-5 max-w-3xl">
@@ -328,38 +332,26 @@ export default function Settings() {
   )
 }
 
-function PushDiagnostics({ c, diagnostics }) {
+function PushDiagnostics({ c, diagnostics, lastChecked }) {
   const steps = diagnostics?.steps || []
+  const hasSteps = steps.length > 0
+  const failed = steps.some((step) => !step.ok)
+  const ready = hasSteps && !failed
+
   return (
     <div className="mt-5 rounded-3xl border border-ink-100 bg-ink-50/60 p-4">
       <h3 className="font-bold text-ink-900">{c.diagnosticTitle}</h3>
-      {!steps.length ? <p className="mt-2 text-sm text-ink-500">{c.noDiagnostics}</p> : (
-        <div className="mt-3 space-y-2">
-          {steps.map((step, index) => (
-            <div key={`${step.label}-${index}`} className="flex items-start gap-2 rounded-2xl bg-white border border-ink-100 px-3 py-2">
-              {step.ok ? <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600 shrink-0" /> : <AlertTriangle className="mt-0.5 h-4 w-4 text-amber-600 shrink-0" />}
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-ink-800">{step.label}</p>
-                {step.detail && <p className="text-xs text-ink-500 break-words">{String(step.detail)}</p>}
-              </div>
+      {!hasSteps ? (
+        <p className="mt-2 text-sm text-ink-500">{c.noDiagnostics}</p>
+      ) : (
+        <div className={`mt-3 rounded-2xl border px-4 py-3 ${ready ? 'border-emerald-100 bg-emerald-50' : 'border-amber-100 bg-amber-50'}`}>
+          <div className="flex items-start gap-2">
+            {ready ? <CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-700 shrink-0" /> : <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-700 shrink-0" />}
+            <div>
+              <p className={`text-sm font-bold ${ready ? 'text-emerald-800' : 'text-amber-800'}`}>{ready ? c.readyText : c.notReadyText}</p>
+              {lastChecked && <p className="mt-1 text-xs text-ink-500">{c.lastChecked}: {lastChecked}</p>}
             </div>
-          ))}
-        </div>
-      )}
-      {diagnostics?.server?.recentSubscriptions?.length > 0 && (
-        <div className="mt-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-ink-400">{c.serverSubscriptions}</p>
-          {diagnostics.server.recentSubscriptions.map((row) => (
-            <p key={row.id} className="mt-1 text-xs text-ink-500 break-all">{row.enabled ? 'ON' : 'OFF'} · {row.endpointStart}</p>
-          ))}
-        </div>
-      )}
-      {diagnostics?.server?.recentLogs?.length > 0 && (
-        <div className="mt-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-ink-400">{c.recentLogs}</p>
-          {diagnostics.server.recentLogs.map((row, index) => (
-            <p key={`${row.created_at}-${index}`} className="mt-1 text-xs text-ink-500">{row.status} · {row.delivered_count || 0} sent · {row.error || row.created_at}</p>
-          ))}
+          </div>
         </div>
       )}
     </div>
