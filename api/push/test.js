@@ -63,10 +63,13 @@ export default async function handler(req, res) {
       .eq('profile_id', user.id)
       .eq('enabled', true)
     if (subError) throw subError
-    if (!subs?.length) return sendJson(res, 404, {
-      error: 'No active push subscription found. Open TXPick on this phone, enable Phone reminders, and allow notifications first.',
-      code: 'NO_ACTIVE_SUBSCRIPTION',
-    })
+    if (!subs?.length) {
+      return sendJson(res, 404, {
+        error: 'No active push subscription found',
+        code: 'no_active_push_subscription',
+        userMessage: 'This phone has not saved a push subscription yet. Enable phone reminders first.',
+      })
+    }
 
     const { data: reminders } = await supabase
       .from('reminders')
@@ -80,44 +83,52 @@ export default async function handler(req, res) {
 
     let sent = 0
     let failed = 0
-    let lastError = null
-    const now = new Date().toISOString()
-
+    const errors = []
     for (const sub of subs) {
       try {
         await sendPush({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, payload)
         sent += 1
-        await supabase.from('push_subscriptions').update({ last_sent_at: now, last_error: null, updated_at: now }).eq('id', sub.id)
+        await supabase.from('push_subscriptions').update({ last_sent_at: new Date().toISOString(), last_error: null, updated_at: new Date().toISOString() }).eq('id', sub.id)
       } catch (err) {
         failed += 1
-        lastError = err.message || 'Push failed'
-        const statusCode = err.statusCode || err.status
-        const disable = statusCode === 404 || statusCode === 410
-        await supabase.from('push_subscriptions').update({ enabled: disable ? false : sub.enabled, last_error: lastError, updated_at: now }).eq('id', sub.id)
+        const lastError = err.message || 'Push failed'
+        errors.push(lastError)
+        await supabase.from('push_subscriptions').update({ last_error: lastError, updated_at: new Date().toISOString() }).eq('id', sub.id)
       }
     }
 
+    const logKey = `test:${user.id}:${Date.now()}`
     await supabase.from('push_notification_logs').insert({
       profile_id: user.id,
       reminder_id: reminders?.[0]?.id || null,
-      dedupe_key: `test:${user.id}:${Date.now()}`,
+      dedupe_key: logKey,
       channel: 'web_push_test',
       status: sent ? 'sent' : 'failed',
       delivered_count: sent,
-      error: sent ? null : lastError,
+      error: sent ? null : (errors[0] || 'No notification delivered'),
     }).catch(() => undefined)
 
-    if (!sent) return sendJson(res, 502, {
-      ok: false,
-      error: lastError || 'Push service did not accept the test notification.',
-      code: 'PUSH_SEND_FAILED',
+    if (!sent) {
+      return sendJson(res, 500, {
+        error: errors[0] || 'Push test failed',
+        code: 'push_send_failed',
+        sent,
+        failed,
+        subscriptionCount: subs.length,
+        payloadPreview: { title: payload.title, body: payload.body },
+        errors,
+      })
+    }
+
+    return sendJson(res, 200, {
+      ok: true,
       sent,
       failed,
-      payload,
+      subscriptionCount: subs.length,
+      payloadPreview: { title: payload.title, body: payload.body },
+      message: 'Test notification sent. Lock your phone and check the notification center.',
     })
-
-    return sendJson(res, 200, { ok: true, sent, failed, payload })
   } catch (err) {
-    return sendJson(res, 500, { error: err.message || 'Unable to send test push' })
+    return sendJson(res, 500, { error: err.message || 'Unable to send test push', code: 'server_error' })
   }
 }

@@ -27,10 +27,10 @@ const txt = {
     insight: 'Gợi ý hôm nay',
     urgent: 'Cần chú ý ngay',
     urgentBody: (overdue, dueToday) => `Có ${overdue} việc quá hạn và ${dueToday} mục tới hạn hôm nay. Xử lý nhóm này trước cho nhẹ đầu.`,
-    quick: 'Thêm nhanh bằng câu tự nhiên',
+    quick: 'Thêm nhanh',
     add: 'Thêm',
     placeholder: 'Ví dụ: nhắc tôi trả tiền điện ngày mai lúc 9 giờ tối',
-    helper: 'Gõ tự nhiên như đang nhắn tin. App tự nhận ngày, giờ và phân loại.',
+    helper: 'Gõ như đang nhắn tin. TXPick sẽ cố gắng nhận ngày, giờ và nhóm việc cho bạn.',
     today: 'Cần làm hôm nay',
     noToday: 'Hôm nay nhẹ nhàng. Bạn không có việc nào tới hạn.',
     noTodayCTA: 'Thêm việc đầu tiên',
@@ -62,9 +62,9 @@ const txt = {
     phonePromptBody: 'Bật một lần để điện thoại tự báo khi tới giờ nhắc việc, kể cả khi bạn không mở app.',
     phonePromptButton: 'Bật nhắc ngay',
     phonePromptOn: 'Xong. Điện thoại này sẽ nhận nhắc việc khi tới giờ.',
-    phonePromptUnsupported: 'Thiết bị này chưa hỗ trợ nhắc nền. Trên iPhone, hãy cài app vào màn hình chính rồi mở lại.',
+    phonePromptUnsupported: 'Điện thoại này chưa nhận thông báo app được. Trên iPhone, hãy thêm TXPick vào màn hình chính rồi mở từ icon.',
     phonePromptDenied: 'Bạn đã chặn thông báo. Vào cài đặt của điện thoại/trình duyệt để cho phép lại.',
-    phonePromptNotReady: 'Chưa bật được nhắc nền lúc này. Kiểm tra cài đặt thông báo rồi thử lại.',
+    phonePromptNotReady: 'Chưa bật được thông báo lúc này. Kiểm tra quyền thông báo rồi thử lại.',
     none: '—',
   },
   en: {
@@ -75,10 +75,10 @@ const txt = {
     insight: 'Today highlight',
     urgent: 'Needs attention',
     urgentBody: (overdue, dueToday) => `${overdue} overdue and ${dueToday} due today. Clear these first to free up your day.`,
-    quick: 'Quick add — natural language',
+    quick: 'Quick Add',
     add: 'Add',
     placeholder: 'Example: remind me to pay the electric bill tomorrow at 9 PM',
-    helper: 'Type the way you would text. The app picks up date, time, and category.',
+    helper: 'Type like you are texting. TXPick will try to read the date, time, and category for you.',
     today: 'On your plate today',
     noToday: 'Nothing on your plate today. Enjoy the calm.',
     noTodayCTA: 'Add your first task',
@@ -110,7 +110,7 @@ const txt = {
     phonePromptBody: 'Turn this on once so your phone can alert you when reminders are due, even if the app is closed.',
     phonePromptButton: 'Enable reminders',
     phonePromptOn: 'Done. This phone will receive reminders when they are due.',
-    phonePromptUnsupported: 'This device does not support background reminders yet. On iPhone, add the app to the Home Screen and reopen it.',
+    phonePromptUnsupported: 'This phone cannot receive app notifications yet. On iPhone, add TXPick to the Home Screen and open it from the icon.',
     phonePromptDenied: 'Notifications are blocked. Allow notifications in phone/browser settings to enable them again.',
     phonePromptNotReady: 'Could not enable background reminders right now. Check notification settings and try again.',
     none: '—',
@@ -181,8 +181,6 @@ export default function Today() {
       .then(async (status) => {
         if (!alive) return
         setPush(status)
-        // If the user already allowed notifications, silently re-save the device.
-        // Browsers do not allow asking permission automatically, so first-time setup still needs one tap.
         if (status.supported && status.permission === 'granted' && !status.subscribed) {
           const result = await enableBackgroundReminders().catch(() => null)
           if (!alive || !result?.ok) return
@@ -230,7 +228,6 @@ export default function Today() {
         <p className="mt-4 text-sm text-rose-600">{loadError}</p>
       )}
 
-      {/* Single highlight callout — replaces the old Focus + Briefing + Insight stack */}
       <section className={`mt-5 card p-4 sm:p-5 ${hasUrgent ? 'border-rose-100 bg-rose-50/40' : ''}`}>
         <div className="flex items-start gap-3">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${hasUrgent ? 'bg-rose-100 text-rose-700' : 'bg-brand-50 text-brand-700'}`}>

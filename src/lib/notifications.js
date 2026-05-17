@@ -188,100 +188,110 @@ async function postJson(url, body) {
 }
 
 
-function waitFor(promise, ms = 8000, label = 'Timed out') {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => setTimeout(() => reject(new Error(label)), ms)),
-  ])
-}
 
-function shortEndpoint(endpoint = '') {
-  if (!endpoint) return ''
-  return endpoint.length > 46 ? `${endpoint.slice(0, 28)}…${endpoint.slice(-14)}` : endpoint
+export function describePushProblem(code, lang = 'vi') {
+  const vi = {
+    unsupported: 'Thiết bị/trình duyệt này chưa hỗ trợ push notification. Trên iPhone, hãy cài TXPick vào Home Screen rồi mở từ icon app.',
+    denied: 'Bạn đã chặn thông báo. Hãy vào Settings của iPhone/Chrome/Safari để bật lại quyền thông báo cho TXPick.',
+    default: 'Bạn chưa cho phép thông báo. Bấm bật nhắc việc để iPhone hỏi quyền thông báo.',
+    missing_key: 'Thiếu VAPID public key/private key trên Vercel. Cần kiểm tra VITE_WEB_PUSH_PUBLIC_KEY và WEB_PUSH_PRIVATE_KEY.',
+    no_browser_subscription: 'Máy này chưa tạo subscription trong trình duyệt.',
+    no_server_subscription: 'Máy này chưa lưu subscription lên Supabase. Backend chưa có địa chỉ điện thoại để gửi.',
+    no_active_push_subscription: 'Supabase chưa có active push subscription cho tài khoản này.',
+    service_worker: 'Service worker chưa sẵn sàng. Hãy refresh app hoặc mở TXPick từ icon Home Screen.',
+    unknown: 'Chưa xác định được lỗi. Kiểm tra Console/Vercel logs và thử lại.',
+  }
+  const en = {
+    unsupported: 'This device/browser does not support push notifications yet. On iPhone, add TXPick to the Home Screen and open it from the app icon.',
+    denied: 'Notifications are blocked. Open iPhone/Chrome/Safari settings and allow notifications for TXPick.',
+    default: 'Notifications have not been allowed yet. Tap enable reminders so the phone can ask for permission.',
+    missing_key: 'VAPID public/private keys are missing on Vercel. Check VITE_WEB_PUSH_PUBLIC_KEY and WEB_PUSH_PRIVATE_KEY.',
+    no_browser_subscription: 'This device has not created a browser push subscription yet.',
+    no_server_subscription: 'This device has not saved its subscription to Supabase, so the backend has no phone address to send to.',
+    no_active_push_subscription: 'Supabase has no active push subscription for this account.',
+    service_worker: 'The service worker is not ready. Refresh the app or open TXPick from the Home Screen icon.',
+    unknown: 'The problem is not clear yet. Check Console/Vercel logs and try again.',
+  }
+  const map = lang === 'vi' ? vi : en
+  return map[code] || map.unknown
 }
 
 export async function getPushStatus() {
-  if (!pushSupported()) return { supported: false, permission: 'unsupported', subscribed: false, endpoint: '' }
-  const reg = await waitFor(navigator.serviceWorker.ready, 8000, 'Service worker is not ready yet')
-  const sub = await reg.pushManager.getSubscription()
-  return {
-    supported: true,
-    permission: Notification.permission,
-    subscribed: Boolean(sub),
-    endpoint: sub?.endpoint || '',
-    endpointShort: shortEndpoint(sub?.endpoint || ''),
-  }
-}
-
-export async function getPushDiagnostics() {
-  const base = {
-    browserSupportsNotifications: notificationSupported(),
-    browserSupportsPush: pushSupported(),
-    permission: notificationSupported() ? Notification.permission : 'unsupported',
-    serviceWorkerReady: false,
-    browserSubscribed: false,
-    endpoint: '',
-    endpointShort: '',
-    publicKeyConfigured: false,
-    signedIn: false,
-    serverSubscriptionCount: null,
-    serverEnabledCount: null,
-    serverError: '',
-  }
-
+  if (!pushSupported()) return { supported: false, permission: notificationSupported() ? Notification.permission : 'unsupported', subscribed: false, browserSubscribed: false }
   try {
-    base.publicKeyConfigured = Boolean(await getVapidPublicKey())
-  } catch {}
-
-  try {
-    const { data } = SUPABASE_CONFIGURED ? await supabase.auth.getSession() : { data: { session: null } }
-    base.signedIn = Boolean(data?.session?.access_token)
-  } catch {}
-
-  if (base.browserSupportsPush) {
-    try {
-      const reg = await waitFor(navigator.serviceWorker.ready, 8000, 'Service worker is not ready yet')
-      base.serviceWorkerReady = Boolean(reg)
-      const sub = await reg.pushManager.getSubscription()
-      base.browserSubscribed = Boolean(sub)
-      base.endpoint = sub?.endpoint || ''
-      base.endpointShort = shortEndpoint(sub?.endpoint || '')
-    } catch (err) {
-      base.serverError = err.message || String(err)
+    const reg = await navigator.serviceWorker.ready
+    const sub = await reg.pushManager.getSubscription()
+    return {
+      supported: true,
+      permission: Notification.permission,
+      subscribed: Boolean(sub),
+      browserSubscribed: Boolean(sub),
+      endpoint: sub?.endpoint || '',
+      endpointStart: sub?.endpoint ? sub.endpoint.slice(0, 80) : '',
+      serviceWorkerReady: true,
     }
+  } catch {
+    return { supported: true, permission: Notification.permission, subscribed: false, browserSubscribed: false, serviceWorkerReady: false }
   }
-
-  try {
-    const server = await postJson('/api/push/status', { endpoint: base.endpoint || null })
-    base.serverSubscriptionCount = server.total || 0
-    base.serverEnabledCount = server.enabled || 0
-    base.serverHasThisEndpoint = Boolean(server.hasThisEndpoint)
-    base.serverEnvReady = Boolean(server.envReady)
-    base.recentLogs = server.recentLogs || []
-  } catch (err) {
-    if (!base.serverError) base.serverError = err.message || 'Could not check server push status'
-  }
-
-  return base
 }
 
+async function currentBrowserSubscription() {
+  if (!pushSupported()) return null
+  const reg = await navigator.serviceWorker.ready
+  return reg.pushManager.getSubscription()
+}
+
+export async function checkServerPushStatus() {
+  const sub = await currentBrowserSubscription().catch(() => null)
+  return postJson('/api/push/status', { endpoint: sub?.endpoint || null })
+}
+
+export async function diagnosePushSetup() {
+  const local = await getPushStatus()
+  let server = null
+  let serverError = null
+  try {
+    server = await checkServerPushStatus()
+  } catch (err) {
+    serverError = err.message || 'Unable to check server push status'
+  }
+  return {
+    ok: Boolean(local.supported && local.permission === 'granted' && local.browserSubscribed && server?.enabled > 0),
+    local,
+    server,
+    serverError,
+  }
+}
 
 export async function enableBackgroundReminders() {
+  const steps = []
   if (!pushSupported()) {
-    return { ok: false, status: 'unsupported', message: 'This browser does not support background push reminders. On iPhone, install TXPick to the Home Screen and open it from the icon.' }
+    steps.push({ key: 'support', ok: false, message: 'Browser push is not supported.' })
+    return { ok: false, status: 'unsupported', problem: 'unsupported', steps, message: 'Push notification is not supported on this browser.' }
   }
+  steps.push({ key: 'support', ok: true, message: 'Browser supports push notifications.' })
 
   const permission = await ensurePermission()
+  steps.push({ key: 'permission', ok: permission === 'granted', value: permission, message: `Notification permission: ${permission}` })
   if (permission !== 'granted') {
-    return { ok: false, status: permission, message: permission === 'denied' ? 'Notifications are blocked for this browser/app.' : 'Notification permission was not granted.' }
+    return { ok: false, status: permission, problem: permission, steps, message: 'Notification permission was not granted.' }
   }
 
   const publicKey = await getVapidPublicKey()
+  steps.push({ key: 'public_key', ok: Boolean(publicKey), message: publicKey ? 'VAPID public key found.' : 'Missing VAPID public key.' })
   if (!publicKey) {
-    return { ok: false, status: 'missing_key', message: 'VAPID public key is missing. Check VITE_WEB_PUSH_PUBLIC_KEY in Vercel and local .env.' }
+    return { ok: false, status: 'missing_key', problem: 'missing_key', steps, message: 'Phone reminders are not configured yet.' }
   }
 
-  const reg = await waitFor(navigator.serviceWorker.ready, 8000, 'Service worker is not ready yet. Reopen the app and try again.')
+  let reg
+  try {
+    reg = await navigator.serviceWorker.ready
+    steps.push({ key: 'service_worker', ok: true, message: 'Service worker is ready.' })
+  } catch {
+    steps.push({ key: 'service_worker', ok: false, message: 'Service worker is not ready.' })
+    return { ok: false, status: 'service_worker', problem: 'service_worker', steps, message: 'Service worker is not ready.' }
+  }
+
   let subscription = await reg.pushManager.getSubscription()
   if (!subscription) {
     subscription = await reg.pushManager.subscribe({
@@ -289,10 +299,21 @@ export async function enableBackgroundReminders() {
       applicationServerKey: urlBase64ToUint8Array(publicKey),
     })
   }
+  steps.push({ key: 'browser_subscription', ok: Boolean(subscription), endpointStart: subscription?.endpoint?.slice(0, 80) || '', message: 'Browser subscription created on this device.' })
 
   const result = await postJson('/api/push/subscribe', { subscription })
-  try { localStorage.setItem(PUSH_STATUS_KEY, JSON.stringify({ enabledAt: new Date().toISOString(), endpoint: subscription.endpoint })) } catch {}
-  return { ok: true, status: 'enabled', subscription, result, endpointShort: shortEndpoint(subscription.endpoint) }
+  steps.push({ key: 'supabase_subscription', ok: Boolean(result?.ok), message: result?.ok ? 'Subscription saved to Supabase.' : 'Subscription was not saved to Supabase.' })
+
+  let serverStatus = null
+  try {
+    serverStatus = await checkServerPushStatus()
+    steps.push({ key: 'server_verify', ok: serverStatus?.enabled > 0, message: serverStatus?.enabled > 0 ? 'Supabase has an active subscription for this account.' : 'Supabase still has no active subscription for this account.' })
+  } catch (err) {
+    steps.push({ key: 'server_verify', ok: false, message: err.message || 'Could not verify server subscription.' })
+  }
+
+  try { localStorage.setItem(PUSH_STATUS_KEY, JSON.stringify({ enabledAt: new Date().toISOString() })) } catch {}
+  return { ok: Boolean(serverStatus ? serverStatus.enabled > 0 : result?.ok), status: 'enabled', subscription, result, serverStatus, steps }
 }
 
 export async function disableBackgroundReminders() {
@@ -309,4 +330,11 @@ export async function disableBackgroundReminders() {
 
 export async function sendTestPush() {
   return postJson('/api/push/test', {})
+}
+
+export async function enableAndSendTestPush() {
+  const setup = await enableBackgroundReminders()
+  if (!setup.ok) return { ok: false, stage: 'setup', setup }
+  const test = await sendTestPush()
+  return { ok: true, stage: 'test', setup, test }
 }

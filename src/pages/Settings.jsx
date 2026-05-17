@@ -1,92 +1,111 @@
 import { useEffect, useState } from 'react'
-import { BellRing, Save, Send, Settings as SettingsIcon, ShieldCheck, UserRound } from 'lucide-react'
+import { BellRing, Save, Send, Settings as SettingsIcon, ShieldCheck, UserRound, MessageSquareHeart, FileText, Shield, CheckCircle2, AlertTriangle, RefreshCw } from 'lucide-react'
 import { getProfile } from '../lib/db.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
-import { disableBackgroundReminders, enableBackgroundReminders, getPushDiagnostics, getPushStatus, sendTestPush } from '../lib/notifications.js'
+import { checkServerPushStatus, diagnosePushSetup, disableBackgroundReminders, enableBackgroundReminders, getPushStatus, sendTestPush, describePushProblem } from '../lib/notifications.js'
 import { getUserDisplayName } from '../lib/userDisplay.js'
 
 const copy = {
   vi: {
     title: 'Cài đặt',
-    sub: 'Đổi nhanh giữa Cá nhân và Kinh doanh, chỉnh tên hiển thị, tên tiệm và ngôn ngữ.',
-    account: 'Tài khoản',
+    sub: 'Đổi tên hiển thị, tên tiệm/business, ngôn ngữ và cách điện thoại nhắc bạn.',
+    account: 'Thông tin cá nhân & business',
     displayName: 'Tên hiển thị',
-    businessName: 'Tên business / tiệm',
-    type: 'Khu đang dùng',
+    businessName: 'Tên tiệm / business',
+    type: 'Mở app ở chế độ',
     personal: 'Cá nhân',
-    business: 'Kinh doanh / Chủ tiệm',
+    business: 'Business',
     language: 'Ngôn ngữ mặc định',
     save: 'Lưu cài đặt',
     saved: 'Đã lưu cài đặt.',
     loading: 'Đang tải…',
     email: 'Email',
-    note: 'Cá nhân và Kinh doanh được tách riêng. Nhắc việc dùng chung cho cả hai để bạn không bỏ sót bill, payroll, deadline hoặc việc gia đình.',
+    note: 'Cá nhân và Business được tách riêng để dễ theo dõi. Nhắc việc vẫn gom chung để bạn không bỏ sót hóa đơn, lương thợ, deadline hoặc việc gia đình.',
     pushTitle: 'Nhắc việc trên điện thoại',
-    pushSub: 'Khi bật, điện thoại sẽ tự báo đúng giờ nhắc việc. Không cần mở app để nhận thông báo.',
-    pushUnsupported: 'Thiết bị này chưa hỗ trợ nhắc nền. Trên iPhone, hãy cài app vào màn hình chính rồi mở lại.',
-    pushOff: 'Chưa bật nhắc nền trên máy này',
-    pushOn: 'Nhắc nền đang bật trên máy này',
+    pushSub: 'Bật một lần để điện thoại có thể nhận nhắc việc từ TXPick. Sau khi bật, dùng nút test để kiểm tra thật trên lock screen.',
+    pushUnsupported: 'Thiết bị này chưa hỗ trợ nhắc nền. Trên iPhone, hãy cài TXPick vào màn hình chính rồi mở từ icon app.',
+    pushOff: 'Chưa bật thông báo trên máy này',
+    pushOn: 'Thông báo đang bật trên máy này',
     permissionDenied: 'Bạn đã chặn thông báo. Vào cài đặt của điện thoại/trình duyệt để cho phép lại.',
-    enablePush: 'Bật nhắc ngay',
-    disablePush: 'Tạm tắt nhắc trên máy này',
-    testPush: 'Gửi thử ngay',
-    checkPush: 'Kiểm tra hệ thống nhắc',
-    pushEnabled: 'Xong. Điện thoại này đã được đăng ký nhận nhắc việc.',
+    enablePush: 'Bật nhắc việc trên máy này',
+    disablePush: 'Tạm tắt thông báo trên máy này',
+    testPush: 'Gửi test notification',
+    enableAndTest: 'Bật & gửi test ngay',
+    checkStatus: 'Kiểm tra trạng thái',
+    pushEnabled: 'Xong. Máy này đã đăng ký nhận nhắc việc từ TXPick.',
     pushDisabled: 'Đã tạm tắt nhắc nền trên máy này.',
-    testSent: 'Đã gửi thử thông báo. Khóa màn hình và kiểm tra trong vài giây.',
-    pushSetupError: 'Chưa gửi được. Xem phần kiểm tra bên dưới để biết đang kẹt ở bước nào.',
-    pushNotReady: 'Chưa bật được nhắc nền. Kiểm tra VAPID key, quyền thông báo, và cài app vào màn hình chính nếu dùng iPhone.',
-    diagnosticTitle: 'Kiểm tra nhanh',
-    diagnosticHelp: 'Nếu dòng nào chưa OK, TXPick chưa thể gửi nhắc việc ra màn hình khóa.',
-    browserSupport: 'Thiết bị hỗ trợ thông báo nền',
-    permission: 'Quyền thông báo',
-    serviceWorker: 'Service worker sẵn sàng',
-    browserSubscription: 'Máy này đã đăng ký trong trình duyệt',
-    serverSubscription: 'Supabase đã lưu thiết bị này',
-    serverEnv: 'Vercel có đủ push keys',
-    endpoint: 'Thiết bị',
+    testSent: 'Đã gửi test notification. Khóa màn hình và kiểm tra Notification Center.',
+    pushSetupError: 'Chưa gửi được notification. Xem chi tiết bên dưới để biết kẹt ở bước nào.',
+    pushNotReady: 'Chưa bật được nhắc nền lúc này. Xem chi tiết bên dưới rồi thử lại.',
+    diagnosticTitle: 'Chi tiết kiểm tra',
+    noDiagnostics: 'Chưa có kiểm tra nào. Bấm “Bật & gửi test ngay” hoặc “Kiểm tra trạng thái”.',
+    serverSubscriptions: 'Subscription trong Supabase',
+    recentLogs: 'Log gửi gần đây',
+    quickLinks: 'Liên kết nhanh',
+    feedback: 'Gửi góp ý',
+    privacy: 'Quyền riêng tư',
+    terms: 'Điều khoản',
   },
   en: {
     title: 'Settings',
-    sub: 'Basic profile settings for your name, business, and default language.',
-    account: 'Account',
+    sub: 'Update your name, business name, language, and phone reminder settings.',
+    account: 'Profile & business',
     displayName: 'Display name',
     businessName: 'Business / salon name',
-    type: 'Active workspace',
+    type: 'Open app in',
     personal: 'Personal',
-    business: 'Kinh doanh / Chủ tiệm',
+    business: 'Business',
     language: 'Default language',
     save: 'Save settings',
     saved: 'Settings saved.',
     loading: 'Loading…',
     email: 'Email',
-    note: 'Personal and Business are separated. Reminders are shared across both so you do not miss bills, payroll, deadlines, or family tasks.',
+    note: 'Personal and Business stay separated for cleaner records. Reminders stay together so bills, payroll, deadlines, and family tasks do not get missed.',
     pushTitle: 'Phone reminders',
-    pushSub: 'When enabled, this phone can notify you when reminders are due. You do not need to keep the app open.',
-    pushUnsupported: 'This device does not support background reminders yet. On iPhone, add the app to the Home Screen and reopen it.',
-    pushOff: 'Background reminders are off on this device',
-    pushOn: 'Background reminders are on for this device',
+    pushSub: 'Turn this on once so this phone can receive TXPick reminders. Then use the test button to check the real lock screen notification.',
+    pushUnsupported: 'This phone cannot receive app notifications yet. On iPhone, add TXPick to the Home Screen and open it from the app icon.',
+    pushOff: 'Notifications are off on this device',
+    pushOn: 'Notifications are on for this device',
     permissionDenied: 'Notifications are blocked. Open browser/phone settings to allow notifications again.',
-    enablePush: 'Enable reminders',
-    disablePush: 'Pause reminders on this device',
-    testPush: 'Send test now',
-    checkPush: 'Check reminder system',
-    pushEnabled: 'Done. This phone is registered for reminder alerts.',
-    pushDisabled: 'Background reminders are paused on this device.',
-    testSent: 'Test notification sent. Lock the screen and check in a few seconds.',
-    pushSetupError: 'Could not send yet. Check the diagnostic list below to see which step is blocked.',
-    pushNotReady: 'Could not enable background reminders. Check VAPID keys, notification permission, and Home Screen install on iPhone.',
-    diagnosticTitle: 'Quick check',
-    diagnosticHelp: 'If any line is not OK, TXPick cannot send lock-screen reminders yet.',
-    browserSupport: 'Device supports background alerts',
-    permission: 'Notification permission',
-    serviceWorker: 'Service worker ready',
-    browserSubscription: 'This phone is registered in browser',
-    serverSubscription: 'Supabase saved this device',
-    serverEnv: 'Vercel push keys are configured',
-    endpoint: 'Device',
+    enablePush: 'Enable reminders on this device',
+    disablePush: 'Pause notifications on this device',
+    testPush: 'Send test notification',
+    enableAndTest: 'Enable & send test now',
+    checkStatus: 'Check status',
+    pushEnabled: 'Done. This device is registered for TXPick reminders.',
+    pushDisabled: 'Notifications are paused on this device.',
+    testSent: 'Test notification sent. Lock your phone and check Notification Center.',
+    pushSetupError: 'Could not send a notification. See the details below to find where it got stuck.',
+    pushNotReady: 'Could not enable background reminders right now. Review the details below and try again.',
+    diagnosticTitle: 'Setup details',
+    noDiagnostics: 'No checks yet. Tap “Enable & send test now” or “Check status”.',
+    serverSubscriptions: 'Supabase subscriptions',
+    recentLogs: 'Recent send logs',
+    quickLinks: 'Quick links',
+    feedback: 'Send feedback',
+    privacy: 'Privacy Policy',
+    terms: 'Terms',
   },
+}
+
+function statusStepsFrom({ local, server, setup, test, errorCode, errorMessage }) {
+  const steps = []
+  if (local) {
+    steps.push({ label: 'Browser support', ok: Boolean(local.supported), detail: local.supported ? 'Supported' : 'Not supported' })
+    steps.push({ label: 'Permission', ok: local.permission === 'granted', detail: local.permission || 'unknown' })
+    steps.push({ label: 'Service worker', ok: local.serviceWorkerReady !== false, detail: local.serviceWorkerReady === false ? 'Not ready' : 'Ready' })
+    steps.push({ label: 'Browser subscription', ok: Boolean(local.browserSubscribed || local.subscribed), detail: local.endpointStart || 'No device endpoint yet' })
+  }
+  for (const step of setup?.steps || []) steps.push({ label: step.key, ok: step.ok, detail: step.endpointStart || step.value || step.message })
+  if (server) {
+    steps.push({ label: 'Vercel push keys', ok: Boolean(server.envReady), detail: server.envReady ? 'Configured' : 'Missing key' })
+    steps.push({ label: 'Supabase subscription', ok: Number(server.enabled || 0) > 0, detail: `${server.enabled || 0} active / ${server.total || 0} total` })
+    if (server.hasThisEndpoint !== undefined) steps.push({ label: 'This device saved', ok: Boolean(server.hasThisEndpoint), detail: server.hasThisEndpoint ? 'Current phone matched in Supabase' : 'Current phone endpoint not found in Supabase' })
+  }
+  if (test) steps.push({ label: 'Test push send', ok: Number(test.sent || 0) > 0, detail: `${test.sent || 0} sent / ${test.failed || 0} failed` })
+  if (errorCode || errorMessage) steps.push({ label: 'Last error', ok: false, detail: errorMessage || errorCode })
+  return steps
 }
 
 export default function Settings() {
@@ -102,7 +121,7 @@ export default function Settings() {
   const [pushBusy, setPushBusy] = useState(false)
   const [pushMessage, setPushMessage] = useState('')
   const [pushError, setPushError] = useState('')
-  const [pushDiagnostic, setPushDiagnostic] = useState(null)
+  const [diagnostics, setDiagnostics] = useState(null)
 
   useEffect(() => {
     let alive = true
@@ -132,19 +151,13 @@ export default function Settings() {
   useEffect(() => {
     let alive = true
     getPushStatus().then((status) => { if (alive) setPush(status) }).catch(() => undefined)
-    getPushDiagnostics().then((diag) => { if (alive) setPushDiagnostic(diag) }).catch(() => undefined)
     return () => { alive = false }
   }, [])
 
   async function refreshPushStatus() {
     const status = await getPushStatus()
     setPush(status)
-    try { setPushDiagnostic(await getPushDiagnostics()) } catch {}
     return status
-  }
-
-  function detailMessage(text) {
-    return String(text || '').replace(/^Error:\s*/i, '').trim()
   }
 
   async function save() {
@@ -162,21 +175,9 @@ export default function Settings() {
     }
   }
 
-  async function enablePush() {
-    setPushBusy(true)
-    setPushMessage('')
-    setPushError('')
-    try {
-      const result = await enableBackgroundReminders()
-      await refreshPushStatus()
-      if (result.ok) setPushMessage(`${c.pushEnabled}${result.endpointShort ? ` (${result.endpointShort})` : ''}`)
-      else setPushError(result.status === 'denied' ? c.permissionDenied : (result.status === 'missing_key' ? c.pushNotReady : (result.message || c.pushSetupError)))
-    } catch (err) {
-      await refreshPushStatus().catch(() => undefined)
-      setPushError(detailMessage(err.message) || c.pushSetupError)
-    } finally {
-      setPushBusy(false)
-    }
+  function setDiagnosticFromParts(parts) {
+    const steps = statusStepsFrom(parts)
+    setDiagnostics({ ...parts, steps })
   }
 
   async function disablePush() {
@@ -185,24 +186,29 @@ export default function Settings() {
     setPushError('')
     try {
       await disableBackgroundReminders()
-      await refreshPushStatus()
+      const local = await refreshPushStatus()
+      setDiagnostics({ steps: statusStepsFrom({ local }) })
       setPushMessage(c.pushDisabled)
     } catch (err) {
-      setPushError(detailMessage(err.message) || c.pushSetupError)
+      setPushError(c.pushSetupError)
     } finally {
       setPushBusy(false)
     }
   }
 
-  async function runDiagnostics() {
+  async function checkStatus() {
     setPushBusy(true)
     setPushMessage('')
     setPushError('')
     try {
-      await refreshPushStatus()
-      setPushMessage(lang === 'vi' ? 'Đã kiểm tra hệ thống nhắc việc.' : 'Reminder system check completed.')
+      const diag = await diagnosePushSetup()
+      setPush(diag.local)
+      setDiagnosticFromParts({ local: diag.local, server: diag.server, errorMessage: diag.serverError })
+      setPushMessage(diag.ok ? c.pushOn : c.pushOff)
     } catch (err) {
-      setPushError(detailMessage(err.message) || c.pushSetupError)
+      const local = await refreshPushStatus().catch(() => null)
+      setDiagnosticFromParts({ local, errorMessage: err.message })
+      setPushError(c.pushSetupError)
     } finally {
       setPushBusy(false)
     }
@@ -213,19 +219,30 @@ export default function Settings() {
     setPushMessage('')
     setPushError('')
     try {
-      let status = await refreshPushStatus()
-      if (!status.subscribed) {
-        const enabled = await enableBackgroundReminders()
-        if (!enabled.ok) throw new Error(enabled.message || c.pushNotReady)
-        status = await refreshPushStatus()
+      let local = await refreshPushStatus()
+      let setup = null
+      let server = null
+      if (!local.subscribed || local.permission !== 'granted') {
+        setup = await enableBackgroundReminders()
+        local = await refreshPushStatus()
+        server = setup.serverStatus || null
+        if (!setup.ok) {
+          setDiagnosticFromParts({ local, server, setup })
+          setPushError(describePushProblem(setup.problem || setup.status, lang))
+          return
+        }
+      } else {
+        server = await checkServerPushStatus().catch(() => null)
       }
-      const result = await sendTestPush()
-      await refreshPushStatus()
-      const body = result?.payload?.body ? ` — ${result.payload.body}` : ''
-      setPushMessage(`${c.testSent}${result?.sent != null ? ` (${result.sent} device${result.sent === 1 ? '' : 's'})` : ''}${body}`)
+      const test = await sendTestPush()
+      setDiagnosticFromParts({ local, server, setup, test })
+      setPushMessage(test?.message || c.testSent)
     } catch (err) {
-      await refreshPushStatus().catch(() => undefined)
-      setPushError(detailMessage(err.message) || c.pushSetupError)
+      const local = await refreshPushStatus().catch(() => null)
+      let server = null
+      try { server = await checkServerPushStatus() } catch {}
+      setDiagnosticFromParts({ local, server, errorCode: err.code, errorMessage: err.message })
+      setPushError(err.message ? `${c.pushSetupError} ${err.message}` : c.pushSetupError)
     } finally {
       setPushBusy(false)
     }
@@ -284,48 +301,67 @@ export default function Settings() {
         {!push.supported && <p className="mt-4 rounded-2xl bg-amber-50 border border-amber-100 px-4 py-3 text-sm text-amber-800">{c.pushUnsupported}</p>}
         {push.permission === 'denied' && <p className="mt-4 rounded-2xl bg-rose-50 border border-rose-100 px-4 py-3 text-sm text-rose-800">{c.permissionDenied}</p>}
 
-        <div className="mt-5 flex flex-col sm:flex-row gap-3">
+        <div className="mt-5 grid sm:grid-cols-2 gap-3">
           {!push.subscribed ? (
-            <button className="btn-primary" onClick={enablePush} disabled={pushBusy || !push.supported}><BellRing className="w-4 h-4" /> {c.enablePush}</button>
+            <button className="btn-primary" onClick={testPush} disabled={pushBusy || !push.supported}><BellRing className="w-4 h-4" /> {c.enableAndTest}</button>
           ) : (
             <button className="btn-secondary" onClick={disablePush} disabled={pushBusy}>{c.disablePush}</button>
           )}
           <button className="btn-secondary" onClick={testPush} disabled={pushBusy || !push.supported}><Send className="w-4 h-4" /> {c.testPush}</button>
+          <button className="btn-secondary sm:col-span-2" onClick={checkStatus} disabled={pushBusy || !push.supported}><RefreshCw className="w-4 h-4" /> {c.checkStatus}</button>
         </div>
-
-        <div className="mt-4 flex flex-col sm:flex-row gap-3">
-          <button className="btn-secondary" onClick={runDiagnostics} disabled={pushBusy}><ShieldCheck className="w-4 h-4" /> {c.checkPush}</button>
-        </div>
-
-        {pushDiagnostic && (
-          <div className="mt-5 rounded-2xl border border-ink-100 bg-ink-50/60 p-4">
-            <h3 className="text-sm font-extrabold text-ink-900">{c.diagnosticTitle}</h3>
-            <p className="text-xs text-ink-500 mt-1">{c.diagnosticHelp}</p>
-            <div className="mt-3 grid gap-2 text-sm">
-              <CheckLine label={c.browserSupport} ok={pushDiagnostic.browserSupportsPush} />
-              <CheckLine label={`${c.permission}: ${pushDiagnostic.permission}`} ok={pushDiagnostic.permission === 'granted'} />
-              <CheckLine label={c.serviceWorker} ok={pushDiagnostic.serviceWorkerReady} />
-              <CheckLine label={c.browserSubscription} ok={pushDiagnostic.browserSubscribed} />
-              <CheckLine label={c.serverSubscription} ok={Boolean(pushDiagnostic.serverHasThisEndpoint || pushDiagnostic.serverEnabledCount > 0)} />
-              <CheckLine label={c.serverEnv} ok={pushDiagnostic.serverEnvReady !== false && pushDiagnostic.publicKeyConfigured} />
-            </div>
-            {pushDiagnostic.endpointShort && <p className="mt-3 text-xs text-ink-500 break-all">{c.endpoint}: {pushDiagnostic.endpointShort}</p>}
-            {pushDiagnostic.serverError && <p className="mt-3 text-xs font-semibold text-rose-700">{pushDiagnostic.serverError}</p>}
-          </div>
-        )}
 
         {pushMessage && <p className="mt-4 text-sm font-semibold text-emerald-700">{pushMessage}</p>}
         {pushError && <p className="mt-4 text-sm font-semibold text-rose-700">{pushError}</p>}
+        <PushDiagnostics c={c} diagnostics={diagnostics} />
+      </section>
+
+      <section className="mt-5 card p-5 max-w-3xl">
+        <h2 className="font-bold text-ink-900 flex items-center gap-2"><Shield className="w-5 h-5 text-brand-600" /> {c.quickLinks}</h2>
+        <div className="mt-4 grid sm:grid-cols-3 gap-3">
+          <a className="btn-secondary justify-start" href="/feedback"><MessageSquareHeart className="w-4 h-4" /> {c.feedback}</a>
+          <a className="btn-secondary justify-start" href="/privacy"><Shield className="w-4 h-4" /> {c.privacy}</a>
+          <a className="btn-secondary justify-start" href="/terms"><FileText className="w-4 h-4" /> {c.terms}</a>
+        </div>
       </section>
     </div>
   )
 }
 
-function CheckLine({ label, ok }) {
+function PushDiagnostics({ c, diagnostics }) {
+  const steps = diagnostics?.steps || []
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl bg-white border border-ink-100 px-3 py-2">
-      <span className="text-ink-700">{label}</span>
-      <span className={`text-xs font-extrabold ${ok ? 'text-emerald-700' : 'text-rose-700'}`}>{ok ? 'OK' : 'CHECK'}</span>
+    <div className="mt-5 rounded-3xl border border-ink-100 bg-ink-50/60 p-4">
+      <h3 className="font-bold text-ink-900">{c.diagnosticTitle}</h3>
+      {!steps.length ? <p className="mt-2 text-sm text-ink-500">{c.noDiagnostics}</p> : (
+        <div className="mt-3 space-y-2">
+          {steps.map((step, index) => (
+            <div key={`${step.label}-${index}`} className="flex items-start gap-2 rounded-2xl bg-white border border-ink-100 px-3 py-2">
+              {step.ok ? <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600 shrink-0" /> : <AlertTriangle className="mt-0.5 h-4 w-4 text-amber-600 shrink-0" />}
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-ink-800">{step.label}</p>
+                {step.detail && <p className="text-xs text-ink-500 break-words">{String(step.detail)}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {diagnostics?.server?.recentSubscriptions?.length > 0 && (
+        <div className="mt-4">
+          <p className="text-xs font-bold uppercase tracking-wide text-ink-400">{c.serverSubscriptions}</p>
+          {diagnostics.server.recentSubscriptions.map((row) => (
+            <p key={row.id} className="mt-1 text-xs text-ink-500 break-all">{row.enabled ? 'ON' : 'OFF'} · {row.endpointStart}</p>
+          ))}
+        </div>
+      )}
+      {diagnostics?.server?.recentLogs?.length > 0 && (
+        <div className="mt-4">
+          <p className="text-xs font-bold uppercase tracking-wide text-ink-400">{c.recentLogs}</p>
+          {diagnostics.server.recentLogs.map((row, index) => (
+            <p key={`${row.created_at}-${index}`} className="mt-1 text-xs text-ink-500">{row.status} · {row.delivered_count || 0} sent · {row.error || row.created_at}</p>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
