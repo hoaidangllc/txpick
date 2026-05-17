@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BellRing, Save, Send, Settings as SettingsIcon, ShieldCheck, UserRound } from 'lucide-react'
+import { BellRing, Save, Send, Settings as SettingsIcon, ShieldCheck, UserRound, MessageSquareHeart, FileText, Shield } from 'lucide-react'
 import { getProfile } from '../lib/db.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
@@ -9,63 +9,71 @@ import { getUserDisplayName } from '../lib/userDisplay.js'
 const copy = {
   vi: {
     title: 'Cài đặt',
-    sub: 'Đổi nhanh giữa Cá nhân và Kinh doanh, chỉnh tên hiển thị, tên tiệm và ngôn ngữ.',
-    account: 'Tài khoản',
+    sub: 'Đổi tên hiển thị, tên tiệm/business, ngôn ngữ và cách điện thoại nhắc bạn.',
+    account: 'Thông tin cá nhân & business',
     displayName: 'Tên hiển thị',
-    businessName: 'Tên business / tiệm',
-    type: 'Khu đang dùng',
+    businessName: 'Tên tiệm / business',
+    type: 'Mở app ở chế độ',
     personal: 'Cá nhân',
-    business: 'Kinh doanh / Chủ tiệm',
+    business: 'Business',
     language: 'Ngôn ngữ mặc định',
     save: 'Lưu cài đặt',
     saved: 'Đã lưu cài đặt.',
     loading: 'Đang tải…',
     email: 'Email',
-    note: 'Cá nhân và Kinh doanh được tách riêng. Nhắc việc dùng chung cho cả hai để bạn không bỏ sót bill, payroll, deadline hoặc việc gia đình.',
+    note: 'Cá nhân và Business được tách riêng để dễ theo dõi. Nhắc việc vẫn gom chung để bạn không bỏ sót hóa đơn, lương thợ, deadline hoặc việc gia đình.',
     pushTitle: 'Nhắc việc trên điện thoại',
-    pushSub: 'Khi bật, điện thoại sẽ tự báo đúng giờ nhắc việc. Không cần mở app để nhận thông báo.',
+    pushSub: 'Bật một lần để điện thoại báo khi tới giờ nhắc việc, kể cả khi bạn không mở app.',
     pushUnsupported: 'Thiết bị này chưa hỗ trợ nhắc nền. Trên iPhone, hãy cài app vào màn hình chính rồi mở lại.',
-    pushOff: 'Chưa bật nhắc nền trên máy này',
-    pushOn: 'Nhắc nền đang bật trên máy này',
+    pushOff: 'Chưa bật thông báo trên máy này',
+    pushOn: 'Thông báo đang bật trên máy này',
     permissionDenied: 'Bạn đã chặn thông báo. Vào cài đặt của điện thoại/trình duyệt để cho phép lại.',
     enablePush: 'Bật nhắc ngay',
-    disablePush: 'Tạm tắt nhắc trên máy này',
+    disablePush: 'Tạm tắt thông báo trên máy này',
     testPush: 'Gửi thử một nhắc việc',
     pushEnabled: 'Xong. Điện thoại này sẽ tự báo khi tới giờ nhắc việc.',
     pushDisabled: 'Đã tạm tắt nhắc nền trên máy này.',
     testSent: 'Đã gửi thử một thông báo nhắc việc.',
     pushSetupError: 'Chưa gửi được thông báo. Kiểm tra quyền thông báo rồi thử lại.',
     pushNotReady: 'Chưa bật được nhắc nền lúc này. Kiểm tra cài đặt thông báo rồi thử lại.',
+    quickLinks: 'Liên kết nhanh',
+    feedback: 'Gửi góp ý',
+    privacy: 'Quyền riêng tư',
+    terms: 'Điều khoản',
   },
   en: {
     title: 'Settings',
-    sub: 'Basic profile settings for your name, business, and default language.',
-    account: 'Account',
+    sub: 'Update your name, business name, language, and phone reminder settings.',
+    account: 'Profile & business',
     displayName: 'Display name',
     businessName: 'Business / salon name',
-    type: 'Active workspace',
+    type: 'Open app in',
     personal: 'Personal',
-    business: 'Kinh doanh / Chủ tiệm',
+    business: 'Business',
     language: 'Default language',
     save: 'Save settings',
     saved: 'Settings saved.',
     loading: 'Loading…',
     email: 'Email',
-    note: 'Personal and Business are separated. Reminders are shared across both so you do not miss bills, payroll, deadlines, or family tasks.',
+    note: 'Personal and Business stay separated for cleaner records. Reminders stay together so bills, payroll, deadlines, and family tasks do not get missed.',
     pushTitle: 'Phone reminders',
-    pushSub: 'When enabled, this phone can notify you when reminders are due. You do not need to keep the app open.',
-    pushUnsupported: 'This device does not support background reminders yet. On iPhone, add the app to the Home Screen and reopen it.',
-    pushOff: 'Background reminders are off on this device',
-    pushOn: 'Background reminders are on for this device',
+    pushSub: 'Turn this on once so this phone can alert you when reminders are due, even if the app is closed.',
+    pushUnsupported: 'This phone cannot receive app notifications yet. On iPhone, add TXPick to the Home Screen and open it from the icon.',
+    pushOff: 'Notifications are off on this device',
+    pushOn: 'Notifications are on for this device',
     permissionDenied: 'Notifications are blocked. Open browser/phone settings to allow notifications again.',
     enablePush: 'Enable reminders',
-    disablePush: 'Pause reminders on this device',
+    disablePush: 'Pause notifications on this device',
     testPush: 'Send a reminder test',
     pushEnabled: 'Done. This phone will notify you when reminders are due.',
-    pushDisabled: 'Background reminders are paused on this device.',
+    pushDisabled: 'Notifications are paused on this device.',
     testSent: 'A reminder test was sent.',
     pushSetupError: 'Could not send a notification. Check notification permission and try again.',
     pushNotReady: 'Could not enable background reminders right now. Check notification settings and try again.',
+    quickLinks: 'Quick links',
+    feedback: 'Send feedback',
+    privacy: 'Privacy Policy',
+    terms: 'Terms',
   },
 }
 
@@ -244,6 +252,15 @@ export default function Settings() {
 
         {pushMessage && <p className="mt-4 text-sm font-semibold text-emerald-700">{pushMessage}</p>}
         {pushError && <p className="mt-4 text-sm font-semibold text-rose-700">{pushError}</p>}
+      </section>
+
+      <section className="mt-5 card p-5 max-w-3xl">
+        <h2 className="font-bold text-ink-900 flex items-center gap-2"><Shield className="w-5 h-5 text-brand-600" /> {c.quickLinks}</h2>
+        <div className="mt-4 grid sm:grid-cols-3 gap-3">
+          <a className="btn-secondary justify-start" href="/feedback"><MessageSquareHeart className="w-4 h-4" /> {c.feedback}</a>
+          <a className="btn-secondary justify-start" href="/privacy"><Shield className="w-4 h-4" /> {c.privacy}</a>
+          <a className="btn-secondary justify-start" href="/terms"><FileText className="w-4 h-4" /> {c.terms}</a>
+        </div>
       </section>
     </div>
   )
