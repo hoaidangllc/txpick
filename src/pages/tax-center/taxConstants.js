@@ -40,7 +40,7 @@ export const taxCopy = {
     emptyWorkers: 'Chưa có thợ hoặc nhân viên nào.', emptyIncome: 'Chưa có income kinh doanh nào.', emptyExpenses: 'Chưa có chi tiêu kinh doanh trong năm nay.',
     businessIncome: 'Income kinh doanh', workerTotal: 'Tiền trả thợ', businessExpenseTotal: 'Chi tiêu kinh doanh', netBusiness: 'Ước tính còn lại',
     warning: 'Thông tin SSN/EIN rất nhạy cảm. Chỉ nhập khi thật sự cần đưa cho người làm thuế. App này chỉ hỗ trợ gom dữ liệu, không tư vấn thuế.',
-    runSql: 'Nếu trang này báo thiếu bảng/cột, chạy file supabase/migration_004_tax_worker_income.sql trong Supabase trước.',
+    runSql: 'Trang business cần được kết nối đúng bảng dữ liệu trong Supabase.',
     incomeCategories: { salon_income: 'Income tiệm nail', booth_rent: 'Booth rent', uber: 'Uber', doordash: 'DoorDash', other_business: 'Kinh doanh khác' },
   },
   en: {
@@ -53,7 +53,7 @@ export const taxCopy = {
     emptyWorkers: 'No worker records yet.', emptyIncome: 'No business income yet.', emptyExpenses: 'No business expenses recorded this year.',
     businessIncome: 'Business income', workerTotal: 'Worker payments', businessExpenseTotal: 'Business expenses', netBusiness: 'Estimated net',
     warning: 'SSN/EIN is sensitive. Only enter it if your tax preparer needs it. This app organizes records; it does not provide tax advice.',
-    runSql: 'If this page says tables/columns are missing, run supabase/migration_004_tax_worker_income.sql in Supabase first.',
+    runSql: 'The business area needs the correct Supabase database tables.',
     incomeCategories: { salon_income: 'Nail salon income', booth_rent: 'Booth rent', uber: 'Uber', doordash: 'DoorDash', other_business: 'Other business' },
   },
 }

@@ -1,16 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   Bell, Plus, Receipt, Sparkles, CheckCircle2, Trash2,
-  Wallet, Crown, ArrowRight, AlertTriangle, WalletCards, Inbox,
+  Wallet, ArrowRight, AlertTriangle, WalletCards, Inbox,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import Modal from '../components/Modal.jsx'
 import StatCard from '../components/StatCard.jsx'
 import {
   EXPENSE_CATEGORIES, CATEGORIES, fmtUSD, isCurrentMonth,
-  parseNaturalReminder, buildDailyInsight, getPlan,
+  parseNaturalReminder, buildDailyInsight,
   todayISO, categoryLabel, repeatLabel,
-  planLabel,
 } from '../lib/lifeStore.js'
 import { billsDb, expensesDb, remindersDb, useRemoteCollection } from '../lib/db.js'
 import { enableBackgroundReminders, getPushStatus } from '../lib/notifications.js'
@@ -42,8 +41,6 @@ const txt = {
     upcoming: 'Sắp tới',
     noUpcoming: 'Chưa có việc nào sắp tới.',
     noUpcomingCTA: 'Tạo nhắc việc',
-    limitReminder: 'Bạn đã đạt giới hạn nhắc việc của gói hiện tại.',
-    limitExpense: 'Bạn đã đạt giới hạn chi tiêu của gói hiện tại.',
     noDate: 'Chưa chọn ngày',
     category: 'Phân loại',
     close: 'Đóng',
@@ -92,8 +89,6 @@ const txt = {
     upcoming: 'Coming up',
     noUpcoming: 'Nothing upcoming yet.',
     noUpcomingCTA: 'Create a reminder',
-    limitReminder: 'You reached the reminder limit for your plan.',
-    limitExpense: 'You reached the expense limit for your plan.',
     noDate: 'No date',
     category: 'Category',
     close: 'Close',
@@ -143,15 +138,13 @@ export default function Today() {
   const [reminders, remApi, remState] = useRemoteCollection(user?.id, remindersDb)
   const [expenses, expApi, expState] = useRemoteCollection(user?.id, expensesDb)
   const [bills, billApi, billState] = useRemoteCollection(user?.id, billsDb)
-  const planKey = profile?.plan_key || (profile?.is_pro ? 'premium' : 'free')
+  const planKey = 'free'
   const [quickText, setQuickText] = useState('')
   const [expenseOpen, setExpenseOpen] = useState(false)
   const [billOpen, setBillOpen] = useState(false)
   const [push, setPush] = useState({ supported: false, permission: 'default', subscribed: false })
   const [pushBusy, setPushBusy] = useState(false)
   const [pushMessage, setPushMessage] = useState('')
-  const plan = getPlan(planKey)
-
   const reminderBuckets = useMemo(() => getReminderBuckets(reminders), [reminders])
   const billBuckets = useMemo(() => getBillBuckets(bills), [bills])
 
@@ -174,7 +167,6 @@ export default function Today() {
 
   const addQuickReminder = () => {
     if (!quickText.trim()) return
-    if (reminders.length >= plan.reminderLimit) return alert(c.limitReminder)
     const parsed = parseNaturalReminder(quickText)
     remApi.add({ ...parsed, done: false, source: 'quick', notes: '' })
     setQuickText('')
@@ -232,9 +224,6 @@ export default function Today() {
           </h1>
           <p className="text-ink-500 mt-1 max-w-xl">{c.sub}</p>
         </div>
-        <span className="badge bg-gold-500/10 text-gold-700 shrink-0">
-          <Crown className="w-3 h-3" /> {planLabel(planKey, lang)}
-        </span>
       </div>
 
       {loadError && (
@@ -325,7 +314,7 @@ export default function Today() {
         </div>
       </section>
 
-      <ExpenseModal open={expenseOpen} onClose={() => setExpenseOpen(false)} onSave={(item) => { if (expenses.length >= plan.expenseLimit) return alert(c.limitExpense); expApi.add(item); setExpenseOpen(false) }} lang={lang} c={c} />
+      <ExpenseModal open={expenseOpen} onClose={() => setExpenseOpen(false)} onSave={(item) => { expApi.add(item); setExpenseOpen(false) }} lang={lang} c={c} />
       <BillModal open={billOpen} onClose={() => setBillOpen(false)} onSave={(item) => { billApi.add(item); setBillOpen(false) }} lang={lang} c={c} />
     </div>
   )

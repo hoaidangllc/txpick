@@ -7,10 +7,10 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 const copy = {
   vi: {
     title: 'Gợi ý hôm nay',
-    sub: 'Một câu ngắn để bạn biết hôm nay cần chú ý gì. AI chỉ dùng nhẹ — hiểu câu nhắc, gợi ý ngắn và tóm tắt. Không chat tự do, không tư vấn thuế.',
+    sub: 'Một câu ngắn để bạn biết hôm nay cần chú ý gì: nhắc việc, hóa đơn sắp tới, chi tiêu còn thiếu hoặc việc cần xử lý trước.',
     preview: 'Tóm tắt hôm nay',
     cached: 'Dựa trên dữ liệu bạn đã nhập',
-    howTitle: 'AI trong app này làm gì',
+    howTitle: 'App hỗ trợ bạn như thế nào',
     h1: 'Hiểu câu nhắc tự nhiên',
     h1Text: 'Ví dụ: "nhắc tôi trả tiền điện ngày mai lúc 9 giờ tối". App tự nhận tiêu đề, ngày, giờ và phân loại.',
     h2: 'Nhắc việc còn thiếu',
@@ -18,14 +18,14 @@ const copy = {
     h3: 'Tóm tắt ngắn',
     h3Text: 'Một câu trong ngày và một câu trong tháng — đủ để mở app là biết làm gì tiếp.',
     noteTitle: 'Giới hạn rõ ràng',
-    note: 'TX Life giữ AI thật nhẹ: hiểu câu nhắc, gợi ý ngắn và tóm tắt. Không scan hình, không chatbot, không tư vấn thuế.',
+    note: 'TXPick tập trung vào việc thực tế: nhắc việc, ghi chi tiêu, tổng kết và xuất hồ sơ. Không scan hình, không chatbot tự do, không tư vấn thuế.',
   },
   en: {
     title: 'Today insight',
-    sub: 'A short note about what to pay attention to today. Light AI only — natural reminder parsing, short hints, and quick summaries. No open chat, no tax advice.',
+    sub: 'A short note about what needs attention today: reminders, upcoming bills, missing expenses, or tasks to clear first.',
     preview: 'Today summary',
     cached: 'Based on the data you have entered',
-    howTitle: 'How AI is used here',
+    howTitle: 'How the app helps you',
     h1: 'Understand natural reminders',
     h1Text: 'Example: "remind me to pay the electric bill tomorrow at 9 PM." The app detects title, date, time, and category.',
     h2: 'Spot what is missing',
@@ -33,7 +33,7 @@ const copy = {
     h3: 'Short summaries',
     h3Text: 'One sentence for the day, one for the month — enough to know what to do next when you open the app.',
     noteTitle: 'Clear limits',
-    note: 'TX Life keeps AI light: natural reminders, short hints, and summaries. No receipt scanning, no chatbot, no tax advice.',
+    note: 'TXPick focuses on practical work: reminders, expenses, summaries, and exports. No receipt scanning, no open chatbot, no tax advice.',
   },
 }
 

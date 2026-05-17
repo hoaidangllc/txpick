@@ -1,19 +1,19 @@
 export const translations = {
   vi: {
-    appName: 'TX Life',
+    appName: 'TXPick',
     taglineMain: 'Một nơi gọn gàng để nhớ việc, ghi chi tiêu và tổng kết cuối năm.',
     taglineSub: 'Dành cho người Việt ở Mỹ — nhắc việc, hóa đơn, chi tiêu cá nhân và kinh doanh.',
     welcome: 'Chào mừng bạn quay lại.',
-    nav: { login: 'Đăng nhập', logout: 'Đăng xuất', pricing: 'Nâng cấp', getStarted: 'Bắt đầu', today: 'Hôm nay' },
+    nav: { login: 'Đăng nhập', logout: 'Đăng xuất', pricing: 'Phản hồi', getStarted: 'Bắt đầu', today: 'Hôm nay' },
     footer: {
-      tagline: 'App quản lý đời sống hằng ngày cho người Việt ở Mỹ.',
+      tagline: 'App sắp xếp việc hằng ngày cho người Việt ở Mỹ.',
       rights: 'Mọi quyền được bảo lưu.',
       contact: 'Liên hệ',
       privacy: 'Bảo mật',
       terms: 'Điều khoản',
     },
     auth: {
-      loginTitle: 'Đăng nhập', signupTitle: 'Tạo tài khoản TX Life',
+      loginTitle: 'Đăng nhập', signupTitle: 'Tạo tài khoản TXPick',
       email: 'Email', password: 'Mật khẩu',
       signIn: 'Đăng nhập', signUp: 'Tạo tài khoản',
       orContinueWith: 'hoặc tiếp tục với', google: 'Tiếp tục với Google',
@@ -25,11 +25,11 @@ export const translations = {
     common: { save: 'Lưu', cancel: 'Hủy', delete: 'Xóa', add: 'Thêm', amount: 'Số tiền', date: 'Ngày', category: 'Phân loại', note: 'Ghi chú', name: 'Tên' },
   },
   en: {
-    appName: 'TX Life',
+    appName: 'TXPick',
     taglineMain: 'A calm home for reminders, expenses, and year-end summaries.',
     taglineSub: 'Built for Vietnamese families in the U.S. — reminders, bills, personal and business expenses.',
     welcome: 'Welcome back.',
-    nav: { login: 'Log in', logout: 'Log out', pricing: 'Upgrade', getStarted: 'Get started', today: 'Today' },
+    nav: { login: 'Log in', logout: 'Log out', pricing: 'Feedback', getStarted: 'Get started', today: 'Today' },
     footer: {
       tagline: 'A daily-life app for Vietnamese families in the U.S.',
       rights: 'All rights reserved.',
@@ -38,7 +38,7 @@ export const translations = {
       terms: 'Terms',
     },
     auth: {
-      loginTitle: 'Welcome back', signupTitle: 'Create your TX Life account',
+      loginTitle: 'Welcome back', signupTitle: 'Create your TXPick account',
       email: 'Email', password: 'Password',
       signIn: 'Log in', signUp: 'Create account',
       orContinueWith: 'or continue with', google: 'Continue with Google',

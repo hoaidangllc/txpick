@@ -1,4 +1,4 @@
--- TX Life Web Push reminder foundation.
+-- TXPick Web Push reminder foundation.
 -- Vercel hosts the PWA only. Supabase runs the reminder scheduler.
 
 create extension if not exists pg_cron with schema extensions;
@@ -67,9 +67,9 @@ create policy "Users can view their push logs"
 -- Schedule setup is intentionally left as a manual block because each Supabase project URL differs.
 -- After deploying the Edge Function, replace YOUR_PROJECT_REF and YOUR_CRON_SECRET, then run:
 --
--- select cron.unschedule('txlife-send-reminders-every-5-minutes'); -- optional if replacing old schedule
+-- select cron.unschedule('txpick-send-reminders-every-5-minutes'); -- optional if replacing old schedule
 -- select cron.schedule(
---   'txlife-send-reminders-every-5-minutes',
+--   'txpick-send-reminders-every-5-minutes',
 --   '*/5 * * * *',
 --   $$
 --   select

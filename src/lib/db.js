@@ -219,7 +219,7 @@ export async function upsertProfile(user, patch = {}) {
     id: user.id,
     email: user.email,
     display_name: patch.display_name || patch.displayName || authDisplayName(user) || user.email?.split('@')[0] || '',
-    type: patch.type || 'personal',
+    type: patch.type || patch.account_type || patch.accountType || 'personal',
     business_name: patch.business_name || patch.businessName || null,
     is_pro: Boolean(patch.is_pro ?? patch.isPro ?? false),
     locale: patch.locale || 'vi',
@@ -229,6 +229,30 @@ export async function upsertProfile(user, patch = {}) {
   const { data, error } = await supabase.from('profiles').upsert(payload).select('*').single()
   if (error) throw error
   return data
+}
+
+
+export const feedbackDb = {
+  async list(userId) {
+    const rows = await selectForUser('feedback_requests', userId, 'created_at', false)
+    return rows
+  },
+  async add(userId, item) {
+    requireUserId(userId)
+    const payload = {
+      profile_id: userId,
+      workspace_type: item.workspace_type || item.workspaceType || 'personal',
+      category: item.category || 'feature_request',
+      subject: item.subject || '',
+      message: item.message || '',
+      contact_email: item.contact_email || item.contactEmail || '',
+      voice_note_url: item.voice_note_url || item.voiceNoteUrl || null,
+      status: 'new',
+    }
+    const { data, error } = await supabase.from('feedback_requests').insert(payload).select('*').single()
+    if (error) throw error
+    return data
+  },
 }
 
 export function useRemoteCollection(userId, adapter) {

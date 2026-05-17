@@ -12,9 +12,9 @@ const copy = {
   vi: {
     login: 'Đăng nhập',
     start: 'Bắt đầu miễn phí',
-    badge: 'App quản lý đời sống hàng ngày',
+    badge: 'App sắp xếp việc hằng ngày',
     title: 'Nhớ ít hơn. Sống gọn hơn.',
-    sub: 'TX Life gom nhắc việc, hóa đơn, chi tiêu và tổng kết vào một nơi dễ dùng mỗi ngày.',
+    sub: 'TXPick gom nhắc việc, hóa đơn, chi tiêu và tổng kết vào một nơi dễ dùng mỗi ngày.',
     trustLine: 'Bắt đầu miễn phí. Ghi nhanh. Nhắc đúng lúc. Cuối tháng nhìn lại rõ ràng.',
     featuresTitle: 'Đủ những thứ cần nhớ, không làm bạn rối thêm',
     featuresSub: 'Mở app là biết hôm nay cần làm gì, tiền đi đâu và việc nào sắp tới hạn.',
@@ -38,9 +38,9 @@ const copy = {
   en: {
     login: 'Log in',
     start: 'Start free',
-    badge: 'A daily life management app',
+    badge: 'A daily organizer app',
     title: 'Remember less. Live lighter.',
-    sub: 'TX Life brings reminders, bills, expenses, and summaries into one simple place you can use every day.',
+    sub: 'TXPick brings reminders, bills, expenses, and summaries into one simple place you can use every day.',
     trustLine: 'Start free. Add quickly. Get reminded on time. Review the month with clarity.',
     featuresTitle: 'The important things, without the clutter',
     featuresSub: 'Open the app and know what matters today, where money went, and what is coming due.',

@@ -1,35 +1,21 @@
-# TXPick Life App Batch Update
+# TXPick Consolidation Update
 
-Direction implemented:
-- TXPick repositioned as a daily life management app for Vietnamese people in the U.S.
-- Today Page is the main app page after login.
-- Core modules are Reminder, Expense, Monthly Bills, Summary, and Smart Tools.
-- Personal and Business share the same Today Page and are separated by category.
-- AI is light/cost-controlled: local natural reminder parsing, cached daily insight, limited daily AI action counters.
-- App remains usable without AI.
+This pass consolidates the app back to the TXPick brand so the product matches the txpick.com domain.
 
-Disabled/removed from active app flow:
-- AI tax advice
-- Receipt/photo scan
-- Unlimited AI chat
-- Mileage tracking
-- Complicated tax forms
-- Old Tax/AI/Business/Personal dashboard routes now redirect to the new flow.
+## Completed in this batch
 
-New routes:
-- /today
-- /reminders
-- /expenses
-- /bills
-- /summary
-- /smart
-- /pricing
+- Replaced TX Life branding with TXPick
+- Updated PWA manifest, favicon label, metadata, notification copy, feedback email copy, and service worker copy
+- Removed browser OpenAI key usage from frontend code
+- Rewrote `.env.example` to separate frontend-safe variables from server-only secrets
+- Added Privacy Policy page
+- Added Terms page
+- Added RLS/security hardening migration
+- Added mobile quick-add floating action button
+- Kept premium/upgrade hidden while feedback is prioritized
 
-Build status:
-- npm run build: PASS
-- npm run lint: PASS after adding a project ESLint config
+## Product rule
 
-Notes:
-- Data is still localStorage-based in this batch, matching the existing lightweight app style.
-- Stripe/subscription enforcement is represented as local plan switching for now. Wire real payments later.
-- Supabase persistence can be added next without rewriting the UI because the store API is isolated.
+TXPick means: pick what matters today.
+
+Do not reintroduce sportsbook language, betting pages, sports routes, or direct browser AI keys.

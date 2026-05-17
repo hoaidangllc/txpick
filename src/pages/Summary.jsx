@@ -17,7 +17,7 @@ const copy = {
     month: 'Tháng', business: 'Kinh doanh', personal: 'Cá nhân', total: 'Tổng', count: 'Số dòng',
     emptyTitle: 'Chưa có dữ liệu để tổng kết',
     empty: 'Hãy ghi chi tiêu hoặc hóa đơn đầu tiên — app sẽ tự gom theo tháng.',
-    aiSummary: 'Tóm tắt nhanh',
+    aiSummary: 'Tổng quan nhanh',
     exportTitle: 'Xuất file',
     exportSub: 'CSV để mở bằng Excel/Google Sheets. PDF để lưu cuối tháng hoặc cuối năm.',
     pro: 'Mẹo: ghi đều mỗi ngày để cuối tháng và cuối năm không phải ngồi nhớ lại. App này không phải kế toán, không tư vấn thuế.',
@@ -31,7 +31,7 @@ const copy = {
     month: 'Month', business: 'Business', personal: 'Personal', total: 'Total', count: 'Records',
     emptyTitle: 'Nothing to summarize yet',
     empty: 'Log a first expense or bill — the app will group them by month for you.',
-    aiSummary: 'Quick summary',
+    aiSummary: 'Quick overview',
     exportTitle: 'Export files',
     exportSub: 'CSV for Excel/Google Sheets. PDF for month-end or year-end review.',
     pro: 'Tip: log a little every day so month-end and year-end are painless. This is not accounting software or tax advice.',
@@ -69,21 +69,21 @@ export default function Summary() {
   const empty = expenses.length === 0 && bills.length === 0 && reminders.length === 0
 
   const exportExpensesCSV = () => {
-    downloadCSV(`tx-life-expenses-${fileDate()}.csv`, [
+    downloadCSV(`txpick-expenses-${fileDate()}.csv`, [
       ['date', 'title', 'category', 'expense_type', 'tax_category', 'amount', 'note'],
       ...expenses.map((e) => [e.date, e.title, e.category, e.expense_type || '', e.tax_category || '', e.amount || 0, e.note || '']),
     ])
   }
 
   const exportBillsCSV = () => {
-    downloadCSV(`tx-life-bills-${fileDate()}.csv`, [
+    downloadCSV(`txpick-bills-${fileDate()}.csv`, [
       ['due_date', 'title', 'category', 'amount', 'paid', 'paid_at'],
       ...bills.map((b) => [b.dueDate || b.due_date || '', b.name || b.title, b.category || '', b.amount || 0, b.paid ? 'yes' : 'no', b.paid_at || '']),
     ])
   }
 
   const exportPDF = () => {
-    downloadSimplePDF(`tx-life-summary-${fileDate()}.pdf`, lang === 'vi' ? 'TX Life — Tổng kết cuối năm' : 'TX Life — Year-end summary', pdfLines)
+    downloadSimplePDF(`txpick-summary-${fileDate()}.pdf`, lang === 'vi' ? 'TXPick — Tổng kết cuối năm' : 'TXPick — Year-end summary', pdfLines)
   }
 
   return (

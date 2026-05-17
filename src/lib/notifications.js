@@ -1,12 +1,12 @@
-// Notification foundation for TX Life.
+// Notification foundation for TXPick.
 // - Local notification: works while app/PWA is open.
 // - Web Push: works from server cron after the user installs/opens PWA and allows notifications.
 
 import { supabase, SUPABASE_CONFIGURED } from './supabase.js'
 
-const NOTIFIED_KEY = 'txlife_notified_v4'
-const DAILY_KEY = 'txlife_daily_briefing_notified_v1'
-const PUSH_STATUS_KEY = 'txlife_push_status_v1'
+const NOTIFIED_KEY = 'txpick_notified_v4'
+const DAILY_KEY = 'txpick_daily_briefing_notified_v1'
+const PUSH_STATUS_KEY = 'txpick_push_status_v1'
 
 export function notificationSupported() {
   return typeof window !== 'undefined' && typeof Notification !== 'undefined'

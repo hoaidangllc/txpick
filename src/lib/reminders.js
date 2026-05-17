@@ -1,4 +1,4 @@
-// Smart reminder parser & schedule engine for TX Life.
+// Smart reminder parser & schedule engine for TXPick.
 //
 // parseReminder(text)  -> { title, category, dueAt, repeat, forPerson }
 // nextOccurrence(rem)  -> next Date for a repeating reminder

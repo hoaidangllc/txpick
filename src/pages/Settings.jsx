@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { BellRing, Save, Send, Settings as SettingsIcon, ShieldCheck, UserRound } from 'lucide-react'
-import { getProfile, upsertProfile } from '../lib/db.js'
+import { getProfile } from '../lib/db.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { disableBackgroundReminders, enableBackgroundReminders, getPushStatus, sendTestPush } from '../lib/notifications.js'
@@ -9,19 +9,19 @@ import { getUserDisplayName } from '../lib/userDisplay.js'
 const copy = {
   vi: {
     title: 'Cài đặt',
-    sub: 'Thông tin cơ bản để app hiển thị đúng tên, công việc/tiệm và ngôn ngữ.',
+    sub: 'Đổi nhanh giữa Cá nhân và Kinh doanh, chỉnh tên hiển thị, tên tiệm và ngôn ngữ.',
     account: 'Tài khoản',
     displayName: 'Tên hiển thị',
     businessName: 'Tên business / tiệm',
-    type: 'Loại tài khoản',
+    type: 'Khu đang dùng',
     personal: 'Cá nhân',
-    business: 'Business',
+    business: 'Kinh doanh / Chủ tiệm',
     language: 'Ngôn ngữ mặc định',
     save: 'Lưu cài đặt',
     saved: 'Đã lưu cài đặt.',
     loading: 'Đang tải…',
     email: 'Email',
-    note: 'App ưu tiên nhập tay nhanh, nhắc việc rõ ràng và tổng kết cuối tháng/cuối năm. Không scan hình để giữ app nhẹ và rẻ.',
+    note: 'Cá nhân và Kinh doanh được tách riêng. Nhắc việc dùng chung cho cả hai để bạn không bỏ sót bill, payroll, deadline hoặc việc gia đình.',
     pushTitle: 'Nhắc việc trên điện thoại',
     pushSub: 'Khi bật, điện thoại sẽ tự báo đúng giờ nhắc việc. Không cần mở app để nhận thông báo.',
     pushUnsupported: 'Thiết bị này chưa hỗ trợ nhắc nền. Trên iPhone, hãy cài app vào màn hình chính rồi mở lại.',
@@ -43,15 +43,15 @@ const copy = {
     account: 'Account',
     displayName: 'Display name',
     businessName: 'Business / salon name',
-    type: 'Account type',
+    type: 'Active workspace',
     personal: 'Personal',
-    business: 'Business',
+    business: 'Kinh doanh / Chủ tiệm',
     language: 'Default language',
     save: 'Save settings',
     saved: 'Settings saved.',
     loading: 'Loading…',
     email: 'Email',
-    note: 'The app is built for quick manual entry, clear reminders, and month-end/year-end summaries. No receipt scan — to keep it light and affordable.',
+    note: 'Personal and Business are separated. Reminders are shared across both so you do not miss bills, payroll, deadlines, or family tasks.',
     pushTitle: 'Phone reminders',
     pushSub: 'When enabled, this phone can notify you when reminders are due. You do not need to keep the app open.',
     pushUnsupported: 'This device does not support background reminders yet. On iPhone, add the app to the Home Screen and reopen it.',
@@ -70,7 +70,7 @@ const copy = {
 }
 
 export default function Settings() {
-  const { user, profile } = useAuth()
+  const { user, profile, updateProfile } = useAuth()
   const { lang } = useLang()
   const c = copy[lang] || copy.en
   const [form, setForm] = useState({ display_name: '', business_name: '', type: 'personal', locale: lang })
@@ -126,7 +126,7 @@ export default function Settings() {
     setMessage('')
     setError('')
     try {
-      await upsertProfile(user, form)
+      await updateProfile?.(form)
       setMessage(c.saved)
     } catch (err) {
       setError(err.message || 'Unable to save settings')

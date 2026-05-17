@@ -90,7 +90,7 @@ function pushPayload(reminder) {
   const timeText = time ? ` • ${time}` : ''
   return {
     title: `${categoryIcon(reminder.category)} ${title}`,
-    body: notes || `Đến giờ làm việc này${timeText}. Mở TX Life để xem chi tiết.`,
+    body: notes || `Đến giờ làm việc này${timeText}. Mở TXPick để xem chi tiết.`,
     tag: `reminder-${reminder.id}`,
     url: '/reminders',
     data: { reminderId: reminder.id, category: reminder.category || 'personal' },

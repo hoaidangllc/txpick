@@ -1,6 +1,6 @@
-# TX Life Push Reminders
+# TXPick Push Reminders
 
-TX Life uses Web Push for real phone reminders.
+TXPick uses Web Push for real phone reminders.
 
 ## Current production path
 

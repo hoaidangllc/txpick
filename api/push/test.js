@@ -30,7 +30,7 @@ function formatDueTime(value) {
 function reminderPayload(reminder) {
   if (!reminder) {
     return {
-      title: '🔔 TX Life nhắc việc',
+      title: '🔔 TXPick nhắc việc',
       body: 'Nhắc việc trên điện thoại đã bật. Khi tới giờ, app sẽ báo nội dung việc cần làm ở đây.',
       tag: `test-${Date.now()}`,
       url: '/today',
@@ -44,7 +44,7 @@ function reminderPayload(reminder) {
 
   return {
     title: `${categoryIcon(reminder.category)} ${title}`,
-    body: notes || `Đến giờ làm việc này${timeText}. Mở TX Life để xem chi tiết.`,
+    body: notes || `Đến giờ làm việc này${timeText}. Mở TXPick để xem chi tiết.`,
     tag: `test-reminder-${reminder.id}-${Date.now()}`,
     url: '/reminders',
     data: { reminderId: reminder.id },

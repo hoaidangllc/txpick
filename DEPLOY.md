@@ -1,99 +1,60 @@
-# Deploy TxPick lên Vercel
+# TXPick Deploy Notes
 
-Hướng dẫn deploy app TxPick lên Vercel và point domain `txpick.com` về app.
-
-## Bước 1 — Push code lên GitHub
+## 1. Install and build
 
 ```bash
-cd "C:\Users\hoaid\TxPick app\TXPICK"
-git init
-git add .
-git commit -m "TxPick v0.1"
-git branch -M main
+npm install
+npm run build
 ```
 
-Tạo repo trống trên GitHub (https://github.com/new), tên `txpick`. Đừng tick "Initialize with README". Sau đó:
+## 2. Vercel environment variables
 
-```bash
-git remote add origin https://github.com/<your-username>/txpick.git
-git push -u origin main
+Frontend-safe:
+
+```txt
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+VITE_APP_URL=https://txpick.com
+VITE_WEB_PUSH_PUBLIC_KEY=
 ```
 
-Nhớ kiểm tra `.gitignore` đã có `.env` — file `.env` **không bao giờ** được commit.
+Server-only:
 
-## Bước 2 — Connect Vercel
+```txt
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+CRON_SECRET=
+WEB_PUSH_PUBLIC_KEY=
+WEB_PUSH_PRIVATE_KEY=
+WEB_PUSH_SUBJECT=mailto:support@txpick.com
+RESEND_API_KEY=
+FEEDBACK_NOTIFY_EMAIL=ddh2755@gmail.com
+FEEDBACK_FROM_EMAIL=TXPick <onboarding@resend.dev>
+ADMIN_EMAILS=ddh2755@gmail.com
+```
 
-1. Vào https://vercel.com/new
-2. Đăng nhập bằng GitHub
-3. Bấm "Import" cạnh repo `txpick`
-4. Vercel sẽ tự nhận Vite. Build command, output directory đã có sẵn trong `vercel.json`.
-5. Mở phần **Environment Variables** và thêm 3 biến:
+Do not add `SUPABASE_SERVICE_ROLE_KEY`, `WEB_PUSH_PRIVATE_KEY`, `RESEND_API_KEY`, or `OPENAI_API_KEY` with a `VITE_` prefix.
 
-| Key | Value |
-|---|---|
-| `VITE_SUPABASE_URL` | `https://viqqwpbmkqhrpthxlsdc.supabase.co` |
-| `VITE_SUPABASE_ANON_KEY` | `sb_publishable_rtc6lvkI6zQU0sZDGGvq3w_S87nhnsp` |
-| `VITE_OPENAI_API_KEY` | (key OpenAI của bạn — có thể bỏ trống để tắt AI) |
+## 3. Supabase
 
-Bấm **Deploy**. Sau 1-2 phút sẽ có URL kiểu `txpick-xxx.vercel.app`.
+Run migrations in order, including:
 
-## Bước 3 — Cập nhật Supabase Redirect URLs
+- `004_tax_worker_income.sql`
+- `005_supabase_edge_push_reminders.sql`
+- `006_feedback_requests.sql`
+- `007_feedback_admin_email.sql`
+- `008_rls_security_hardening.sql`
 
-1. Vào https://supabase.com/dashboard/project/viqqwpbmkqhrpthxlsdc/auth/url-configuration
-2. **Site URL**: đổi thành URL Vercel (ví dụ `https://txpick-xxx.vercel.app`) — sau khi point domain xong thì đổi thành `https://txpick.com`.
-3. **Redirect URLs**: thêm cả 2:
-   - `https://txpick-xxx.vercel.app/**`
-   - `https://txpick.com/**`
-4. Lưu.
+## 4. Smoke test
 
-Bước này quan trọng — không có nó, Google OAuth và email verification sẽ redirect về `localhost`.
+Test on phone before public launch:
 
-## Bước 4 — Point domain txpick.com
-
-### Nếu bạn đã mua txpick.com:
-
-1. Trong Vercel, vào project → Settings → Domains
-2. Bấm "Add", gõ `txpick.com`
-3. Vercel sẽ hiện DNS records cần thêm. Có 2 tùy chọn:
-
-**A. Đổi nameservers (đơn giản hơn):**
-- Trong panel của registrar (GoDaddy, Namecheap, Cloudflare...), đổi nameservers thành:
-  ```
-  ns1.vercel-dns.com
-  ns2.vercel-dns.com
-  ```
-- Đợi 5-30 phút (đôi khi đến 24 giờ) cho DNS lan truyền.
-
-**B. Thêm record thủ công:**
-- A record cho `@` (root domain) → `76.76.21.21`
-- CNAME cho `www` → `cname.vercel-dns.com`
-
-Vercel sẽ tự cấp SSL cert miễn phí (Let's Encrypt) trong vòng vài phút sau khi DNS resolve.
-
-### Nếu chưa mua domain:
-
-Mua trên Namecheap, Cloudflare, Porkbun (rẻ nhất, ~$10/năm cho `.com`). Sau đó làm theo các bước trên.
-
-## Bước 5 — Smoke test
-
-Vào `https://txpick.com` (hoặc URL `*.vercel.app`):
-
-- [ ] Landing page hiện đúng
-- [ ] Đổi EN/VI hoạt động
-- [ ] Đăng ký email mới → vào được dashboard
-- [ ] Thêm chi phí → reload trang → data còn nguyên
-- [ ] Xuất PDF từ tab Tax → in được Schedule C + 1099 + W-2
-
-Nếu có lỗi, mở DevTools (F12) → tab Console xem có error gì. Báo mình, mình debug.
-
-## Auto-deploy
-
-Sau khi setup xong, mỗi lần `git push` lên branch `main`, Vercel sẽ tự build và deploy. Pull request sẽ tự có preview URL riêng — tiện để bạn của bạn test trước khi merge.
-
-## ⚠️ Trước khi public cho khách hàng thật
-
-1. **Rotate OpenAI key** trong https://platform.openai.com/api-keys (key cũ đã lộ ra trong chat).
-2. **Rotate Supabase secret key** trong Supabase Dashboard → Settings → API.
-3. **Move OpenAI call sang Supabase Edge Function** — để key không vào browser bundle. Xem `src/lib/openai.js` có ghi chú chỗ cần đổi.
-4. **Setup Stripe** cho subscription Pro $9.99/tháng (mình có thể làm sau).
-5. **Review RLS policies** trong Supabase — chắc chắn không ai đọc được data của người khác.
+- Google login
+- PWA install
+- enable notifications
+- send test notification
+- add reminder
+- add bill
+- add expense
+- submit feedback
+- open Privacy and Terms

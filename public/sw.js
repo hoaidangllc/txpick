@@ -1,4 +1,4 @@
-const CACHE_NAME = 'txlife-v4'
+const CACHE_NAME = 'txpick-v4'
 const APP_SHELL = ['/', '/today', '/manifest.webmanifest', '/favicon.svg']
 
 self.addEventListener('install', (event) => {
@@ -39,10 +39,10 @@ self.addEventListener('push', (event) => {
     payload = { body: event.data?.text?.() || '' }
   }
 
-  const title = payload.title || 'TX Life reminder'
+  const title = payload.title || 'TXPick reminder'
   const options = {
-    body: payload.body || 'Open TX Life to review your reminder.',
-    tag: payload.tag || `txlife-${Date.now()}`,
+    body: payload.body || 'Open TXPick to review your reminder.',
+    tag: payload.tag || `txpick-${Date.now()}`,
     renotify: true,
     icon: payload.icon || '/favicon.svg',
     badge: payload.badge || '/favicon.svg',

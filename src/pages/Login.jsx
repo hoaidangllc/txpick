@@ -21,7 +21,8 @@ export default function Login() {
   const redirectAfterLogin = () => {
     const from = location.state?.from?.pathname
     if (from) return navigate(from, { replace: true })
-    if (profile?.type) return navigate('/today', { replace: true })
+    if (profile?.type === 'business') return navigate('/business', { replace: true })
+    if (profile?.type === 'personal') return navigate('/today', { replace: true })
     navigate('/onboarding', { replace: true })
   }
 
@@ -44,7 +45,7 @@ export default function Login() {
     }
     const { error: err } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin + '/today' },
+      options: { redirectTo: window.location.origin + '/onboarding' },
     })
     if (err) setError(err.message)
   }

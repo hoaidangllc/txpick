@@ -51,7 +51,7 @@ function getServiceClient() {
 function configureWebPush() {
   const publicKey = Deno.env.get('WEB_PUSH_PUBLIC_KEY') || Deno.env.get('VITE_WEB_PUSH_PUBLIC_KEY')
   const privateKey = Deno.env.get('WEB_PUSH_PRIVATE_KEY')
-  const subject = Deno.env.get('WEB_PUSH_SUBJECT') || 'mailto:support@txlife.app'
+  const subject = Deno.env.get('WEB_PUSH_SUBJECT') || 'mailto:support@txpick.app'
   if (!publicKey || !privateKey) throw new Error('Missing WEB_PUSH_PUBLIC_KEY/VITE_WEB_PUSH_PUBLIC_KEY or WEB_PUSH_PRIVATE_KEY')
   webpush.setVapidDetails(subject, publicKey, privateKey)
 }
@@ -139,7 +139,7 @@ function pushPayload(reminder: ReminderRow) {
   const timeText = time ? ` • ${time}` : ''
   return {
     title: `${categoryIcon(reminder.category)} ${title}`,
-    body: notes || `Đến giờ làm việc này${timeText}. Mở TX Life để xem chi tiết.`,
+    body: notes || `Đến giờ làm việc này${timeText}. Mở TXPick để xem chi tiết.`,
     tag: `reminder-${reminder.id}`,
     url: '/reminders',
     data: { reminderId: reminder.id, category: reminder.category || 'personal' },

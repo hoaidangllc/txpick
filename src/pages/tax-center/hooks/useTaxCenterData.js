@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../../lib/supabase.js'
 import { currentYear } from '../constants.js'
-import { buildIncomePayload, buildWorkerPayload } from '../utils/taxPayloads.js'
+import { buildExpensePayload, buildIncomePayload, buildWorkerPayload } from '../utils/taxPayloads.js'
 import { inTaxYear, isBusinessExpense, money, workerTotal } from '../utils/taxMath.js'
 
 export function useTaxCenterData(user) {
@@ -24,6 +24,14 @@ export function useTaxCenterData(user) {
     const date = expense.expense_date || expense.date
     return inTaxYear(date, year) && isBusinessExpense(expense)
   }), [expenses, year])
+
+  const counts = useMemo(() => ({
+    w2: allWorkers.filter((row) => row.type === 'W2').length,
+    contractors1099: allWorkers.filter((row) => row.type === '1099').length,
+    workers: allWorkers.length,
+    income: yearIncomeRows.length,
+    expenses: businessExpenses.length,
+  }), [allWorkers, yearIncomeRows, businessExpenses])
 
   const totals = useMemo(() => {
     const workerPay = allWorkers.reduce((sum, row) => sum + workerTotal(row), 0)
@@ -89,6 +97,21 @@ export function useTaxCenterData(user) {
     setIncomeRows((prev) => prev.filter((x) => x.id !== id))
   }, [user?.id])
 
+
+
+  const addBusinessExpense = useCallback(async (form) => {
+    const payload = buildExpensePayload(user.id, form)
+    const { data, error: insertError } = await supabase.from('expenses').insert(payload).select('*').single()
+    if (insertError) throw insertError
+    setExpenses((prev) => [data, ...prev])
+  }, [user?.id])
+
+  const removeBusinessExpense = useCallback(async (id) => {
+    const { error: deleteError } = await supabase.from('expenses').delete().eq('id', id).eq('profile_id', user.id)
+    if (deleteError) throw deleteError
+    setExpenses((prev) => prev.filter((x) => x.id !== id))
+  }, [user?.id])
+
   return {
     year,
     loading,
@@ -97,10 +120,13 @@ export function useTaxCenterData(user) {
     yearIncomeRows,
     incomeRows,
     businessExpenses,
+    counts,
     totals,
     addWorker,
     removeWorker,
     addIncome,
     removeIncome,
+    addBusinessExpense,
+    removeBusinessExpense,
   }
 }

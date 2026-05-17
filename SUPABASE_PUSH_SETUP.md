@@ -1,4 +1,4 @@
-# TX Life Push Reminders — Supabase Scheduler Path
+# TXPick Push Reminders — Supabase Scheduler Path
 
 This project no longer uses Vercel Cron as the production reminder scheduler.
 
@@ -11,7 +11,7 @@ This project no longer uses Vercel Cron as the production reminder scheduler.
 
 ## Why Vercel Cron was removed
 
-Vercel Hobby cron is too limited for reminder timing. TX Life needs reminders around the selected time, so production scheduling should run from Supabase or another external cron.
+Vercel Hobby cron is too limited for reminder timing. TXPick needs reminders around the selected time, so production scheduling should run from Supabase or another external cron.
 
 `vercel.json` intentionally has no `crons` block now.
 
@@ -76,10 +76,10 @@ Run:
 Then create the schedule. Replace placeholders before running:
 
 ```sql
-select cron.unschedule('txlife-send-reminders-every-5-minutes');
+select cron.unschedule('txpick-send-reminders-every-5-minutes');
 
 select cron.schedule(
-  'txlife-send-reminders-every-5-minutes',
+  'txpick-send-reminders-every-5-minutes',
   '*/5 * * * *',
   $$
   select
@@ -119,7 +119,7 @@ Expected response:
 ## Phone test
 
 1. Deploy Vercel.
-2. Open TX Life on the phone.
+2. Open TXPick on the phone.
 3. Install PWA / Add to Home Screen.
 4. Log in.
 5. Settings → enable notifications.

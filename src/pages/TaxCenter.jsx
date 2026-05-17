@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import BusinessExpenseModal from './tax-center/components/BusinessExpenseModal.jsx'
 import ExpensesCard from './tax-center/components/ExpensesCard.jsx'
 import IncomeCard from './tax-center/components/IncomeCard.jsx'
 import IncomeModal from './tax-center/components/IncomeModal.jsx'
 import TaxHeader from './tax-center/components/TaxHeader.jsx'
+import TaxPrepGuide from './tax-center/components/TaxPrepGuide.jsx'
 import TaxStats from './tax-center/components/TaxStats.jsx'
 import WorkerModal from './tax-center/components/WorkerModal.jsx'
 import WorkersCard from './tax-center/components/WorkersCard.jsx'
@@ -13,11 +15,12 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 import { exportExpensesCsv, exportIncomeCsv, exportTaxPackageCsv, exportTaxSummaryPdf, exportWorkersCsv } from './tax-center/utils/taxExports.js'
 
 export default function TaxCenter() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const { lang } = useLang()
   const labels = taxCopy[lang] || taxCopy.en
   const [workerOpen, setWorkerOpen] = useState(false)
   const [incomeOpen, setIncomeOpen] = useState(false)
+  const [expenseOpen, setExpenseOpen] = useState(false)
 
   const tax = useTaxCenterData(user)
 
@@ -35,6 +38,10 @@ export default function TaxCenter() {
 
   return (
     <div className="container-app py-6 sm:py-8">
+      {profile?.type !== 'business' && (
+        <p className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{labels.personalNotice}</p>
+      )}
+
       <TaxHeader
         labels={labels}
         onExportWorkers={() => exportWorkersCsv(tax.year, tax.allWorkers)}
@@ -47,6 +54,8 @@ export default function TaxCenter() {
         disableExpenses={tax.businessExpenses.length === 0}
       />
 
+      <TaxPrepGuide labels={labels} counts={tax.counts} />
+
       <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{labels.warning}</p>
       {tax.error && <p className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{tax.error}<br />{labels.runSql}</p>}
 
@@ -57,10 +66,11 @@ export default function TaxCenter() {
         <IncomeCard labels={labels} rows={tax.yearIncomeRows} loading={tax.loading} onAdd={() => setIncomeOpen(true)} onRemove={tax.removeIncome} />
       </section>
 
-      <ExpensesCard labels={labels} rows={tax.businessExpenses} />
+      <ExpensesCard labels={labels} rows={tax.businessExpenses} onAdd={() => setExpenseOpen(true)} onRemove={tax.removeBusinessExpense} />
 
       <WorkerModal open={workerOpen} onClose={() => setWorkerOpen(false)} onSave={async (form) => { await tax.addWorker(form); setWorkerOpen(false) }} labels={labels} />
       <IncomeModal open={incomeOpen} onClose={() => setIncomeOpen(false)} onSave={async (form) => { await tax.addIncome(form); setIncomeOpen(false) }} labels={labels} />
+      <BusinessExpenseModal open={expenseOpen} onClose={() => setExpenseOpen(false)} onSave={async (form) => { await tax.addBusinessExpense(form); setExpenseOpen(false) }} labels={labels} />
     </div>
   )
 }

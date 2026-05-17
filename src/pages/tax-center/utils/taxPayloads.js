@@ -33,3 +33,19 @@ export function buildIncomePayload(userId, form) {
     notes: form.notes || null,
   }
 }
+
+
+export function buildExpensePayload(userId, form) {
+  return {
+    profile_id: userId,
+    title: form.title,
+    amount: money(form.amount),
+    category: form.category || 'other_business',
+    expense_type: 'business',
+    recurring: Boolean(form.recurring),
+    recurring_pattern: form.recurring_pattern || form.recurringPattern || 'none',
+    tax_category: form.tax_category || form.taxCategory || form.category || 'other_business',
+    expense_date: form.date || form.expense_date || todayISO(),
+    notes: form.note || form.notes || null,
+  }
+}

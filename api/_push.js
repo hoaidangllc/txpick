@@ -3,7 +3,7 @@ import webpush from 'web-push'
 export function configureWebPush() {
   const publicKey = process.env.VITE_WEB_PUSH_PUBLIC_KEY || process.env.WEB_PUSH_PUBLIC_KEY
   const privateKey = process.env.WEB_PUSH_PRIVATE_KEY
-  const subject = process.env.WEB_PUSH_SUBJECT || 'mailto:support@txlife.app'
+  const subject = process.env.WEB_PUSH_SUBJECT || 'mailto:support@txpick.app'
   if (!publicKey || !privateKey) throw new Error('Missing VITE_WEB_PUSH_PUBLIC_KEY/WEB_PUSH_PUBLIC_KEY or WEB_PUSH_PRIVATE_KEY')
   webpush.setVapidDetails(subject, publicKey, privateKey)
   return webpush
