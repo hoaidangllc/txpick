@@ -50,7 +50,7 @@ export default function AppShell() {
   const navItems = [...(isBusiness ? businessNav : personalNav), ...extraNav]
   const mobileNav = isBusiness
     ? [businessNav[0], businessNav[1], businessNav[2], feedbackNav, settingsNav]
-    : [personalNav[0], personalNav[1], personalNav[2], personalNav[3], settingsNav]
+    : [personalNav[0], personalNav[1], personalNav[2], personalNav[3], feedbackNav]
 
   const handleLogout = async () => {
     await signOut()
@@ -58,14 +58,15 @@ export default function AppShell() {
   }
 
   const logoutLabel = lang === 'vi' ? 'Đăng xuất' : 'Log out'
-  const workspaceLabel = isBusiness ? (profile?.business_name || (lang === 'vi' ? 'Business' : 'Business')) : (lang === 'vi' ? 'Cá nhân' : 'Personal')
-  const switchLabel = isBusiness ? (lang === 'vi' ? 'Đổi sang Cá nhân' : 'Switch to Personal') : (lang === 'vi' ? 'Đổi sang Business' : 'Switch to Business')
+  const workspaceLabel = isBusiness ? (lang === 'vi' ? 'Business' : 'Business') : (lang === 'vi' ? 'Cá nhân' : 'Personal')
+  const switchLabel = isBusiness ? (lang === 'vi' ? 'Qua Cá nhân' : 'Switch to Personal') : (lang === 'vi' ? 'Qua Business' : 'Switch to Business')
   const switchTarget = isBusiness ? 'personal' : 'business'
+  const feedbackLabel = lang === 'vi' ? 'Góp ý' : 'Feedback'
   const [quickOpen, setQuickOpen] = useState(false)
   const quick = lang === 'vi' ? {
-    title: 'Thêm nhanh', reminder: 'Nhắc việc', expense: 'Chi tiêu', bill: 'Hóa đơn', business: 'Business / Thuế', close: 'Đóng', sub: 'Chọn việc cần thêm. Mục này giúp bạn ghi nhanh mà không phải đi nhiều bước.'
+    title: 'Thêm nhanh', reminder: 'Nhắc việc', expense: 'Chi tiêu', bill: 'Hóa đơn', business: 'Business / Tax', close: 'Đóng', sub: 'Chọn việc cần thêm. TXPick ưu tiên thao tác nhanh trên điện thoại.'
   } : {
-    title: 'Quick Add', reminder: 'Reminder', expense: 'Expense', bill: 'Bill', business: 'Business / Tax', close: 'Close', sub: 'Choose what you want to add. This keeps common actions one tap away.'
+    title: 'Quick add', reminder: 'Reminder', expense: 'Expense', bill: 'Bill', business: 'Business / Tax', close: 'Close', sub: 'Choose what you want to add. TXPick is optimized for fast mobile entry.'
   }
 
   const switchWorkspace = async () => {
@@ -100,26 +101,27 @@ export default function AppShell() {
             <button
               type="button"
               onClick={switchWorkspace}
-              className="inline-flex items-center gap-1.5 rounded-full border border-ink-100 bg-white hover:bg-brand-50 hover:text-brand-700 px-2.5 sm:px-3 py-2 sm:py-1.5 text-xs font-bold text-ink-700 shadow-sm transition"
+              className="inline-flex items-center gap-1.5 rounded-full bg-ink-100 hover:bg-brand-50 hover:text-brand-700 px-2.5 sm:px-3 py-2 sm:py-1.5 text-xs font-bold text-ink-600 transition"
               title={switchLabel}
               aria-label={switchLabel}
             >
               {isBusiness ? <BriefcaseBusiness className="w-3.5 h-3.5" /> : <UserRound className="w-3.5 h-3.5" />}
-              <span className="hidden sm:inline max-w-[140px] truncate">{workspaceLabel}</span>
-              <span className="sm:hidden">{isBusiness ? 'Biz' : (lang === 'vi' ? 'Tôi' : 'Me')}</span>
+              <span className="hidden sm:inline">{workspaceLabel}</span>
+              <span className="sm:hidden">{isBusiness ? 'Biz' : (lang === 'vi' ? 'Cá nhân' : 'Me')}</span>
             </button>
             <LanguageToggle />
             <NavLink
-              to="/settings"
+              to="/feedback"
               className={({ isActive }) =>
-                `lg:hidden inline-flex items-center justify-center rounded-full border border-ink-100 bg-white w-9 h-9 text-ink-600 shadow-sm transition hover:bg-brand-50 hover:text-brand-700 ${isActive ? 'ring-2 ring-brand-200 text-brand-700' : ''}`
+                `lg:hidden inline-flex items-center gap-1.5 rounded-full border border-brand-100 bg-brand-50 px-2.5 py-2 text-xs font-extrabold text-brand-700 shadow-sm transition hover:bg-brand-100 ${isActive ? 'ring-2 ring-brand-200' : ''}`
               }
-              title={lang === 'vi' ? 'Cài đặt' : 'Settings'}
-              aria-label={lang === 'vi' ? 'Cài đặt' : 'Settings'}
+              title={feedbackLabel}
+              aria-label={feedbackLabel}
             >
-              <Settings className="w-4 h-4" />
+              <MessageSquareHeart className="w-4 h-4" />
+              <span>{lang === 'vi' ? 'Góp ý' : 'Feedback'}</span>
             </NavLink>
-            <NavLink to="/settings" className="hidden sm:block text-xs text-ink-500 max-w-[160px] truncate ml-1 hover:text-brand-700">{profile?.display_name || user?.user_metadata?.full_name || user?.email}</NavLink>
+            <span className="hidden sm:block text-xs text-ink-500 max-w-[160px] truncate ml-1">{profile?.display_name || user?.user_metadata?.full_name || user?.email}</span>
             <button onClick={handleLogout} className="btn-ghost !px-2 !py-2" title={logoutLabel} aria-label={logoutLabel}>
               <LogOut className="w-4 h-4" />
             </button>
@@ -135,11 +137,22 @@ export default function AppShell() {
         <button
           type="button"
           onClick={() => setQuickOpen(true)}
-          className="w-14 h-14 rounded-full bg-brand-600 text-white shadow-soft flex items-center justify-center active:scale-95 transition"
+          className="mb-3 w-14 h-14 rounded-full bg-brand-600 text-white shadow-soft flex items-center justify-center active:scale-95 transition"
           aria-label={quick.title}
           title={quick.title}
         >
           <Plus className="w-7 h-7" />
+        </button>
+      </div>
+
+      <div className="lg:hidden fixed bottom-16 right-3 z-30">
+        <button
+          type="button"
+          onClick={switchWorkspace}
+          className="rounded-full bg-ink-900 text-white shadow-soft px-3 py-2 text-xs font-extrabold flex items-center gap-1.5"
+        >
+          {isBusiness ? <UserRound className="w-4 h-4" /> : <BriefcaseBusiness className="w-4 h-4" />}
+          {switchLabel}
         </button>
       </div>
 

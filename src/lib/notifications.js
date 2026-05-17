@@ -187,29 +187,101 @@ async function postJson(url, body) {
   return json
 }
 
-export async function getPushStatus() {
-  if (!pushSupported()) return { supported: false, permission: 'unsupported', subscribed: false }
-  const reg = await navigator.serviceWorker.ready
-  const sub = await reg.pushManager.getSubscription()
-  return { supported: true, permission: Notification.permission, subscribed: Boolean(sub) }
+
+function waitFor(promise, ms = 8000, label = 'Timed out') {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(label)), ms)),
+  ])
 }
+
+function shortEndpoint(endpoint = '') {
+  if (!endpoint) return ''
+  return endpoint.length > 46 ? `${endpoint.slice(0, 28)}…${endpoint.slice(-14)}` : endpoint
+}
+
+export async function getPushStatus() {
+  if (!pushSupported()) return { supported: false, permission: 'unsupported', subscribed: false, endpoint: '' }
+  const reg = await waitFor(navigator.serviceWorker.ready, 8000, 'Service worker is not ready yet')
+  const sub = await reg.pushManager.getSubscription()
+  return {
+    supported: true,
+    permission: Notification.permission,
+    subscribed: Boolean(sub),
+    endpoint: sub?.endpoint || '',
+    endpointShort: shortEndpoint(sub?.endpoint || ''),
+  }
+}
+
+export async function getPushDiagnostics() {
+  const base = {
+    browserSupportsNotifications: notificationSupported(),
+    browserSupportsPush: pushSupported(),
+    permission: notificationSupported() ? Notification.permission : 'unsupported',
+    serviceWorkerReady: false,
+    browserSubscribed: false,
+    endpoint: '',
+    endpointShort: '',
+    publicKeyConfigured: false,
+    signedIn: false,
+    serverSubscriptionCount: null,
+    serverEnabledCount: null,
+    serverError: '',
+  }
+
+  try {
+    base.publicKeyConfigured = Boolean(await getVapidPublicKey())
+  } catch {}
+
+  try {
+    const { data } = SUPABASE_CONFIGURED ? await supabase.auth.getSession() : { data: { session: null } }
+    base.signedIn = Boolean(data?.session?.access_token)
+  } catch {}
+
+  if (base.browserSupportsPush) {
+    try {
+      const reg = await waitFor(navigator.serviceWorker.ready, 8000, 'Service worker is not ready yet')
+      base.serviceWorkerReady = Boolean(reg)
+      const sub = await reg.pushManager.getSubscription()
+      base.browserSubscribed = Boolean(sub)
+      base.endpoint = sub?.endpoint || ''
+      base.endpointShort = shortEndpoint(sub?.endpoint || '')
+    } catch (err) {
+      base.serverError = err.message || String(err)
+    }
+  }
+
+  try {
+    const server = await postJson('/api/push/status', { endpoint: base.endpoint || null })
+    base.serverSubscriptionCount = server.total || 0
+    base.serverEnabledCount = server.enabled || 0
+    base.serverHasThisEndpoint = Boolean(server.hasThisEndpoint)
+    base.serverEnvReady = Boolean(server.envReady)
+    base.recentLogs = server.recentLogs || []
+  } catch (err) {
+    if (!base.serverError) base.serverError = err.message || 'Could not check server push status'
+  }
+
+  return base
+}
+
 
 export async function enableBackgroundReminders() {
   if (!pushSupported()) {
-    return { ok: false, status: 'unsupported', message: 'Push notification is not supported on this browser.' }
+    return { ok: false, status: 'unsupported', message: 'This browser does not support background push reminders. On iPhone, install TXPick to the Home Screen and open it from the icon.' }
   }
 
   const permission = await ensurePermission()
   if (permission !== 'granted') {
-    return { ok: false, status: permission, message: 'Notification permission was not granted.' }
+    return { ok: false, status: permission, message: permission === 'denied' ? 'Notifications are blocked for this browser/app.' : 'Notification permission was not granted.' }
   }
 
   const publicKey = await getVapidPublicKey()
   if (!publicKey) {
-    return { ok: false, status: 'missing_key', message: 'Phone reminders are not configured yet.' }
+    return { ok: false, status: 'missing_key', message: 'VAPID public key is missing. Check VITE_WEB_PUSH_PUBLIC_KEY in Vercel and local .env.' }
   }
 
-  const reg = await navigator.serviceWorker.ready
+  const reg = await waitFor(navigator.serviceWorker.ready, 8000, 'Service worker is not ready yet. Reopen the app and try again.')
   let subscription = await reg.pushManager.getSubscription()
   if (!subscription) {
     subscription = await reg.pushManager.subscribe({
@@ -219,8 +291,8 @@ export async function enableBackgroundReminders() {
   }
 
   const result = await postJson('/api/push/subscribe', { subscription })
-  try { localStorage.setItem(PUSH_STATUS_KEY, JSON.stringify({ enabledAt: new Date().toISOString() })) } catch {}
-  return { ok: true, status: 'enabled', subscription, result }
+  try { localStorage.setItem(PUSH_STATUS_KEY, JSON.stringify({ enabledAt: new Date().toISOString(), endpoint: subscription.endpoint })) } catch {}
+  return { ok: true, status: 'enabled', subscription, result, endpointShort: shortEndpoint(subscription.endpoint) }
 }
 
 export async function disableBackgroundReminders() {

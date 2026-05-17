@@ -1,79 +1,91 @@
 import { useEffect, useState } from 'react'
-import { BellRing, Save, Send, Settings as SettingsIcon, ShieldCheck, UserRound, MessageSquareHeart, FileText, Shield } from 'lucide-react'
+import { BellRing, Save, Send, Settings as SettingsIcon, ShieldCheck, UserRound } from 'lucide-react'
 import { getProfile } from '../lib/db.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
-import { disableBackgroundReminders, enableBackgroundReminders, getPushStatus, sendTestPush } from '../lib/notifications.js'
+import { disableBackgroundReminders, enableBackgroundReminders, getPushDiagnostics, getPushStatus, sendTestPush } from '../lib/notifications.js'
 import { getUserDisplayName } from '../lib/userDisplay.js'
 
 const copy = {
   vi: {
     title: 'Cài đặt',
-    sub: 'Đổi tên hiển thị, tên tiệm/business, ngôn ngữ và cách điện thoại nhắc bạn.',
-    account: 'Thông tin cá nhân & business',
+    sub: 'Đổi nhanh giữa Cá nhân và Kinh doanh, chỉnh tên hiển thị, tên tiệm và ngôn ngữ.',
+    account: 'Tài khoản',
     displayName: 'Tên hiển thị',
-    businessName: 'Tên tiệm / business',
-    type: 'Mở app ở chế độ',
+    businessName: 'Tên business / tiệm',
+    type: 'Khu đang dùng',
     personal: 'Cá nhân',
-    business: 'Business',
+    business: 'Kinh doanh / Chủ tiệm',
     language: 'Ngôn ngữ mặc định',
     save: 'Lưu cài đặt',
     saved: 'Đã lưu cài đặt.',
     loading: 'Đang tải…',
     email: 'Email',
-    note: 'Cá nhân và Business được tách riêng để dễ theo dõi. Nhắc việc vẫn gom chung để bạn không bỏ sót hóa đơn, lương thợ, deadline hoặc việc gia đình.',
+    note: 'Cá nhân và Kinh doanh được tách riêng. Nhắc việc dùng chung cho cả hai để bạn không bỏ sót bill, payroll, deadline hoặc việc gia đình.',
     pushTitle: 'Nhắc việc trên điện thoại',
-    pushSub: 'Bật một lần để điện thoại báo khi tới giờ nhắc việc, kể cả khi bạn không mở app.',
+    pushSub: 'Khi bật, điện thoại sẽ tự báo đúng giờ nhắc việc. Không cần mở app để nhận thông báo.',
     pushUnsupported: 'Thiết bị này chưa hỗ trợ nhắc nền. Trên iPhone, hãy cài app vào màn hình chính rồi mở lại.',
-    pushOff: 'Chưa bật thông báo trên máy này',
-    pushOn: 'Thông báo đang bật trên máy này',
+    pushOff: 'Chưa bật nhắc nền trên máy này',
+    pushOn: 'Nhắc nền đang bật trên máy này',
     permissionDenied: 'Bạn đã chặn thông báo. Vào cài đặt của điện thoại/trình duyệt để cho phép lại.',
     enablePush: 'Bật nhắc ngay',
-    disablePush: 'Tạm tắt thông báo trên máy này',
-    testPush: 'Gửi thử một nhắc việc',
-    pushEnabled: 'Xong. Điện thoại này sẽ tự báo khi tới giờ nhắc việc.',
+    disablePush: 'Tạm tắt nhắc trên máy này',
+    testPush: 'Gửi thử ngay',
+    checkPush: 'Kiểm tra hệ thống nhắc',
+    pushEnabled: 'Xong. Điện thoại này đã được đăng ký nhận nhắc việc.',
     pushDisabled: 'Đã tạm tắt nhắc nền trên máy này.',
-    testSent: 'Đã gửi thử một thông báo nhắc việc.',
-    pushSetupError: 'Chưa gửi được thông báo. Kiểm tra quyền thông báo rồi thử lại.',
-    pushNotReady: 'Chưa bật được nhắc nền lúc này. Kiểm tra cài đặt thông báo rồi thử lại.',
-    quickLinks: 'Liên kết nhanh',
-    feedback: 'Gửi góp ý',
-    privacy: 'Quyền riêng tư',
-    terms: 'Điều khoản',
+    testSent: 'Đã gửi thử thông báo. Khóa màn hình và kiểm tra trong vài giây.',
+    pushSetupError: 'Chưa gửi được. Xem phần kiểm tra bên dưới để biết đang kẹt ở bước nào.',
+    pushNotReady: 'Chưa bật được nhắc nền. Kiểm tra VAPID key, quyền thông báo, và cài app vào màn hình chính nếu dùng iPhone.',
+    diagnosticTitle: 'Kiểm tra nhanh',
+    diagnosticHelp: 'Nếu dòng nào chưa OK, TXPick chưa thể gửi nhắc việc ra màn hình khóa.',
+    browserSupport: 'Thiết bị hỗ trợ thông báo nền',
+    permission: 'Quyền thông báo',
+    serviceWorker: 'Service worker sẵn sàng',
+    browserSubscription: 'Máy này đã đăng ký trong trình duyệt',
+    serverSubscription: 'Supabase đã lưu thiết bị này',
+    serverEnv: 'Vercel có đủ push keys',
+    endpoint: 'Thiết bị',
   },
   en: {
     title: 'Settings',
-    sub: 'Update your name, business name, language, and phone reminder settings.',
-    account: 'Profile & business',
+    sub: 'Basic profile settings for your name, business, and default language.',
+    account: 'Account',
     displayName: 'Display name',
     businessName: 'Business / salon name',
-    type: 'Open app in',
+    type: 'Active workspace',
     personal: 'Personal',
-    business: 'Business',
+    business: 'Kinh doanh / Chủ tiệm',
     language: 'Default language',
     save: 'Save settings',
     saved: 'Settings saved.',
     loading: 'Loading…',
     email: 'Email',
-    note: 'Personal and Business stay separated for cleaner records. Reminders stay together so bills, payroll, deadlines, and family tasks do not get missed.',
+    note: 'Personal and Business are separated. Reminders are shared across both so you do not miss bills, payroll, deadlines, or family tasks.',
     pushTitle: 'Phone reminders',
-    pushSub: 'Turn this on once so this phone can alert you when reminders are due, even if the app is closed.',
-    pushUnsupported: 'This phone cannot receive app notifications yet. On iPhone, add TXPick to the Home Screen and open it from the icon.',
-    pushOff: 'Notifications are off on this device',
-    pushOn: 'Notifications are on for this device',
+    pushSub: 'When enabled, this phone can notify you when reminders are due. You do not need to keep the app open.',
+    pushUnsupported: 'This device does not support background reminders yet. On iPhone, add the app to the Home Screen and reopen it.',
+    pushOff: 'Background reminders are off on this device',
+    pushOn: 'Background reminders are on for this device',
     permissionDenied: 'Notifications are blocked. Open browser/phone settings to allow notifications again.',
     enablePush: 'Enable reminders',
-    disablePush: 'Pause notifications on this device',
-    testPush: 'Send a reminder test',
-    pushEnabled: 'Done. This phone will notify you when reminders are due.',
-    pushDisabled: 'Notifications are paused on this device.',
-    testSent: 'A reminder test was sent.',
-    pushSetupError: 'Could not send a notification. Check notification permission and try again.',
-    pushNotReady: 'Could not enable background reminders right now. Check notification settings and try again.',
-    quickLinks: 'Quick links',
-    feedback: 'Send feedback',
-    privacy: 'Privacy Policy',
-    terms: 'Terms',
+    disablePush: 'Pause reminders on this device',
+    testPush: 'Send test now',
+    checkPush: 'Check reminder system',
+    pushEnabled: 'Done. This phone is registered for reminder alerts.',
+    pushDisabled: 'Background reminders are paused on this device.',
+    testSent: 'Test notification sent. Lock the screen and check in a few seconds.',
+    pushSetupError: 'Could not send yet. Check the diagnostic list below to see which step is blocked.',
+    pushNotReady: 'Could not enable background reminders. Check VAPID keys, notification permission, and Home Screen install on iPhone.',
+    diagnosticTitle: 'Quick check',
+    diagnosticHelp: 'If any line is not OK, TXPick cannot send lock-screen reminders yet.',
+    browserSupport: 'Device supports background alerts',
+    permission: 'Notification permission',
+    serviceWorker: 'Service worker ready',
+    browserSubscription: 'This phone is registered in browser',
+    serverSubscription: 'Supabase saved this device',
+    serverEnv: 'Vercel push keys are configured',
+    endpoint: 'Device',
   },
 }
 
@@ -90,6 +102,7 @@ export default function Settings() {
   const [pushBusy, setPushBusy] = useState(false)
   const [pushMessage, setPushMessage] = useState('')
   const [pushError, setPushError] = useState('')
+  const [pushDiagnostic, setPushDiagnostic] = useState(null)
 
   useEffect(() => {
     let alive = true
@@ -119,13 +132,19 @@ export default function Settings() {
   useEffect(() => {
     let alive = true
     getPushStatus().then((status) => { if (alive) setPush(status) }).catch(() => undefined)
+    getPushDiagnostics().then((diag) => { if (alive) setPushDiagnostic(diag) }).catch(() => undefined)
     return () => { alive = false }
   }, [])
 
   async function refreshPushStatus() {
     const status = await getPushStatus()
     setPush(status)
+    try { setPushDiagnostic(await getPushDiagnostics()) } catch {}
     return status
+  }
+
+  function detailMessage(text) {
+    return String(text || '').replace(/^Error:\s*/i, '').trim()
   }
 
   async function save() {
@@ -150,10 +169,11 @@ export default function Settings() {
     try {
       const result = await enableBackgroundReminders()
       await refreshPushStatus()
-      if (result.ok) setPushMessage(c.pushEnabled)
-      else setPushError(result.status === 'denied' ? c.permissionDenied : (result.status === 'missing_key' ? c.pushNotReady : c.pushSetupError))
+      if (result.ok) setPushMessage(`${c.pushEnabled}${result.endpointShort ? ` (${result.endpointShort})` : ''}`)
+      else setPushError(result.status === 'denied' ? c.permissionDenied : (result.status === 'missing_key' ? c.pushNotReady : (result.message || c.pushSetupError)))
     } catch (err) {
-      setPushError(c.pushSetupError)
+      await refreshPushStatus().catch(() => undefined)
+      setPushError(detailMessage(err.message) || c.pushSetupError)
     } finally {
       setPushBusy(false)
     }
@@ -168,7 +188,21 @@ export default function Settings() {
       await refreshPushStatus()
       setPushMessage(c.pushDisabled)
     } catch (err) {
-      setPushError(c.pushSetupError)
+      setPushError(detailMessage(err.message) || c.pushSetupError)
+    } finally {
+      setPushBusy(false)
+    }
+  }
+
+  async function runDiagnostics() {
+    setPushBusy(true)
+    setPushMessage('')
+    setPushError('')
+    try {
+      await refreshPushStatus()
+      setPushMessage(lang === 'vi' ? 'Đã kiểm tra hệ thống nhắc việc.' : 'Reminder system check completed.')
+    } catch (err) {
+      setPushError(detailMessage(err.message) || c.pushSetupError)
     } finally {
       setPushBusy(false)
     }
@@ -179,10 +213,19 @@ export default function Settings() {
     setPushMessage('')
     setPushError('')
     try {
-      await sendTestPush()
-      setPushMessage(c.testSent)
+      let status = await refreshPushStatus()
+      if (!status.subscribed) {
+        const enabled = await enableBackgroundReminders()
+        if (!enabled.ok) throw new Error(enabled.message || c.pushNotReady)
+        status = await refreshPushStatus()
+      }
+      const result = await sendTestPush()
+      await refreshPushStatus()
+      const body = result?.payload?.body ? ` — ${result.payload.body}` : ''
+      setPushMessage(`${c.testSent}${result?.sent != null ? ` (${result.sent} device${result.sent === 1 ? '' : 's'})` : ''}${body}`)
     } catch (err) {
-      setPushError(c.pushSetupError)
+      await refreshPushStatus().catch(() => undefined)
+      setPushError(detailMessage(err.message) || c.pushSetupError)
     } finally {
       setPushBusy(false)
     }
@@ -247,21 +290,42 @@ export default function Settings() {
           ) : (
             <button className="btn-secondary" onClick={disablePush} disabled={pushBusy}>{c.disablePush}</button>
           )}
-          <button className="btn-secondary" onClick={testPush} disabled={pushBusy || !push.subscribed}><Send className="w-4 h-4" /> {c.testPush}</button>
+          <button className="btn-secondary" onClick={testPush} disabled={pushBusy || !push.supported}><Send className="w-4 h-4" /> {c.testPush}</button>
         </div>
+
+        <div className="mt-4 flex flex-col sm:flex-row gap-3">
+          <button className="btn-secondary" onClick={runDiagnostics} disabled={pushBusy}><ShieldCheck className="w-4 h-4" /> {c.checkPush}</button>
+        </div>
+
+        {pushDiagnostic && (
+          <div className="mt-5 rounded-2xl border border-ink-100 bg-ink-50/60 p-4">
+            <h3 className="text-sm font-extrabold text-ink-900">{c.diagnosticTitle}</h3>
+            <p className="text-xs text-ink-500 mt-1">{c.diagnosticHelp}</p>
+            <div className="mt-3 grid gap-2 text-sm">
+              <CheckLine label={c.browserSupport} ok={pushDiagnostic.browserSupportsPush} />
+              <CheckLine label={`${c.permission}: ${pushDiagnostic.permission}`} ok={pushDiagnostic.permission === 'granted'} />
+              <CheckLine label={c.serviceWorker} ok={pushDiagnostic.serviceWorkerReady} />
+              <CheckLine label={c.browserSubscription} ok={pushDiagnostic.browserSubscribed} />
+              <CheckLine label={c.serverSubscription} ok={Boolean(pushDiagnostic.serverHasThisEndpoint || pushDiagnostic.serverEnabledCount > 0)} />
+              <CheckLine label={c.serverEnv} ok={pushDiagnostic.serverEnvReady !== false && pushDiagnostic.publicKeyConfigured} />
+            </div>
+            {pushDiagnostic.endpointShort && <p className="mt-3 text-xs text-ink-500 break-all">{c.endpoint}: {pushDiagnostic.endpointShort}</p>}
+            {pushDiagnostic.serverError && <p className="mt-3 text-xs font-semibold text-rose-700">{pushDiagnostic.serverError}</p>}
+          </div>
+        )}
 
         {pushMessage && <p className="mt-4 text-sm font-semibold text-emerald-700">{pushMessage}</p>}
         {pushError && <p className="mt-4 text-sm font-semibold text-rose-700">{pushError}</p>}
       </section>
+    </div>
+  )
+}
 
-      <section className="mt-5 card p-5 max-w-3xl">
-        <h2 className="font-bold text-ink-900 flex items-center gap-2"><Shield className="w-5 h-5 text-brand-600" /> {c.quickLinks}</h2>
-        <div className="mt-4 grid sm:grid-cols-3 gap-3">
-          <a className="btn-secondary justify-start" href="/feedback"><MessageSquareHeart className="w-4 h-4" /> {c.feedback}</a>
-          <a className="btn-secondary justify-start" href="/privacy"><Shield className="w-4 h-4" /> {c.privacy}</a>
-          <a className="btn-secondary justify-start" href="/terms"><FileText className="w-4 h-4" /> {c.terms}</a>
-        </div>
-      </section>
+function CheckLine({ label, ok }) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-xl bg-white border border-ink-100 px-3 py-2">
+      <span className="text-ink-700">{label}</span>
+      <span className={`text-xs font-extrabold ${ok ? 'text-emerald-700' : 'text-rose-700'}`}>{ok ? 'OK' : 'CHECK'}</span>
     </div>
   )
 }

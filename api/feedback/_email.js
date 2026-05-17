@@ -14,7 +14,7 @@ export function escapeHtml(value) {
 export async function sendFeedbackEmail(feedback, profile = {}) {
   const apiKey = process.env.RESEND_API_KEY || process.env.EMAIL_API_KEY || ''
   const to = process.env.FEEDBACK_NOTIFY_EMAIL || process.env.ADMIN_EMAIL || 'ddh2755@gmail.com'
-  const from = process.env.FEEDBACK_FROM_EMAIL || 'TXPick <noreply@txpick.com>'
+  const from = process.env.FEEDBACK_FROM_EMAIL || 'TXPick <onboarding@resend.dev>'
   const appUrl = process.env.VITE_APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://txpick.com'
 
   if (!apiKey) {
