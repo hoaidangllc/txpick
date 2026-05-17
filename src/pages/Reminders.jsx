@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Bell, CheckCircle2, Plus, Trash2, RotateCcw, Inbox } from 'lucide-react'
+import { Bell, CheckCircle2, Circle, Plus, Trash2, Inbox } from 'lucide-react'
 import Modal from '../components/Modal.jsx'
 import {
   CATEGORIES, todayISO, parseNaturalReminder,
@@ -29,6 +29,8 @@ const copy = {
     titleField: 'Nội dung cần nhớ',
     date: 'Ngày', time: 'Giờ', category: 'Phân loại', repeat: 'Lặp lại', notes: 'Ghi chú',
     none: 'Một lần', daily: 'Hằng ngày', weekly: 'Hằng tuần', monthly: 'Hằng tháng',
+    markDone: 'Đánh dấu đã xong',
+    reopen: 'Đổi lại chưa xong',
     loading: 'Đang tải…',
   },
   en: {
@@ -50,6 +52,8 @@ const copy = {
     titleField: 'Title',
     date: 'Date', time: 'Time', category: 'Category', repeat: 'Repeat', notes: 'Notes',
     none: 'One time', daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly',
+    markDone: 'Mark done',
+    reopen: 'Mark not done',
     loading: 'Loading…',
   },
 }
@@ -117,9 +121,23 @@ function ReminderCard({ title, items, api, emptyTitle, empty, done, onAdd, addLa
               </div>
               <div className="flex gap-2 shrink-0">
                 {done ? (
-                  <button onClick={() => api.update(r.id, { done: false, doneAt: null })} className="text-brand-600 hover:text-brand-800" aria-label="Reopen"><RotateCcw className="w-4 h-4" /></button>
+                  <button
+                    onClick={() => api.update(r.id, { done: false, doneAt: null })}
+                    className="inline-flex items-center justify-center rounded-full bg-emerald-50 p-1.5 text-emerald-700 hover:bg-emerald-100"
+                    aria-label={c.reopen}
+                    title={c.reopen}
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                  </button>
                 ) : (
-                  <button onClick={() => api.update(r.id, { done: true, doneAt: new Date().toISOString() })} className="text-brand-600 hover:text-brand-800" aria-label="Done"><CheckCircle2 className="w-5 h-5" /></button>
+                  <button
+                    onClick={() => api.update(r.id, { done: true, doneAt: new Date().toISOString() })}
+                    className="inline-flex items-center justify-center rounded-full border border-ink-200 bg-white p-1.5 text-ink-400 hover:border-brand-300 hover:text-brand-700"
+                    aria-label={c.markDone}
+                    title={c.markDone}
+                  >
+                    <Circle className="w-4 h-4" />
+                  </button>
                 )}
                 <button onClick={() => api.remove(r.id)} className="text-ink-300 hover:text-rose-600" aria-label="Delete"><Trash2 className="w-4 h-4" /></button>
               </div>

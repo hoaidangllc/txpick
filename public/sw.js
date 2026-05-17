@@ -1,4 +1,4 @@
-const CACHE_NAME = 'txpick-v4'
+const CACHE_NAME = 'txpick-v5'
 const APP_SHELL = ['/', '/today', '/manifest.webmanifest', '/favicon.svg']
 
 self.addEventListener('install', (event) => {
@@ -33,20 +33,23 @@ self.addEventListener('fetch', (event) => {
 
 self.addEventListener('push', (event) => {
   let payload = {}
+
   try {
     payload = event.data ? event.data.json() : {}
   } catch {
     payload = { body: event.data?.text?.() || '' }
   }
 
-  const title = payload.title || 'TXPick reminder'
+  const title = payload.title || 'TXPick Reminder'
+  const targetUrl = payload.url || payload?.data?.url || '/reminders'
   const options = {
-    body: payload.body || 'Open TXPick to review your reminder.',
-    tag: payload.tag || `txpick-${Date.now()}`,
+    body: payload.body || 'You have a reminder from TXPick.',
+    tag: payload.tag || `txpick-reminder-${Date.now()}`,
     renotify: true,
-    icon: payload.icon || '/favicon.svg',
-    badge: payload.badge || '/favicon.svg',
-    data: { url: payload.url || '/today', ...(payload.data || {}) },
+    icon: payload.icon || '/icon-192.png',
+    badge: payload.badge || '/icon-192.png',
+    timestamp: Date.now(),
+    data: { ...(payload.data || {}), url: targetUrl },
   }
 
   event.waitUntil(self.registration.showNotification(title, options))

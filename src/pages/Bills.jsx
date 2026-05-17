@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { CheckCircle2, Plus, RotateCcw, Trash2, WalletCards } from 'lucide-react'
+import { CheckCircle2, Circle, Plus, Trash2, WalletCards } from 'lucide-react'
 import Modal from '../components/Modal.jsx'
 import StatCard from '../components/StatCard.jsx'
 import { CATEGORIES, fmtUSD, categoryLabel } from '../lib/lifeStore.js'
@@ -18,7 +18,7 @@ const copy = {
     paid: 'Đã thanh toán',
     unpaid: 'Chưa thanh toán',
     markPaid: 'Đánh dấu đã trả',
-    reopen: 'Mở lại hóa đơn',
+    reopen: 'Đổi lại chưa trả',
     modal: 'Thêm hóa đơn hằng tháng',
     close: 'Đóng',
     save: 'Lưu',
@@ -42,7 +42,7 @@ const copy = {
     paid: 'Paid',
     unpaid: 'Unpaid',
     markPaid: 'Mark paid',
-    reopen: 'Reopen bill',
+    reopen: 'Mark unpaid',
     modal: 'Add monthly bill',
     close: 'Cancel',
     save: 'Save',
@@ -107,20 +107,22 @@ export default function Bills() {
                   {b.paid ? (
                     <button
                       onClick={() => api.update(b.id, { paid: false, paid_at: null })}
-                      className="text-ink-400 hover:text-brand-700"
+                      className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 hover:bg-emerald-100"
                       aria-label={c.reopen}
                       title={c.reopen}
                     >
-                      <RotateCcw className="w-4 h-4" />
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span className="hidden sm:inline">{c.paid}</span>
                     </button>
                   ) : (
                     <button
                       onClick={() => api.update(b.id, { paid: true, paid_at: new Date().toISOString() })}
-                      className="text-brand-600 hover:text-brand-800"
+                      className="inline-flex items-center gap-1 rounded-full border border-ink-200 bg-white px-2.5 py-1 text-xs font-bold text-ink-500 hover:border-brand-300 hover:text-brand-700"
                       aria-label={c.markPaid}
                       title={c.markPaid}
                     >
-                      <CheckCircle2 className="w-5 h-5" />
+                      <Circle className="w-4 h-4" />
+                      <span className="hidden sm:inline">{c.unpaid}</span>
                     </button>
                   )}
                   <button onClick={() => api.remove(b.id)} className="text-ink-300 hover:text-rose-600" aria-label={c.delete} title={c.delete}>

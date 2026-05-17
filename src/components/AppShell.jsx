@@ -127,19 +127,19 @@ export default function AppShell() {
         </div>
       </header>
 
-      <main className="flex-1 pb-24 lg:pb-10">
+      <main className="flex-1 pb-32 lg:pb-10">
         <Outlet />
       </main>
 
-      <div className="lg:hidden fixed bottom-20 right-4 z-40">
+      <div className="lg:hidden fixed bottom-24 right-4 z-40">
         <button
           type="button"
           onClick={() => setQuickOpen(true)}
-          className="w-14 h-14 rounded-full bg-brand-600 text-white shadow-soft flex items-center justify-center active:scale-95 transition"
+          className="w-12 h-12 rounded-full bg-brand-600 text-white shadow-soft flex items-center justify-center active:scale-95 transition"
           aria-label={quick.title}
           title={quick.title}
         >
-          <Plus className="w-7 h-7" />
+          <Plus className="w-6 h-6" />
         </button>
       </div>
 
