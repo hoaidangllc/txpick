@@ -1,5 +1,6 @@
 export const CATEGORIES = [
   { key: 'personal', label: 'Personal', vi: 'Cá nhân' },
+  { key: 'travel', label: 'Travel', vi: 'Du lịch' },
   { key: 'business', label: 'Business', vi: 'Kinh doanh' },
   { key: 'family', label: 'Family', vi: 'Gia đình' },
   { key: 'bill', label: 'Bill', vi: 'Hóa đơn' },
@@ -51,19 +52,34 @@ export function fmtUSD(value) {
   return (Number(value) || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' })
 }
 
-export function todayISO() {
-  return new Date().toISOString().slice(0, 10)
+export function todayISO(date = new Date()) {
+  const d = new Date(date)
+  if (Number.isNaN(d.getTime())) return ''
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+export function parseLocalDateOnly(value) {
+  if (!value) return null
+  const [y, m, d] = String(value).slice(0, 10).split('-').map(Number)
+  if (!y || !m || !d) return null
+  return new Date(y, m - 1, d)
 }
 
 export function monthKey(date = new Date()) {
-  const d = new Date(date)
+  const d = typeof date === 'string' ? parseLocalDateOnly(date) : new Date(date)
+  if (!d || Number.isNaN(d.getTime())) return ''
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 }
 
 export function isSameDay(iso, ref = new Date()) {
   if (!iso) return false
-  const d = new Date(iso)
-  return d.getFullYear() === ref.getFullYear() && d.getMonth() === ref.getMonth() && d.getDate() === ref.getDate()
+  const d = parseLocalDateOnly(iso)
+  const r = typeof ref === 'string' ? parseLocalDateOnly(ref) : new Date(ref)
+  if (!d || !r || Number.isNaN(d.getTime()) || Number.isNaN(r.getTime())) return false
+  return d.getFullYear() === r.getFullYear() && d.getMonth() === r.getMonth() && d.getDate() === r.getDate()
 }
 
 export function isCurrentMonth(iso) {
@@ -101,7 +117,7 @@ export function parseNaturalReminder(text) {
   const d = new Date()
   if (/mai|tomorrow/.test(lower)) {
     d.setDate(d.getDate() + 1)
-    date = d.toISOString().slice(0, 10)
+    date = todayISO(d)
   }
 
   let time = ''

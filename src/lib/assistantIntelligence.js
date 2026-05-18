@@ -1,12 +1,12 @@
-import { fmtUSD, isCurrentMonth, isSameDay, monthKey, todayISO } from './lifeStore.js'
+import { fmtUSD, isCurrentMonth, isSameDay, monthKey, todayISO, parseLocalDateOnly } from './lifeStore.js'
 
 const BUSINESS_CATEGORIES = new Set(['business', 'salon', 'supply', 'supplies', 'gas', 'marketing', 'advertising', 'vehicle'])
 
-export function dateDiffDays(isoDate) {
+export function dateDiffDays(isoDate, ref = new Date()) {
   if (!isoDate) return null
-  const a = new Date(`${todayISO()}T00:00:00`)
-  const b = new Date(`${String(isoDate).slice(0, 10)}T00:00:00`)
-  if (Number.isNaN(b.getTime())) return null
+  const a = parseLocalDateOnly(todayISO(ref))
+  const b = parseLocalDateOnly(isoDate)
+  if (!a || !b || Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return null
   return Math.round((b.getTime() - a.getTime()) / 86400000)
 }
 

@@ -9,7 +9,9 @@ function requireUserId(userId) {
 export function toISODate(value) {
   if (!value) return ''
   if (typeof value === 'string') return value.slice(0, 10)
-  return new Date(value).toISOString().slice(0, 10)
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return ''
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 export function toLocalTime(value) {
@@ -146,7 +148,7 @@ export const expensesDb = {
       recurring: Boolean(item.recurring),
       recurring_pattern: item.recurring_pattern || item.recurringPattern || 'none',
       tax_category: item.tax_category || item.taxCategory || null,
-      expense_date: item.date || item.expense_date || new Date().toISOString().slice(0, 10),
+      expense_date: item.date || item.expense_date || toISODate(new Date()),
       notes: item.note || item.notes || '',
     }
     const { data, error } = await supabase.from('expenses').insert(payload).select('*').single()
