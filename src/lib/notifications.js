@@ -191,26 +191,26 @@ async function postJson(url, body) {
 
 export function describePushProblem(code, lang = 'vi') {
   const vi = {
-    unsupported: 'Thiết bị/trình duyệt này chưa hỗ trợ push notification. Trên iPhone, hãy cài TXPick vào Home Screen rồi mở từ icon app.',
-    denied: 'Bạn đã chặn thông báo. Hãy vào Settings của iPhone/Chrome/Safari để bật lại quyền thông báo cho TXPick.',
-    default: 'Bạn chưa cho phép thông báo. Bấm bật nhắc việc để iPhone hỏi quyền thông báo.',
-    missing_key: 'Thiếu VAPID public key/private key trên Vercel. Cần kiểm tra VITE_WEB_PUSH_PUBLIC_KEY và WEB_PUSH_PRIVATE_KEY.',
-    no_browser_subscription: 'Máy này chưa tạo subscription trong trình duyệt.',
-    no_server_subscription: 'Máy này chưa lưu subscription lên Supabase. Backend chưa có địa chỉ điện thoại để gửi.',
-    no_active_push_subscription: 'Supabase chưa có active push subscription cho tài khoản này.',
-    service_worker: 'Service worker chưa sẵn sàng. Hãy refresh app hoặc mở TXPick từ icon Home Screen.',
-    unknown: 'Chưa xác định được lỗi. Kiểm tra Console/Vercel logs và thử lại.',
+    unsupported: 'Điện thoại hoặc trình duyệt này chưa hỗ trợ thông báo. Trên iPhone, hãy thêm TXPick vào màn hình chính rồi mở từ icon app.',
+    denied: 'Bạn đã chặn thông báo. Vào phần cài đặt của điện thoại hoặc trình duyệt để bật lại thông báo cho TXPick.',
+    default: 'Bạn chưa cho phép thông báo. Bấm bật nhắc việc để điện thoại hỏi quyền.',
+    missing_key: 'Thông báo chưa được cài đặt. Vui lòng liên hệ hỗ trợ.',
+    no_browser_subscription: 'Điện thoại này chưa đăng ký nhận thông báo. Bấm bật nhắc việc để thử lại.',
+    no_server_subscription: 'Điện thoại này chưa được lưu để nhận nhắc việc. Bấm bật nhắc việc để thử lại.',
+    no_active_push_subscription: 'Tài khoản này chưa có điện thoại nào đăng ký nhận nhắc việc.',
+    service_worker: 'App chưa sẵn sàng. Hãy tải lại trang hoặc mở TXPick từ icon màn hình chính.',
+    unknown: 'Có lỗi xảy ra. Vui lòng thử lại sau ít phút.',
   }
   const en = {
-    unsupported: 'This device/browser does not support push notifications yet. On iPhone, add TXPick to the Home Screen and open it from the app icon.',
-    denied: 'Notifications are blocked. Open iPhone/Chrome/Safari settings and allow notifications for TXPick.',
+    unsupported: 'This phone or browser does not support notifications yet. On iPhone, add TXPick to the Home Screen and open it from the app icon.',
+    denied: 'Notifications are blocked. Open your phone or browser settings and allow notifications for TXPick.',
     default: 'Notifications have not been allowed yet. Tap enable reminders so the phone can ask for permission.',
-    missing_key: 'VAPID public/private keys are missing on Vercel. Check VITE_WEB_PUSH_PUBLIC_KEY and WEB_PUSH_PRIVATE_KEY.',
-    no_browser_subscription: 'This device has not created a browser push subscription yet.',
-    no_server_subscription: 'This device has not saved its subscription to Supabase, so the backend has no phone address to send to.',
-    no_active_push_subscription: 'Supabase has no active push subscription for this account.',
-    service_worker: 'The service worker is not ready. Refresh the app or open TXPick from the Home Screen icon.',
-    unknown: 'The problem is not clear yet. Check Console/Vercel logs and try again.',
+    missing_key: 'Notifications are not set up yet. Please contact support.',
+    no_browser_subscription: 'This phone is not registered for notifications yet. Tap enable reminders to try again.',
+    no_server_subscription: 'This phone has not been saved for reminders yet. Tap enable reminders to try again.',
+    no_active_push_subscription: 'This account does not have any phone registered for reminders yet.',
+    service_worker: 'The app is not ready yet. Reload the page or open TXPick from the Home Screen icon.',
+    unknown: 'Something went wrong. Please try again in a moment.',
   }
   const map = lang === 'vi' ? vi : en
   return map[code] || map.unknown

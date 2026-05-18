@@ -24,23 +24,23 @@ const copy = {
     email: 'Email',
     note: 'Cá nhân và Business được tách riêng để dễ theo dõi. Nhắc việc vẫn gom chung để bạn không bỏ sót hóa đơn, lương thợ, deadline hoặc việc gia đình.',
     pushTitle: 'Nhắc việc trên điện thoại',
-    pushSub: 'Bật một lần để điện thoại có thể nhận nhắc việc từ TXPick. Sau khi bật, dùng nút test để kiểm tra thật trên lock screen.',
-    pushUnsupported: 'Thiết bị này chưa hỗ trợ nhắc nền. Trên iPhone, hãy cài TXPick vào màn hình chính rồi mở từ icon app.',
+    pushSub: 'Bật một lần để điện thoại nhận nhắc việc từ TXPick. Sau khi bật, bấm nút thử để xem thông báo có hiện trên màn hình khóa không.',
+    pushUnsupported: 'Điện thoại này chưa nhận thông báo được. Trên iPhone, hãy thêm TXPick vào màn hình chính rồi mở từ icon app.',
     pushOff: 'Chưa bật thông báo trên máy này',
     pushOn: 'Thông báo đang bật trên máy này',
     permissionDenied: 'Bạn đã chặn thông báo. Vào cài đặt của điện thoại/trình duyệt để cho phép lại.',
     enablePush: 'Bật nhắc việc trên máy này',
     disablePush: 'Tạm tắt thông báo trên máy này',
-    testPush: 'Gửi thông báo kiểm tra',
-    enableAndTest: 'Bật & kiểm tra ngay',
+    testPush: 'Gửi thông báo thử',
+    enableAndTest: 'Bật và gửi thử ngay',
     checkStatus: 'Kiểm tra trạng thái',
     refreshPush: 'Làm mới thông báo trên máy này',
-    pushEnabled: 'Xong. Máy này đã đăng ký nhận nhắc việc từ TXPick.',
-    pushDisabled: 'Đã tạm tắt nhắc nền trên máy này.',
+    pushEnabled: 'Xong. Máy này đã sẵn sàng nhận nhắc việc từ TXPick.',
+    pushDisabled: 'Đã tạm tắt thông báo trên máy này.',
     pushRefreshed: 'Đã làm mới thông báo trên máy này.',
-    testSent: 'Đã gửi thông báo kiểm tra. Khóa màn hình và xem thông báo trên điện thoại.',
-    pushSetupError: 'Chưa gửi được notification. Vui lòng bấm “Kiểm tra trạng thái” rồi thử lại.',
-    pushNotReady: 'Chưa bật được nhắc nền lúc này. Hãy kiểm tra quyền thông báo trên điện thoại rồi thử lại.',
+    testSent: 'Đã gửi thông báo thử. Khóa màn hình rồi xem thông báo trên điện thoại.',
+    pushSetupError: 'Chưa gửi được thông báo. Vui lòng bấm "Kiểm tra trạng thái" rồi thử lại.',
+    pushNotReady: 'Chưa bật được thông báo lúc này. Hãy kiểm tra quyền thông báo trên điện thoại rồi thử lại.',
     diagnosticTitle: 'Trạng thái nhắc việc',
     noDiagnostics: 'Bấm “Kiểm tra trạng thái” để xem điện thoại đã sẵn sàng nhận nhắc việc chưa.',
     readyText: 'Máy này đã sẵn sàng nhận nhắc việc từ TXPick.',
@@ -80,22 +80,22 @@ const copy = {
     email: 'Email',
     note: 'Personal and Business stay separated for cleaner records. Reminders stay together so bills, payroll, deadlines, and family tasks do not get missed.',
     pushTitle: 'Phone reminders',
-    pushSub: 'Turn this on once so this phone can receive TXPick reminders. Then use the test button to check the real lock screen notification.',
+    pushSub: 'Turn this on once so this phone can receive TXPick reminders. Then tap the sample alert button to make sure it shows on the lock screen.',
     pushUnsupported: 'This phone cannot receive app notifications yet. On iPhone, add TXPick to the Home Screen and open it from the app icon.',
     pushOff: 'Notifications are off on this device',
     pushOn: 'Notifications are on for this device',
     permissionDenied: 'Notifications are blocked. Open browser/phone settings to allow notifications again.',
     enablePush: 'Enable reminders on this device',
     disablePush: 'Pause notifications on this device',
-    testPush: 'Send check alert',
-    enableAndTest: 'Enable & check now',
+    testPush: 'Send a sample alert',
+    enableAndTest: 'Enable and send a sample',
     checkStatus: 'Check status',
     refreshPush: 'Refresh notifications on this device',
     pushEnabled: 'Done. This device is registered for TXPick reminders.',
     pushDisabled: 'Notifications are paused on this device.',
     pushRefreshed: 'Notifications refreshed on this device.',
-    testSent: 'Check alert sent. Lock your phone and look for the notification.',
-    pushSetupError: 'Could not send a notification. Tap “Check status” and try again.',
+    testSent: 'Sample alert sent. Lock your phone and look for the notification.',
+    pushSetupError: 'Could not send a notification. Tap "Check status" and try again.',
     pushNotReady: 'Could not enable phone reminders right now. Check phone notification permission and try again.',
     diagnosticTitle: 'Reminder status',
     noDiagnostics: 'Tap “Check status” to see whether this phone is ready for reminders.',
@@ -104,9 +104,9 @@ const copy = {
     lastChecked: 'Last checked',
     premiumTitle: 'Smart Assistant Pro',
     premiumSub: 'Plus and Pro are coming soon. You can keep using TXPick for free during early access.',
-    premiumBadge: 'Sắp ra mắt',
-    freePlan: 'Free: reminders, bills, expenses, light AI',
-    plusPlan: 'Plus $1.99: remove ads, more Smart Assistant usage',
+    premiumBadge: 'Coming soon',
+    freePlan: 'Free: reminders, bills, expenses, light assistant',
+    plusPlan: 'Plus $1.99: remove ads, more assistant usage',
     proPlan: 'Pro $4.99: business mode, tax summary, stronger assistant',
     viewPlans: 'View upgrade plans',
     quickLinks: 'Quick links',
@@ -125,19 +125,19 @@ const copy = {
 function statusStepsFrom({ local, server, setup, test, errorCode, errorMessage }) {
   const steps = []
   if (local) {
-    steps.push({ label: 'Notification support', ok: Boolean(local.supported), detail: local.supported ? 'Supported' : 'Not supported' })
-    steps.push({ label: 'Permission', ok: local.permission === 'granted', detail: local.permission || 'unknown' })
-    steps.push({ label: 'App background support', ok: local.serviceWorkerReady !== false, detail: local.serviceWorkerReady === false ? 'Not ready' : 'Ready' })
-    steps.push({ label: 'Phone registration', ok: Boolean(local.browserSubscribed || local.subscribed), detail: local.endpointStart || 'This phone has not registered yet' })
+    steps.push({ label: 'Phone supports notifications', ok: Boolean(local.supported), detail: local.supported ? 'Yes' : 'No' })
+    steps.push({ label: 'Notification permission', ok: local.permission === 'granted', detail: local.permission || 'unknown' })
+    steps.push({ label: 'App ready in background', ok: local.serviceWorkerReady !== false, detail: local.serviceWorkerReady === false ? 'Not ready' : 'Ready' })
+    steps.push({ label: 'This phone registered', ok: Boolean(local.browserSubscribed || local.subscribed), detail: local.browserSubscribed || local.subscribed ? 'Yes' : 'Not yet' })
   }
-  for (const step of setup?.steps || []) steps.push({ label: step.key, ok: step.ok, detail: step.endpointStart || step.value || step.message })
+  for (const step of setup?.steps || []) steps.push({ label: step.key, ok: step.ok, detail: step.value || step.message })
   if (server) {
-    steps.push({ label: 'Reminder delivery setup', ok: Boolean(server.envReady), detail: server.envReady ? 'Configured' : 'Missing key' })
-    steps.push({ label: 'Saved phone reminders', ok: Number(server.enabled || 0) > 0, detail: `${server.enabled || 0} active / ${server.total || 0} total` })
-    if (server.hasThisEndpoint !== undefined) steps.push({ label: 'This phone saved', ok: Boolean(server.hasThisEndpoint), detail: server.hasThisEndpoint ? 'This phone is saved for reminders' : 'This phone is not saved yet' })
+    steps.push({ label: 'Reminder service ready', ok: Boolean(server.envReady), detail: server.envReady ? 'Ready' : 'Not set up' })
+    steps.push({ label: 'Phones saved for reminders', ok: Number(server.enabled || 0) > 0, detail: `${server.enabled || 0} active / ${server.total || 0} total` })
+    if (server.hasThisEndpoint !== undefined) steps.push({ label: 'This phone saved', ok: Boolean(server.hasThisEndpoint), detail: server.hasThisEndpoint ? 'Yes' : 'Not yet' })
   }
-  if (test) steps.push({ label: 'Check alert delivery', ok: Number(test.sent || 0) > 0, detail: `${test.sent || 0} sent / ${test.failed || 0} failed` })
-  if (errorCode || errorMessage) steps.push({ label: 'Last error', ok: false, detail: errorMessage || errorCode })
+  if (test) steps.push({ label: 'Sample alert delivery', ok: Number(test.sent || 0) > 0, detail: `${test.sent || 0} sent / ${test.failed || 0} failed` })
+  if (errorCode || errorMessage) steps.push({ label: 'Last issue', ok: false, detail: errorMessage || errorCode })
   return steps
 }
 

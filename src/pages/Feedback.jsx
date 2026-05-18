@@ -28,7 +28,7 @@ const copy = {
     sending: 'Đang gửi…',
     sent: 'Đã nhận góp ý. Cảm ơn bạn — phản hồi này giúp TXPick dễ dùng hơn cho người thật.',
     needMessage: 'Viết vài dòng hoặc ghi âm trước khi gửi nha.',
-    storageOff: 'Chưa lưu được file tiếng nói vì Supabase Storage chưa bật bucket feedback-voice-notes. Góp ý chữ vẫn gửi được.',
+    storageOff: 'Chưa lưu được file ghi âm lúc này. Phần góp ý bằng chữ của bạn vẫn được gửi.',
     recent: 'Góp ý gần đây',
     empty: 'Chưa có góp ý nào. Gửi góp ý đầu tiên để giúp TXPick tốt hơn.',
     whyTitle: 'Vì sao TXPick cần góp ý lúc này?',
@@ -60,7 +60,7 @@ const copy = {
     sending: 'Sending…',
     sent: 'Feedback received. Thank you — this helps make TXPick easier for real daily use.',
     needMessage: 'Please write a few words or record voice feedback first.',
-    storageOff: 'Voice storage is not ready because the feedback-voice-notes bucket is not enabled. Text feedback can still be sent.',
+    storageOff: 'Could not save the voice recording right now. Your written feedback was still sent.',
     recent: 'Recent feedback',
     empty: 'No feedback yet. Send the first one to help shape the app.',
     whyTitle: 'Why TXPick asks for feedback',
@@ -162,8 +162,8 @@ export default function Feedback() {
       if (audioBlob) {
         try {
           voicePath = await uploadVoiceNote()
-        } catch (err) {
-          setError(`${c.storageOff} ${err.message ? `(${err.message})` : ''}`)
+        } catch {
+          setError(c.storageOff)
         }
       }
       const saved = await api.add({

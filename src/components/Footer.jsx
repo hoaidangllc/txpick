@@ -14,7 +14,7 @@ export default function Footer() {
         </div>
         <div className="text-sm text-ink-500">
           <p className="font-semibold text-ink-700 mb-2">{t.footer.contact}</p>
-          <a href="mailto:hello@txpick.app" className="hover:text-ink-900">hello@txpick.app</a>
+          <a href="mailto:ddh2755@gmail.com" className="hover:text-ink-900">ddh2755@gmail.com</a>
           <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
             <a href="/what-is-txpick.html" className="hover:text-ink-900">TXPick</a>
             <a href="/how-it-works.html" className="hover:text-ink-900">Guide</a>

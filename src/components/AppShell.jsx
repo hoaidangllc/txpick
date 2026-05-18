@@ -63,9 +63,9 @@ export default function AppShell() {
   const switchTarget = isBusiness ? 'personal' : 'business'
   const [quickOpen, setQuickOpen] = useState(false)
   const quick = lang === 'vi' ? {
-    title: 'Thêm nhanh', reminder: 'Nhắc việc', expense: 'Chi tiêu', bill: 'Hóa đơn', business: 'Kinh doanh / Thuế', close: 'Đóng', sub: 'Chọn việc cần thêm. Mục này giúp bạn ghi nhanh mà không phải đi nhiều bước.'
+    title: 'Thêm nhanh', reminder: 'Nhắc việc', expense: 'Chi tiêu', bill: 'Hóa đơn', business: 'Kinh doanh / Thuế', close: 'Đóng', sub: 'Chọn loại bạn muốn ghi nhanh trong vài giây.'
   } : {
-    title: 'Quick Add', reminder: 'Reminder', expense: 'Expense', bill: 'Bill', business: 'Business / Tax', close: 'Close', sub: 'Choose what you want to add. This keeps common actions one tap away.'
+    title: 'Quick Add', reminder: 'Reminder', expense: 'Expense', bill: 'Bill', business: 'Business / Tax', close: 'Close', sub: 'Pick what you want to add — done in a few seconds.'
   }
 
   const switchWorkspace = async () => {

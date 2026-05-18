@@ -31,7 +31,7 @@ const txt = {
     billsDue: 'Hóa đơn sắp tới',
     insight: 'Gợi ý hôm nay',
     urgent: 'Cần chú ý ngay',
-    urgentBody: (overdue, dueToday) => `Có ${overdue} việc quá hạn và ${dueToday} mục tới hạn hôm nay. Xử lý nhóm này trước cho nhẹ đầu.`,
+    urgentBody: (overdue, dueToday) => `Có ${overdue} việc quá hạn và ${dueToday} việc tới hạn hôm nay. Xử lý trước cho nhẹ đầu.`,
     quick: 'Thêm nhanh',
     add: 'Thêm',
     placeholder: 'Ví dụ: nhắc tôi trả tiền điện ngày mai lúc 9 giờ tối',

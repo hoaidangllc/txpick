@@ -24,7 +24,7 @@ export const taxCopy = {
     businessIncome: 'Doanh thu business', workerTotal: 'Tiền trả thợ', businessExpenseTotal: 'Chi tiêu business', netBusiness: 'Ước tính còn lại',
     personalNotice: 'Bạn đang ở khu Cá nhân. Trang này là khu Business riêng. Có thể đổi sang Business bằng nút chuyển ở trên hoặc trong Cài đặt.',
     warning: 'SSN/EIN là thông tin nhạy cảm. Chỉ nhập khi thật sự cần đưa cho người làm thuế. App này giúp chuẩn bị hồ sơ 1099/W-2 và tổng kết business, nhưng không tư vấn thuế và không tự nộp IRS forms.',
-    runSql: 'Trang business cần được kết nối đúng bảng dữ liệu. Nếu vẫn báo lỗi, kiểm tra lại phần Supabase setup cho Tax/Business.',
+    runSql: 'Khu business chưa sẵn sàng. Vui lòng tải lại trang hoặc liên hệ hỗ trợ nếu vẫn báo lỗi.',
     incomeCategories: { salon_income: 'Income tiệm nail', service_sales: 'Service sales', product_sales: 'Product sales', booth_rent: 'Booth rent', uber: 'Uber', doordash: 'DoorDash', other_business: 'Kinh doanh khác' },
     expenseCategories: {
       supplies: 'Supplies / vật tư', utilities: 'Utilities / điện nước', rent: 'Rent / lease', payroll: 'Labor / payroll', insurance: 'Insurance', advertising: 'Advertising / marketing', phone_internet: 'Phone / Internet', repairs: 'Repairs / maintenance', office: 'Office expense', accounting: 'Accounting', legal_professional: 'Legal / professional fee', taxes: 'Taxes', car_truck: 'Car / truck', fuel: 'Fuel / oil', gift: 'Gift', other_business: 'Other business', salon: 'Salon', supply: 'Supply', business: 'Business'
@@ -37,13 +37,13 @@ export const taxCopy = {
     ],
   },
   en: {
-    title: 'Hồ sơ thuế Business — 1099 / W-2',
+    title: 'Business Tax Records — 1099 / W-2',
     sub: 'A separate owner workspace for 1099/W-2, business income, daily/monthly business expenses, and tax-preparer exports. Personal bills/expenses stay separate.',
     workers: '1099 / W-2 workers',
     addWorker: 'Add 1099 / W-2',
-    income: 'Doanh thu business',
+    income: 'Business income',
     addIncome: 'Add business income',
-    expenses: 'Chi tiêu business',
+    expenses: 'Business expenses',
     expenseSub: 'Track business expenses daily/monthly: supplies, rent, utilities, phone/internet, advertising, repairs, accounting, and more.',
     addExpense: 'Add business expense',
     exportWorkers: '1099/W-2 CSV',
@@ -59,7 +59,7 @@ export const taxCopy = {
     businessIncome: 'Business income', workerTotal: 'Worker payments', businessExpenseTotal: 'Business expenses', netBusiness: 'Estimated net',
     personalNotice: 'You are in Personal workspace. This is the separate Business area. Use the switch button at the top or Settings to move to Business.',
     warning: 'SSN/EIN is sensitive. Only enter it if your tax preparer needs it. The app helps organize 1099/W-2 and business records; it does not provide tax advice or file IRS forms.',
-    runSql: 'The business area needs the correct database tables. If this still shows an error, check the Supabase setup for Tax/Business.',
+    runSql: 'The business area is not ready yet. Please reload the page or contact support if the error continues.',
     incomeCategories: { salon_income: 'Nail salon income', service_sales: 'Service sales', product_sales: 'Product sales', booth_rent: 'Booth rent', uber: 'Uber', doordash: 'DoorDash', other_business: 'Other business' },
     expenseCategories: {
       supplies: 'Supplies', utilities: 'Utilities', rent: 'Rent / lease', payroll: 'Labor / payroll', insurance: 'Insurance', advertising: 'Advertising / marketing', phone_internet: 'Phone / Internet', repairs: 'Repairs / maintenance', office: 'Office expense', accounting: 'Accounting', legal_professional: 'Legal / professional fees', taxes: 'Taxes', car_truck: 'Car / truck', fuel: 'Fuel / oil', gift: 'Gift', other_business: 'Other business', salon: 'Salon', supply: 'Supply', business: 'Business'
