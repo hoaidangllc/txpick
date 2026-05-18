@@ -1,6 +1,6 @@
 # TXPick Public Beta Pack 4
 
-This pack keeps the app simple and production-safe. No rewrite, no Stripe, no chatbot.
+This pack keeps the app simple and production-safe. No rewrite and no chatbot.
 
 ## Included
 
@@ -22,8 +22,8 @@ This pack keeps the app simple and production-safe. No rewrite, no Stripe, no ch
 ### Monetization Foundation
 - Free / Plus / Pro plan config
 - Feature gate helpers
-- Ads placeholder component for Free plan
-- No payment, no Stripe, no popup spam
+- Future ad placement is prepared but hidden from users by default
+- No payment is active yet, and there are no upgrade popups
 
 ### Google Play Readiness
 - Delete account API route

@@ -73,7 +73,7 @@ Run:
 -- supabase/migrations/005_supabase_edge_push_reminders.sql
 ```
 
-Then create the schedule. Replace placeholders before running:
+Then create the schedule. Replace templates before running:
 
 ```sql
 select cron.unschedule('txpick-send-reminders-every-5-minutes');

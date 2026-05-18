@@ -6,7 +6,7 @@ This pack keeps the current app architecture and adds production-safe polish onl
 
 - Starter checklist on Today page for first-time users.
 - Lightweight analytics foundation (`app_events`) with safe local queue fallback.
-- Pricing/Upgrade page polished as Launching Soon only; no Stripe and no real subscription.
+- Pricing/Upgrade page polished as Coming Soon only; no payment is active yet.
 - Free / Plus $1.99 / Pro $4.99 plan UI aligned with public beta direction.
 - Settings links now expose upgrade plans without aggressive popup upsell.
 - Fixed duplicate due-day input in Today bill modal.

@@ -1,5 +1,5 @@
 -- TXPick public beta plan foundation only.
--- No payment provider, no Stripe, no subscription billing yet.
+-- Upgrade plan foundation only. Payment is not active yet.
 
 alter table public.profiles
   add column if not exists plan text not null default 'free',

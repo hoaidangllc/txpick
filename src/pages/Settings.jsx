@@ -31,14 +31,14 @@ const copy = {
     permissionDenied: 'Bạn đã chặn thông báo. Vào cài đặt của điện thoại/trình duyệt để cho phép lại.',
     enablePush: 'Bật nhắc việc trên máy này',
     disablePush: 'Tạm tắt thông báo trên máy này',
-    testPush: 'Gửi thông báo thử',
-    enableAndTest: 'Bật & gửi test ngay',
+    testPush: 'Gửi thông báo kiểm tra',
+    enableAndTest: 'Bật & kiểm tra ngay',
     checkStatus: 'Kiểm tra trạng thái',
     refreshPush: 'Làm mới thông báo trên máy này',
     pushEnabled: 'Xong. Máy này đã đăng ký nhận nhắc việc từ TXPick.',
     pushDisabled: 'Đã tạm tắt nhắc nền trên máy này.',
     pushRefreshed: 'Đã làm mới thông báo trên máy này.',
-    testSent: 'Đã gửi thông báo thử. Khóa màn hình và kiểm tra thông báo trên điện thoại.',
+    testSent: 'Đã gửi thông báo kiểm tra. Khóa màn hình và xem thông báo trên điện thoại.',
     pushSetupError: 'Chưa gửi được notification. Vui lòng bấm “Kiểm tra trạng thái” rồi thử lại.',
     pushNotReady: 'Chưa bật được nhắc nền lúc này. Hãy kiểm tra quyền thông báo trên điện thoại rồi thử lại.',
     diagnosticTitle: 'Trạng thái nhắc việc',
@@ -47,10 +47,10 @@ const copy = {
     notReadyText: 'Máy này chưa sẵn sàng nhận nhắc việc. Hãy bật thông báo rồi thử lại.',
     lastChecked: 'Lần kiểm tra cuối',
     premiumTitle: 'Smart Assistant Pro',
-    premiumSub: 'Plus và Pro đang chuẩn bị. Hiện tại chưa thu tiền, chưa bật Stripe, chưa có popup nâng cấp.',
-    premiumBadge: 'Launching Soon',
+    premiumSub: 'Plus và Pro sắp ra mắt. Hiện tại bạn vẫn có thể dùng TXPick miễn phí trong giai đoạn đầu.',
+    premiumBadge: 'Sắp ra mắt',
     freePlan: 'Free: reminder, bills, expenses, AI nhẹ',
-    plusPlan: 'Plus $1.99: bỏ ads, thêm lượt Smart Assistant',
+    plusPlan: 'Plus $1.99: không quảng cáo, thêm lượt Smart Assistant',
     proPlan: 'Pro $4.99: business mode, tax summary, assistant mạnh hơn',
     viewPlans: 'Xem gói nâng cấp',
     quickLinks: 'Liên kết nhanh',
@@ -87,14 +87,14 @@ const copy = {
     permissionDenied: 'Notifications are blocked. Open browser/phone settings to allow notifications again.',
     enablePush: 'Enable reminders on this device',
     disablePush: 'Pause notifications on this device',
-    testPush: 'Send test alert',
-    enableAndTest: 'Enable & send test now',
+    testPush: 'Send check alert',
+    enableAndTest: 'Enable & check now',
     checkStatus: 'Check status',
     refreshPush: 'Refresh notifications on this device',
     pushEnabled: 'Done. This device is registered for TXPick reminders.',
     pushDisabled: 'Notifications are paused on this device.',
     pushRefreshed: 'Notifications refreshed on this device.',
-    testSent: 'Test alert sent. Lock your phone and check the notification.',
+    testSent: 'Check alert sent. Lock your phone and look for the notification.',
     pushSetupError: 'Could not send a notification. Tap “Check status” and try again.',
     pushNotReady: 'Could not enable phone reminders right now. Check phone notification permission and try again.',
     diagnosticTitle: 'Reminder status',
@@ -103,8 +103,8 @@ const copy = {
     notReadyText: 'This device is not ready yet. Enable notifications and try again.',
     lastChecked: 'Last checked',
     premiumTitle: 'Smart Assistant Pro',
-    premiumSub: 'Plus and Pro are being prepared. No payment, no Stripe, and no upgrade popup yet.',
-    premiumBadge: 'Launching Soon',
+    premiumSub: 'Plus and Pro are coming soon. You can keep using TXPick for free during early access.',
+    premiumBadge: 'Sắp ra mắt',
     freePlan: 'Free: reminders, bills, expenses, light AI',
     plusPlan: 'Plus $1.99: remove ads, more Smart Assistant usage',
     proPlan: 'Pro $4.99: business mode, tax summary, stronger assistant',
@@ -125,18 +125,18 @@ const copy = {
 function statusStepsFrom({ local, server, setup, test, errorCode, errorMessage }) {
   const steps = []
   if (local) {
-    steps.push({ label: 'Browser support', ok: Boolean(local.supported), detail: local.supported ? 'Supported' : 'Not supported' })
+    steps.push({ label: 'Notification support', ok: Boolean(local.supported), detail: local.supported ? 'Supported' : 'Not supported' })
     steps.push({ label: 'Permission', ok: local.permission === 'granted', detail: local.permission || 'unknown' })
-    steps.push({ label: 'Service worker', ok: local.serviceWorkerReady !== false, detail: local.serviceWorkerReady === false ? 'Not ready' : 'Ready' })
-    steps.push({ label: 'Browser subscription', ok: Boolean(local.browserSubscribed || local.subscribed), detail: local.endpointStart || 'No device endpoint yet' })
+    steps.push({ label: 'App background support', ok: local.serviceWorkerReady !== false, detail: local.serviceWorkerReady === false ? 'Not ready' : 'Ready' })
+    steps.push({ label: 'Phone registration', ok: Boolean(local.browserSubscribed || local.subscribed), detail: local.endpointStart || 'This phone has not registered yet' })
   }
   for (const step of setup?.steps || []) steps.push({ label: step.key, ok: step.ok, detail: step.endpointStart || step.value || step.message })
   if (server) {
-    steps.push({ label: 'Vercel push keys', ok: Boolean(server.envReady), detail: server.envReady ? 'Configured' : 'Missing key' })
-    steps.push({ label: 'Supabase subscription', ok: Number(server.enabled || 0) > 0, detail: `${server.enabled || 0} active / ${server.total || 0} total` })
-    if (server.hasThisEndpoint !== undefined) steps.push({ label: 'This device saved', ok: Boolean(server.hasThisEndpoint), detail: server.hasThisEndpoint ? 'Current phone matched in Supabase' : 'Current phone endpoint not found in Supabase' })
+    steps.push({ label: 'Reminder delivery setup', ok: Boolean(server.envReady), detail: server.envReady ? 'Configured' : 'Missing key' })
+    steps.push({ label: 'Saved phone reminders', ok: Number(server.enabled || 0) > 0, detail: `${server.enabled || 0} active / ${server.total || 0} total` })
+    if (server.hasThisEndpoint !== undefined) steps.push({ label: 'This phone saved', ok: Boolean(server.hasThisEndpoint), detail: server.hasThisEndpoint ? 'This phone is saved for reminders' : 'This phone is not saved yet' })
   }
-  if (test) steps.push({ label: 'Test push send', ok: Number(test.sent || 0) > 0, detail: `${test.sent || 0} sent / ${test.failed || 0} failed` })
+  if (test) steps.push({ label: 'Check alert delivery', ok: Number(test.sent || 0) > 0, detail: `${test.sent || 0} sent / ${test.failed || 0} failed` })
   if (errorCode || errorMessage) steps.push({ label: 'Last error', ok: false, detail: errorMessage || errorCode })
   return steps
 }
@@ -374,6 +374,26 @@ export default function Settings() {
         <button className="btn-primary mt-5" onClick={save} disabled={saving || loading}><Save className="w-4 h-4" /> {c.save}</button>
       </section>
 
+      <section className="mt-5 card p-5 max-w-3xl border-brand-100 bg-brand-50/40">
+        <div className="flex items-start gap-3">
+          <span className="h-10 w-10 rounded-2xl bg-white text-brand-700 grid place-items-center shadow-soft shrink-0"><Sparkles className="w-5 h-5" /></span>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="font-extrabold text-ink-900">{c.premiumTitle}</h2>
+              <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-brand-700 border border-brand-100">{c.premiumBadge}</span>
+            </div>
+            <p className="mt-1 text-sm text-ink-600">{c.premiumSub}</p>
+            <ul className="mt-3 space-y-1 text-sm text-ink-600">
+              <li>{c.freePlan}</li>
+              <li>{c.plusPlan}</li>
+              <li>{c.proPlan}</li>
+            </ul>
+            <a href="/pricing" className="btn-secondary mt-4 inline-flex"><Crown className="w-4 h-4" /> {c.viewPlans}</a>
+          </div>
+        </div>
+      </section>
+
+
       <section className="mt-5 card p-5 max-w-3xl">
         <div className="flex items-start gap-3">
           <span className="h-10 w-10 rounded-2xl bg-brand-600 text-white grid place-items-center shadow-soft shrink-0"><BellRing className="w-5 h-5" /></span>
@@ -407,24 +427,6 @@ export default function Settings() {
       </section>
 
 
-      <section className="mt-5 card p-5 max-w-3xl border-brand-100 bg-brand-50/40">
-        <div className="flex items-start gap-3">
-          <span className="h-10 w-10 rounded-2xl bg-white text-brand-700 grid place-items-center shadow-soft shrink-0"><Sparkles className="w-5 h-5" /></span>
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="font-extrabold text-ink-900">{c.premiumTitle}</h2>
-              <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-brand-700 border border-brand-100">{c.premiumBadge}</span>
-            </div>
-            <p className="mt-1 text-sm text-ink-600">{c.premiumSub}</p>
-            <ul className="mt-3 space-y-1 text-sm text-ink-600">
-              <li>{c.freePlan}</li>
-              <li>{c.plusPlan}</li>
-              <li>{c.proPlan}</li>
-            </ul>
-            <a href="/pricing" className="btn-secondary mt-4 inline-flex"><Crown className="w-4 h-4" /> {c.viewPlans}</a>
-          </div>
-        </div>
-      </section>
 
 
 

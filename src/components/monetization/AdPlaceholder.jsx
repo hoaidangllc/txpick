@@ -5,12 +5,12 @@ import { useLang } from '../../contexts/LanguageContext.jsx'
 
 const copy = {
   vi: {
-    label: 'Beta ad slot',
-    text: 'Chỗ quảng cáo nhẹ cho gói Free. Hiện tại đang tắt quảng cáo thật trong public beta.',
+    label: 'TXPick tip',
+    text: 'Plus sẽ có trải nghiệm gọn hơn và không quảng cáo khi ra mắt.'
   },
   en: {
-    label: 'Beta ad slot',
-    text: 'Light ad placement for Free. Real ads are currently off during public beta.',
+    label: 'TXPick tip',
+    text: 'Plus will offer a cleaner, ad-free experience when it launches.'
   },
 }
 
@@ -21,6 +21,7 @@ export default function AdPlaceholder({ className = '' }) {
   const c = copy[lang] || copy.en
 
   if (!canShowAds(planKey)) return null
+  if (import.meta.env.VITE_SHOW_AD_PREVIEW !== 'true') return null
 
   return (
     <aside className={`rounded-3xl border border-dashed border-ink-200 bg-white/70 p-4 text-sm text-ink-500 ${className}`} aria-label={c.label}>

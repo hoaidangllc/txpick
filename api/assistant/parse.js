@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     const input = String(body?.input || '').trim()
     if (!input) return sendJson(res, 400, { error: 'Missing input', code: 'missing_input' })
 
-    // Production-safe placeholder: server route exists, auth is protected,
+    // Server route is ready, auth is protected,
     // but AI is intentionally disabled until OPENAI_API_KEY + token limits are ready.
     // This prevents a public beta from accidentally burning tokens.
     return sendJson(res, 503, {

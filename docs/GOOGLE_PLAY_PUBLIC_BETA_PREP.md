@@ -34,5 +34,5 @@ Minimum public beta requirement:
 
 5. Payment
 - Not included in this phase.
-- Plus/Pro are internal placeholders only.
+- Plus/Pro are prepared as early-access upgrade options only.
 - Do not submit subscription metadata until Stripe/Play Billing is actually built.

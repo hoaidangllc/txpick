@@ -1,4 +1,4 @@
-// Server-safe AI placeholder for TXPick.
+// Server-safe AI template for TXPick.
 // Do NOT call OpenAI directly from the browser. Any future AI feature must run
 // through a server route or Supabase Edge Function using OPENAI_API_KEY.
 
