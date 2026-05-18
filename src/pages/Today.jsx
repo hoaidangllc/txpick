@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import Modal from '../components/Modal.jsx'
+import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import StatCard from '../components/StatCard.jsx'
 import {
   EXPENSE_CATEGORIES, CATEGORIES, fmtUSD, isCurrentMonth,
@@ -318,6 +319,15 @@ export default function Today() {
 }
 
 function ReminderList({ items, api, empty, emptyCTA, emptyHref, compact, lang, c }) {
+  const [confirm, setConfirm] = useState(null)
+
+  const runConfirm = async () => {
+    if (!confirm) return
+    if (confirm.type === 'delete') await api.remove(confirm.item.id)
+    if (confirm.type === 'complete') await api.update(confirm.item.id, { done: true, doneAt: new Date().toISOString() })
+    setConfirm(null)
+  }
+
   if (!items.length) {
     return (
       <div className="mt-2 rounded-2xl bg-ink-50 border border-ink-100 px-4 py-6 text-center">
@@ -334,6 +344,7 @@ function ReminderList({ items, api, empty, emptyCTA, emptyHref, compact, lang, c
     )
   }
   return (
+    <>
     <ul className="mt-2 divide-y divide-ink-100">
       {items.map((r) => (
         <li key={r.id} className="py-3 flex items-start justify-between gap-3">
@@ -345,12 +356,21 @@ function ReminderList({ items, api, empty, emptyCTA, emptyHref, compact, lang, c
             {!compact && r.notes ? <p className="text-xs text-ink-400 mt-1">{r.notes}</p> : null}
           </div>
           <div className="flex gap-2 shrink-0">
-            <button onClick={() => api.update(r.id, { done: true, doneAt: new Date().toISOString() })} className="text-brand-600 hover:text-brand-800" aria-label="Done"><CheckCircle2 className="w-5 h-5" /></button>
-            <button onClick={() => api.remove(r.id)} className="text-ink-300 hover:text-rose-600" aria-label="Delete"><Trash2 className="w-4 h-4" /></button>
+            <button onClick={() => setConfirm({ type: 'complete', item: r })} className="text-brand-600 hover:text-brand-800" aria-label="Done"><CheckCircle2 className="w-5 h-5" /></button>
+            <button onClick={() => setConfirm({ type: 'delete', item: r })} className="text-ink-300 hover:text-rose-600" aria-label="Delete"><Trash2 className="w-4 h-4" /></button>
           </div>
         </li>
       ))}
     </ul>
+    <ConfirmDialog
+      open={Boolean(confirm)}
+      type={confirm?.type}
+      itemTitle={confirm?.item?.title}
+      lang={lang}
+      onCancel={() => setConfirm(null)}
+      onConfirm={runConfirm}
+    />
+    </>
   )
 }
 

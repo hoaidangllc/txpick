@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Bell, CheckCircle2, Circle, Plus, Trash2, Inbox } from 'lucide-react'
 import Modal from '../components/Modal.jsx'
+import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import {
   CATEGORIES, todayISO, parseNaturalReminder,
   categoryLabel, repeatLabel,
@@ -93,6 +94,16 @@ export default function Reminders() {
 }
 
 function ReminderCard({ title, items, api, emptyTitle, empty, done, onAdd, addLabel, c, lang }) {
+  const [confirm, setConfirm] = useState(null)
+
+  const runConfirm = async () => {
+    if (!confirm) return
+    if (confirm.type === 'delete') await api.remove(confirm.item.id)
+    if (confirm.type === 'complete') await api.update(confirm.item.id, { done: true, doneAt: new Date().toISOString() })
+    if (confirm.type === 'reopen') await api.update(confirm.item.id, { done: false, doneAt: null })
+    setConfirm(null)
+  }
+
   return (
     <div className="card p-5">
       <h2 className="font-bold text-ink-900">{title}</h2>
@@ -122,7 +133,7 @@ function ReminderCard({ title, items, api, emptyTitle, empty, done, onAdd, addLa
               <div className="flex gap-2 shrink-0">
                 {done ? (
                   <button
-                    onClick={() => api.update(r.id, { done: false, doneAt: null })}
+                    onClick={() => setConfirm({ type: 'reopen', item: r })}
                     className="inline-flex items-center justify-center rounded-full bg-emerald-50 p-1.5 text-emerald-700 hover:bg-emerald-100"
                     aria-label={c.reopen}
                     title={c.reopen}
@@ -131,7 +142,7 @@ function ReminderCard({ title, items, api, emptyTitle, empty, done, onAdd, addLa
                   </button>
                 ) : (
                   <button
-                    onClick={() => api.update(r.id, { done: true, doneAt: new Date().toISOString() })}
+                    onClick={() => setConfirm({ type: 'complete', item: r })}
                     className="inline-flex items-center justify-center rounded-full border border-ink-200 bg-white p-1.5 text-ink-400 hover:border-brand-300 hover:text-brand-700"
                     aria-label={c.markDone}
                     title={c.markDone}
@@ -139,12 +150,20 @@ function ReminderCard({ title, items, api, emptyTitle, empty, done, onAdd, addLa
                     <Circle className="w-4 h-4" />
                   </button>
                 )}
-                <button onClick={() => api.remove(r.id)} className="text-ink-300 hover:text-rose-600" aria-label="Delete"><Trash2 className="w-4 h-4" /></button>
+                <button onClick={() => setConfirm({ type: 'delete', item: r })} className="text-ink-300 hover:text-rose-600" aria-label="Delete"><Trash2 className="w-4 h-4" /></button>
               </div>
             </li>
           ))}
         </ul>
       )}
+      <ConfirmDialog
+        open={Boolean(confirm)}
+        type={confirm?.type}
+        itemTitle={confirm?.item?.title}
+        lang={lang}
+        onCancel={() => setConfirm(null)}
+        onConfirm={runConfirm}
+      />
     </div>
   )
 }

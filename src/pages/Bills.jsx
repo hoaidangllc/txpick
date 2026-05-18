@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { CheckCircle2, Circle, Plus, Trash2, WalletCards } from 'lucide-react'
 import Modal from '../components/Modal.jsx'
+import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import StatCard from '../components/StatCard.jsx'
 import { CATEGORIES, fmtUSD, categoryLabel } from '../lib/lifeStore.js'
 import { billsDb, useRemoteCollection } from '../lib/db.js'
@@ -64,6 +65,15 @@ export default function Bills() {
   const { user } = useAuth()
   const [items, api, state] = useRemoteCollection(user?.id, billsDb)
   const [open, setOpen] = useState(false)
+  const [confirm, setConfirm] = useState(null)
+
+  const runConfirm = async () => {
+    if (!confirm) return
+    if (confirm.type === 'delete') await api.remove(confirm.item.id)
+    if (confirm.type === 'paid') await api.update(confirm.item.id, { paid: true, paid_at: new Date().toISOString() })
+    if (confirm.type === 'unpaid') await api.update(confirm.item.id, { paid: false, paid_at: null })
+    setConfirm(null)
+  }
   const total = useMemo(() => items.reduce((s, b) => s + Number(b.amount || 0), 0), [items])
 
   return (
@@ -106,7 +116,7 @@ export default function Bills() {
                   <span className="font-bold text-ink-900">{fmtUSD(b.amount)}</span>
                   {b.paid ? (
                     <button
-                      onClick={() => api.update(b.id, { paid: false, paid_at: null })}
+                      onClick={() => setConfirm({ type: 'unpaid', item: b })}
                       className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 hover:bg-emerald-100"
                       aria-label={c.reopen}
                       title={c.reopen}
@@ -116,7 +126,7 @@ export default function Bills() {
                     </button>
                   ) : (
                     <button
-                      onClick={() => api.update(b.id, { paid: true, paid_at: new Date().toISOString() })}
+                      onClick={() => setConfirm({ type: 'paid', item: b })}
                       className="inline-flex items-center gap-1 rounded-full border border-ink-200 bg-white px-2.5 py-1 text-xs font-bold text-ink-500 hover:border-brand-300 hover:text-brand-700"
                       aria-label={c.markPaid}
                       title={c.markPaid}
@@ -125,7 +135,7 @@ export default function Bills() {
                       <span className="hidden sm:inline">{c.unpaid}</span>
                     </button>
                   )}
-                  <button onClick={() => api.remove(b.id)} className="text-ink-300 hover:text-rose-600" aria-label={c.delete} title={c.delete}>
+                  <button onClick={() => setConfirm({ type: 'delete', item: b })} className="text-ink-300 hover:text-rose-600" aria-label={c.delete} title={c.delete}>
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -136,6 +146,14 @@ export default function Bills() {
       </div>
 
       <BillModal open={open} onClose={() => setOpen(false)} onSave={(item) => { api.add(item); setOpen(false) }} c={c} lang={lang} />
+      <ConfirmDialog
+        open={Boolean(confirm)}
+        type={confirm?.type}
+        itemTitle={confirm?.item?.name || confirm?.item?.title}
+        lang={lang}
+        onCancel={() => setConfirm(null)}
+        onConfirm={runConfirm}
+      />
     </div>
   )
 }

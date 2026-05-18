@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Plus, Receipt, Trash2, Wallet } from 'lucide-react'
 import Modal from '../components/Modal.jsx'
+import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import StatCard from '../components/StatCard.jsx'
 import {
   EXPENSE_CATEGORIES, fmtUSD, isCurrentMonth, todayISO,
@@ -43,6 +44,13 @@ export default function Expenses() {
   const { user } = useAuth()
   const [items, api, state] = useRemoteCollection(user?.id, expensesDb)
   const [open, setOpen] = useState(false)
+  const [confirm, setConfirm] = useState(null)
+
+  const runConfirm = async () => {
+    if (!confirm) return
+    if (confirm.type === 'delete') await api.remove(confirm.item.id)
+    setConfirm(null)
+  }
   const monthItems = useMemo(() => items.filter((x) => isCurrentMonth(x.date)), [items])
   const total = monthItems.reduce((s, e) => s + Number(e.amount || 0), 0)
   const business = monthItems.filter((e) => ['business', 'salon', 'supply'].includes(e.category)).reduce((s, e) => s + Number(e.amount || 0), 0)
@@ -85,7 +93,7 @@ export default function Expenses() {
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   <span className="font-bold text-ink-900">{fmtUSD(e.amount)}</span>
-                  <button onClick={() => api.remove(e.id)} className="text-ink-300 hover:text-rose-600" aria-label="Delete"><Trash2 className="w-4 h-4" /></button>
+                  <button onClick={() => setConfirm({ type: 'delete', item: e })} className="text-ink-300 hover:text-rose-600" aria-label="Delete"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </li>
             ))}
@@ -94,6 +102,14 @@ export default function Expenses() {
       </div>
 
       <ExpenseModal open={open} onClose={() => setOpen(false)} onSave={(item) => { api.add(item); setOpen(false) }} c={c} lang={lang} />
+      <ConfirmDialog
+        open={Boolean(confirm)}
+        type={confirm?.type}
+        itemTitle={confirm?.item?.title}
+        lang={lang}
+        onCancel={() => setConfirm(null)}
+        onConfirm={runConfirm}
+      />
     </div>
   )
 }
