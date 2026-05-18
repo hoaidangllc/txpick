@@ -1,6 +1,28 @@
 import { sendPush } from '../_push.js'
 import { getUserFromRequest, sendJson } from '../_supabase.js'
 
+// Basic in-memory rate limit for /api/push/test.
+// Beta-grade: per-instance, resets when the serverless function is recycled.
+// Goal: stop a single user from spamming push and burning VAPID quota.
+const TEST_PUSH_RATE = { max: 5, windowMs: 60 * 1000 }
+const testPushHits = new Map() // userId -> { count, windowStart }
+
+function checkTestPushRate(userId) {
+  if (!userId) return { ok: true }
+  const now = Date.now()
+  const entry = testPushHits.get(userId)
+  if (!entry || now - entry.windowStart > TEST_PUSH_RATE.windowMs) {
+    testPushHits.set(userId, { count: 1, windowStart: now })
+    return { ok: true }
+  }
+  if (entry.count >= TEST_PUSH_RATE.max) {
+    const retryAfter = Math.max(1, Math.ceil((entry.windowStart + TEST_PUSH_RATE.windowMs - now) / 1000))
+    return { ok: false, retryAfter }
+  }
+  entry.count += 1
+  return { ok: true }
+}
+
 function categoryIcon(category) {
   const value = String(category || '').toLowerCase()
   if (value.includes('health') || value.includes('med')) return '💊'
@@ -56,6 +78,16 @@ export default async function handler(req, res) {
   try {
     const { user, supabase, error } = await getUserFromRequest(req)
     if (error) return sendJson(res, 401, { error })
+
+    const rate = checkTestPushRate(user.id)
+    if (!rate.ok) {
+      res.setHeader('Retry-After', String(rate.retryAfter))
+      return sendJson(res, 429, {
+        error: 'Too many test pushes. Please wait a moment.',
+        code: 'rate_limited',
+        retryAfter: rate.retryAfter,
+      })
+    }
 
     const { data: subs, error: subError } = await supabase
       .from('push_subscriptions')
