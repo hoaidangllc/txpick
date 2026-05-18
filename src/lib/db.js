@@ -85,13 +85,31 @@ export const remindersDb = {
   },
   async add(userId, item) {
     requireUserId(userId)
+    const title = String(item.title || '').trim()
+    const due_at = buildDueAt(item.date, item.time)
+
+    // Basic duplicate prevention: same user + same title + same due_at, still active.
+    // If a match exists, return it instead of inserting a duplicate row.
+    if (title && due_at) {
+      const { data: existing } = await supabase
+        .from('reminders')
+        .select('*')
+        .eq('profile_id', userId)
+        .eq('title', title)
+        .eq('due_at', due_at)
+        .eq('completed', false)
+        .limit(1)
+        .maybeSingle()
+      if (existing) return normalizeReminder(existing)
+    }
+
     const payload = {
       profile_id: userId,
-      title: item.title,
+      title: title || item.title,
       notes: item.notes || '',
       category: item.category || 'personal',
       for_person: item.for_person || item.forPerson || 'me',
-      due_at: buildDueAt(item.date, item.time),
+      due_at,
       repeat_pattern: item.repeat || item.repeat_pattern || 'none',
       completed: Boolean(item.done || item.completed),
       completed_at: item.doneAt || item.completed_at || null,
@@ -288,7 +306,11 @@ export function useRemoteCollection(userId, adapter) {
     reload,
     add: async (item) => {
       const created = await adapter.add(userId, item)
-      setItems((prev) => [created, ...prev])
+      // If the adapter returned an existing row (e.g. duplicate-prevention path),
+      // avoid inserting it twice into local state.
+      setItems((prev) => (created?.id && prev.some((x) => x.id === created.id)
+        ? prev.map((x) => (x.id === created.id ? created : x))
+        : [created, ...prev]))
       return created
     },
     update: async (id, patch) => {

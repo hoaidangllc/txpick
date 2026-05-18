@@ -19,7 +19,11 @@ export async function getUserFromRequest(req) {
 
 export function requireCronAuth(req) {
   const secret = process.env.CRON_SECRET
-  if (!secret) return true
+  // Fail-closed: never accept cron requests when the secret is not configured.
+  if (!secret) {
+    console.error('CRON_SECRET is not configured; rejecting cron request')
+    return false
+  }
   const authHeader = req.headers.authorization || req.headers.Authorization || ''
   const cronHeader = req.headers['x-cron-secret'] || req.headers['X-Cron-Secret'] || ''
   return authHeader === `Bearer ${secret}` || cronHeader === secret
