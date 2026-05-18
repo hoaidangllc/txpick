@@ -9,15 +9,19 @@ import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import StatCard from '../components/StatCard.jsx'
 import {
   EXPENSE_CATEGORIES, CATEGORIES, fmtUSD, isCurrentMonth,
-  parseNaturalReminder, buildDailyInsight,
+  buildDailyInsight,
   todayISO, categoryLabel, repeatLabel,
 } from '../lib/lifeStore.js'
 import { billsDb, expensesDb, remindersDb, useRemoteCollection } from '../lib/db.js'
 import { enableBackgroundReminders, getPushStatus } from '../lib/notifications.js'
 import { getUserDisplayName } from '../lib/userDisplay.js'
 import { getBillBuckets, getReminderBuckets } from '../lib/assistantIntelligence.js'
+import { explainParsedSmartEntry, parseSmartEntry } from '../lib/smartAssistantLite.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
+import AdPlaceholder from '../components/monetization/AdPlaceholder.jsx'
+import StarterChecklist from '../components/retention/StarterChecklist.jsx'
+import { flushQueuedAnalytics, trackEvent } from '../lib/analytics.js'
 
 const txt = {
   vi: {
@@ -31,7 +35,9 @@ const txt = {
     quick: 'Thêm nhanh',
     add: 'Thêm',
     placeholder: 'Ví dụ: nhắc tôi trả tiền điện ngày mai lúc 9 giờ tối',
-    helper: 'Gõ như đang nhắn tin. TXPick sẽ cố gắng nhận ngày, giờ và nhóm việc cho bạn.',
+    helper: 'Gõ như đang nhắn tin. TXPick sẽ tự phân loại nhắc việc, hóa đơn hoặc chi tiêu khi có thể.',
+    quickSaved: (type) => type === 'bill' ? 'Đã thêm hóa đơn.' : type === 'expense' ? 'Đã ghi chi tiêu.' : 'Đã thêm nhắc việc.',
+    smartNeedsReview: 'Câu này hơi khó. TXPick đã xử lý bằng parser local trước; AI fallback đang để chế độ chuẩn bị để tiết kiệm chi phí public beta.',
     today: 'Cần làm hôm nay',
     noToday: 'Hôm nay nhẹ nhàng. Bạn không có việc nào tới hạn.',
     noTodayCTA: 'Thêm việc đầu tiên',
@@ -79,7 +85,9 @@ const txt = {
     quick: 'Quick Add',
     add: 'Add',
     placeholder: 'Example: remind me to pay the electric bill tomorrow at 9 PM',
-    helper: 'Type like you are texting. TXPick will try to read the date, time, and category for you.',
+    helper: 'Type like you are texting. TXPick will auto-sort reminders, bills, or expenses when possible.',
+    quickSaved: (type) => type === 'bill' ? 'Bill added.' : type === 'expense' ? 'Expense logged.' : 'Reminder added.',
+    smartNeedsReview: 'This was a harder sentence. TXPick used the local parser first; AI fallback is prepared but kept off to control public beta cost.',
     today: 'On your plate today',
     noToday: 'Nothing on your plate today. Enjoy the calm.',
     noTodayCTA: 'Add your first task',
@@ -141,6 +149,7 @@ export default function Today() {
   const [bills, billApi, billState] = useRemoteCollection(user?.id, billsDb)
   const planKey = 'free'
   const [quickText, setQuickText] = useState('')
+  const [quickMessage, setQuickMessage] = useState('')
   const [expenseOpen, setExpenseOpen] = useState(false)
   const [billOpen, setBillOpen] = useState(false)
   const [push, setPush] = useState({ supported: false, permission: 'default', subscribed: false })
@@ -166,15 +175,28 @@ export default function Today() {
 
   const userName = getUserDisplayName(user, profile)
 
-  const addQuickReminder = () => {
+  const addQuickReminder = async () => {
     if (!quickText.trim()) return
-    const parsed = parseNaturalReminder(quickText)
-    remApi.add({ ...parsed, done: false, source: 'quick', notes: '' })
+    const parsed = parseSmartEntry(quickText)
+    if (!parsed.ok) return
+    if (parsed.type === 'bill') await billApi.add(parsed.item)
+    else if (parsed.type === 'expense') await expApi.add(parsed.item)
+    else await remApi.add(parsed.item)
+    trackEvent(user?.id, 'smart_quick_add_created', { type: parsed.type, confidence: parsed.confidence || null, needs_ai_fallback: Boolean(parsed.needsAiFallback) })
+    setQuickMessage(`${c.quickSaved(parsed.type)} ${explainParsedSmartEntry(parsed, lang)}${parsed.needsAiFallback ? ` ${c.smartNeedsReview}` : ''}`)
     setQuickText('')
   }
 
   const loadError = remState.error || expState.error || billState.error
 
+
+  useEffect(() => {
+    if (user?.id) flushQueuedAnalytics(user.id)
+  }, [user?.id])
+
+  useEffect(() => {
+    trackEvent(user?.id, 'today_opened', { lang })
+  }, [user?.id, lang])
 
   useEffect(() => {
     let alive = true
@@ -262,10 +284,24 @@ export default function Today() {
         </section>
       )}
 
+      <StarterChecklist
+        lang={lang}
+        remindersCount={reminders.length}
+        billsCount={bills.length}
+        expensesCount={expenses.length}
+        className="mt-5"
+      />
+
       <section className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <StatCard label={c.remindersToday} value={(reminderBuckets.today.length + reminderBuckets.overdue.length) || c.none} icon={Bell} tone="brand" />
-        <StatCard label={c.thisMonth} value={monthTotal ? fmtUSD(monthTotal) : c.none} icon={Wallet} />
-        <StatCard label={c.billsDue} value={billsSoon || c.none} icon={WalletCards} tone={billBuckets.overdue.length ? 'rose' : 'ink'} />
+        <Link to="/reminders?filter=today" className="block rounded-2xl transition hover:-translate-y-0.5 hover:shadow-soft focus:outline-none focus:ring-2 focus:ring-brand-300">
+          <StatCard label={c.remindersToday} value={(reminderBuckets.today.length + reminderBuckets.overdue.length) || c.none} icon={Bell} tone="brand" />
+        </Link>
+        <Link to="/expenses?month=current" className="block rounded-2xl transition hover:-translate-y-0.5 hover:shadow-soft focus:outline-none focus:ring-2 focus:ring-brand-300">
+          <StatCard label={c.thisMonth} value={monthTotal ? fmtUSD(monthTotal) : c.none} icon={Wallet} />
+        </Link>
+        <Link to="/bills?filter=upcoming" className="block rounded-2xl transition hover:-translate-y-0.5 hover:shadow-soft focus:outline-none focus:ring-2 focus:ring-brand-300">
+          <StatCard label={c.billsDue} value={billsSoon || c.none} icon={WalletCards} tone={billBuckets.overdue.length ? 'rose' : 'ink'} />
+        </Link>
       </section>
 
       <section className="mt-4 grid lg:grid-cols-[1.1fr_0.9fr] gap-4">
@@ -286,6 +322,7 @@ export default function Today() {
             </button>
           </div>
           <p className="mt-2 text-xs text-ink-400">{c.helper}</p>
+          {quickMessage && <p className="mt-2 text-xs font-semibold text-emerald-700">{quickMessage}</p>}
           <div className="mt-5">
             <h3 className="text-sm font-bold text-ink-700">{c.today}</h3>
             <ReminderList items={[...reminderBuckets.overdue, ...reminderBuckets.today]} api={remApi} empty={c.noToday} emptyCTA={c.noTodayCTA} emptyHref="/reminders" lang={lang} c={c} />
@@ -312,8 +349,10 @@ export default function Today() {
         </div>
       </section>
 
-      <ExpenseModal open={expenseOpen} onClose={() => setExpenseOpen(false)} onSave={(item) => { expApi.add(item); setExpenseOpen(false) }} lang={lang} c={c} />
-      <BillModal open={billOpen} onClose={() => setBillOpen(false)} onSave={(item) => { billApi.add(item); setBillOpen(false) }} lang={lang} c={c} />
+      <AdPlaceholder className="mt-5 max-w-3xl" />
+
+      <ExpenseModal open={expenseOpen} onClose={() => setExpenseOpen(false)} onSave={(item) => { expApi.add(item); trackEvent(user?.id, 'expense_created_from_today'); setExpenseOpen(false) }} lang={lang} c={c} />
+      <BillModal open={billOpen} onClose={() => setBillOpen(false)} onSave={(item) => { billApi.add(item); trackEvent(user?.id, 'bill_created_from_today'); setBillOpen(false) }} lang={lang} c={c} />
     </div>
   )
 }

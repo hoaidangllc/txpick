@@ -246,6 +246,10 @@ export async function checkServerPushStatus() {
   return postJson('/api/push/status', { endpoint: sub?.endpoint || null })
 }
 
+export async function cleanupStalePushSubscriptions(keepEndpoint = null) {
+  return postJson('/api/push/cleanup', { keepEndpoint })
+}
+
 export async function diagnosePushSetup() {
   const local = await getPushStatus()
   let server = null
@@ -293,6 +297,9 @@ export async function enableBackgroundReminders() {
   }
 
   let subscription = await reg.pushManager.getSubscription()
+  if (subscription) {
+    await cleanupStalePushSubscriptions(subscription.endpoint).catch(() => undefined)
+  }
   if (!subscription) {
     subscription = await reg.pushManager.subscribe({
       userVisibleOnly: true,
@@ -326,6 +333,20 @@ export async function disableBackgroundReminders() {
   }
   try { localStorage.removeItem(PUSH_STATUS_KEY) } catch {}
   return { ok: true, status: 'disabled' }
+}
+
+
+export async function refreshBackgroundReminders() {
+  if (!pushSupported()) return { ok: false, status: 'unsupported', problem: 'unsupported' }
+  const reg = await navigator.serviceWorker.ready
+  const existing = await reg.pushManager.getSubscription()
+  if (existing) {
+    await postJson('/api/push/unsubscribe', { endpoint: existing.endpoint }).catch(() => undefined)
+    await existing.unsubscribe().catch(() => undefined)
+  }
+  await cleanupStalePushSubscriptions().catch(() => undefined)
+  try { localStorage.removeItem(PUSH_STATUS_KEY) } catch {}
+  return enableBackgroundReminders()
 }
 
 export async function sendTestPush() {

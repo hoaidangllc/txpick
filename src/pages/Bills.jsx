@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { CheckCircle2, Circle, Plus, Trash2, WalletCards } from 'lucide-react'
 import Modal from '../components/Modal.jsx'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
@@ -29,6 +30,7 @@ const copy = {
     category: 'Phân loại',
     monthly: 'Tổng mỗi tháng',
     count: 'Số hóa đơn',
+    upcomingTitle: 'Hóa đơn sắp tới',
     none: '—',
     delete: 'Xóa hóa đơn',
     loading: 'Đang tải…',
@@ -53,6 +55,7 @@ const copy = {
     category: 'Category',
     monthly: 'Monthly total',
     count: 'Bills',
+    upcomingTitle: 'Upcoming bills',
     none: '—',
     delete: 'Delete bill',
     loading: 'Loading…',
@@ -64,6 +67,7 @@ export default function Bills() {
   const c = copy[lang]
   const { user } = useAuth()
   const [items, api, state] = useRemoteCollection(user?.id, billsDb)
+  const [searchParams] = useSearchParams()
   const [open, setOpen] = useState(false)
   const [confirm, setConfirm] = useState(null)
 
@@ -75,6 +79,18 @@ export default function Bills() {
     setConfirm(null)
   }
   const total = useMemo(() => items.reduce((s, b) => s + Number(b.amount || 0), 0), [items])
+  const visibleItems = useMemo(() => {
+    if (searchParams.get('filter') !== 'upcoming') return items
+    const today = new Date()
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    const nextWeek = new Date(todayStart)
+    nextWeek.setDate(nextWeek.getDate() + 7)
+    return items.filter((b) => {
+      if (b.paid) return false
+      const due = b.dueDate ? new Date(`${b.dueDate}T00:00:00`) : null
+      return due && due <= nextWeek
+    })
+  }, [items, searchParams])
 
   return (
     <div className="container-app py-6 sm:py-8">
@@ -96,15 +112,16 @@ export default function Bills() {
       </section>
 
       <div className="mt-5 card p-5">
+        {searchParams.get('filter') === 'upcoming' && <h2 className="mb-3 font-bold text-ink-900">{c.upcomingTitle}</h2>}
         {state.loading ? (
           <p className="py-10 text-center text-sm text-ink-400">{c.loading}</p>
         ) : state.error ? (
           <p className="py-10 text-center text-sm text-rose-600">{state.error}</p>
-        ) : items.length === 0 ? (
+        ) : visibleItems.length === 0 ? (
           <EmptyBills c={c} onAdd={() => setOpen(true)} />
         ) : (
           <ul className="divide-y divide-ink-100">
-            {items.map((b) => (
+            {visibleItems.map((b) => (
               <li key={b.id} className="py-3 flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <p className="font-semibold text-ink-900 truncate">{b.name || b.title}</p>

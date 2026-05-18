@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { BellRing, Save, Send, Settings as SettingsIcon, ShieldCheck, UserRound, MessageSquareHeart, FileText, Shield, CheckCircle2, AlertTriangle, RefreshCw } from 'lucide-react'
+import { BellRing, Save, Send, Settings as SettingsIcon, ShieldCheck, UserRound, MessageSquareHeart, FileText, Shield, CheckCircle2, AlertTriangle, RefreshCw, Sparkles, Trash2, Crown } from 'lucide-react'
 import { getProfile } from '../lib/db.js'
+import { supabase } from '../lib/supabase.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
-import { checkServerPushStatus, diagnosePushSetup, disableBackgroundReminders, enableBackgroundReminders, getPushStatus, sendTestPush, describePushProblem } from '../lib/notifications.js'
+import { checkServerPushStatus, diagnosePushSetup, disableBackgroundReminders, enableBackgroundReminders, getPushStatus, sendTestPush, describePushProblem, refreshBackgroundReminders } from '../lib/notifications.js'
 import { getUserDisplayName } from '../lib/userDisplay.js'
 
 const copy = {
@@ -33,8 +34,10 @@ const copy = {
     testPush: 'Gửi thông báo thử',
     enableAndTest: 'Bật & gửi test ngay',
     checkStatus: 'Kiểm tra trạng thái',
+    refreshPush: 'Làm mới thông báo trên máy này',
     pushEnabled: 'Xong. Máy này đã đăng ký nhận nhắc việc từ TXPick.',
     pushDisabled: 'Đã tạm tắt nhắc nền trên máy này.',
+    pushRefreshed: 'Đã làm mới thông báo trên máy này.',
     testSent: 'Đã gửi thông báo thử. Khóa màn hình và kiểm tra thông báo trên điện thoại.',
     pushSetupError: 'Chưa gửi được notification. Vui lòng bấm “Kiểm tra trạng thái” rồi thử lại.',
     pushNotReady: 'Chưa bật được nhắc nền lúc này. Hãy kiểm tra quyền thông báo trên điện thoại rồi thử lại.',
@@ -43,10 +46,23 @@ const copy = {
     readyText: 'Máy này đã sẵn sàng nhận nhắc việc từ TXPick.',
     notReadyText: 'Máy này chưa sẵn sàng nhận nhắc việc. Hãy bật thông báo rồi thử lại.',
     lastChecked: 'Lần kiểm tra cuối',
+    premiumTitle: 'Smart Assistant Pro',
+    premiumSub: 'Plus và Pro đang chuẩn bị. Hiện tại chưa thu tiền, chưa bật Stripe, chưa có popup nâng cấp.',
+    premiumBadge: 'Launching Soon',
+    freePlan: 'Free: reminder, bills, expenses, AI nhẹ',
+    plusPlan: 'Plus $1.99: bỏ ads, thêm lượt Smart Assistant',
+    proPlan: 'Pro $4.99: business mode, tax summary, assistant mạnh hơn',
+    viewPlans: 'Xem gói nâng cấp',
     quickLinks: 'Liên kết nhanh',
     feedback: 'Gửi góp ý',
     privacy: 'Quyền riêng tư',
     terms: 'Điều khoản',
+    dangerTitle: 'Xóa tài khoản',
+    dangerSub: 'Dành cho yêu cầu Google Play. Xóa tài khoản sẽ xóa dữ liệu chính của bạn và đăng xuất khỏi TXPick.',
+    deleteLabel: 'Gõ DELETE để xác nhận',
+    deleteButton: 'Xóa tài khoản',
+    deleting: 'Đang xóa…',
+    deleteError: 'Chưa xóa được tài khoản. Vui lòng thử lại hoặc liên hệ hỗ trợ.',
   },
   en: {
     title: 'Settings',
@@ -74,8 +90,10 @@ const copy = {
     testPush: 'Send test alert',
     enableAndTest: 'Enable & send test now',
     checkStatus: 'Check status',
+    refreshPush: 'Refresh notifications on this device',
     pushEnabled: 'Done. This device is registered for TXPick reminders.',
     pushDisabled: 'Notifications are paused on this device.',
+    pushRefreshed: 'Notifications refreshed on this device.',
     testSent: 'Test alert sent. Lock your phone and check the notification.',
     pushSetupError: 'Could not send a notification. Tap “Check status” and try again.',
     pushNotReady: 'Could not enable phone reminders right now. Check phone notification permission and try again.',
@@ -84,10 +102,23 @@ const copy = {
     readyText: 'This device is ready to receive TXPick reminders.',
     notReadyText: 'This device is not ready yet. Enable notifications and try again.',
     lastChecked: 'Last checked',
+    premiumTitle: 'Smart Assistant Pro',
+    premiumSub: 'Plus and Pro are being prepared. No payment, no Stripe, and no upgrade popup yet.',
+    premiumBadge: 'Launching Soon',
+    freePlan: 'Free: reminders, bills, expenses, light AI',
+    plusPlan: 'Plus $1.99: remove ads, more Smart Assistant usage',
+    proPlan: 'Pro $4.99: business mode, tax summary, stronger assistant',
+    viewPlans: 'View upgrade plans',
     quickLinks: 'Quick links',
     feedback: 'Send feedback',
     privacy: 'Privacy Policy',
     terms: 'Terms',
+    dangerTitle: 'Delete account',
+    dangerSub: 'Required for Google Play readiness. This deletes your main TXPick data and signs you out.',
+    deleteLabel: 'Type DELETE to confirm',
+    deleteButton: 'Delete account',
+    deleting: 'Deleting…',
+    deleteError: 'Could not delete the account. Try again or contact support.',
   },
 }
 
@@ -111,7 +142,7 @@ function statusStepsFrom({ local, server, setup, test, errorCode, errorMessage }
 }
 
 export default function Settings() {
-  const { user, profile, updateProfile } = useAuth()
+  const { user, profile, updateProfile, signOut } = useAuth()
   const { lang } = useLang()
   const c = copy[lang] || copy.en
   const [form, setForm] = useState({ display_name: '', business_name: '', type: 'personal', locale: lang })
@@ -125,6 +156,9 @@ export default function Settings() {
   const [pushError, setPushError] = useState('')
   const [diagnostics, setDiagnostics] = useState(null)
   const [lastChecked, setLastChecked] = useState('')
+  const [deleteConfirm, setDeleteConfirm] = useState('')
+  const [deleteBusy, setDeleteBusy] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
 
   useEffect(() => {
     let alive = true
@@ -200,6 +234,30 @@ export default function Settings() {
     }
   }
 
+
+  async function refreshPush() {
+    setPushBusy(true)
+    setPushMessage('')
+    setPushError('')
+    try {
+      const setup = await refreshBackgroundReminders()
+      const local = await refreshPushStatus()
+      const server = setup.serverStatus || await checkServerPushStatus().catch(() => null)
+      setDiagnosticFromParts({ local, server, setup })
+      if (!setup.ok) {
+        setPushError(describePushProblem(setup.problem || setup.status, lang))
+        return
+      }
+      setPushMessage(c.pushRefreshed)
+    } catch (err) {
+      const local = await refreshPushStatus().catch(() => null)
+      setDiagnosticFromParts({ local, errorCode: err.code, errorMessage: err.message })
+      setPushError(c.pushSetupError)
+    } finally {
+      setPushBusy(false)
+    }
+  }
+
   async function checkStatus() {
     setPushBusy(true)
     setPushMessage('')
@@ -215,6 +273,33 @@ export default function Settings() {
       setPushError(c.pushSetupError)
     } finally {
       setPushBusy(false)
+    }
+  }
+
+
+  async function deleteAccount() {
+    if (deleteConfirm !== 'DELETE') return
+    setDeleteBusy(true)
+    setDeleteError('')
+    try {
+      const { data } = await supabase.auth.getSession()
+      const token = data?.session?.access_token
+      const res = await fetch('/api/account/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ confirm: 'DELETE' }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json.error || 'Unable to delete account')
+      await signOut?.()
+      window.location.assign('/')
+    } catch (err) {
+      setDeleteError(err.message || c.deleteError)
+    } finally {
+      setDeleteBusy(false)
     }
   }
 
@@ -312,7 +397,8 @@ export default function Settings() {
             <button className="btn-secondary" onClick={disablePush} disabled={pushBusy}>{c.disablePush}</button>
           )}
           <button className="btn-secondary" onClick={testPush} disabled={pushBusy || !push.supported}><Send className="w-4 h-4" /> {c.testPush}</button>
-          <button className="btn-secondary sm:col-span-2" onClick={checkStatus} disabled={pushBusy || !push.supported}><RefreshCw className="w-4 h-4" /> {c.checkStatus}</button>
+          <button className="btn-secondary" onClick={refreshPush} disabled={pushBusy || !push.supported}><RefreshCw className="w-4 h-4" /> {c.refreshPush}</button>
+          <button className="btn-secondary" onClick={checkStatus} disabled={pushBusy || !push.supported}><RefreshCw className="w-4 h-4" /> {c.checkStatus}</button>
         </div>
 
         {pushMessage && <p className="mt-4 text-sm font-semibold text-emerald-700">{pushMessage}</p>}
@@ -320,9 +406,50 @@ export default function Settings() {
         <PushDiagnostics c={c} diagnostics={diagnostics} lastChecked={lastChecked} />
       </section>
 
+
+      <section className="mt-5 card p-5 max-w-3xl border-brand-100 bg-brand-50/40">
+        <div className="flex items-start gap-3">
+          <span className="h-10 w-10 rounded-2xl bg-white text-brand-700 grid place-items-center shadow-soft shrink-0"><Sparkles className="w-5 h-5" /></span>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="font-extrabold text-ink-900">{c.premiumTitle}</h2>
+              <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-brand-700 border border-brand-100">{c.premiumBadge}</span>
+            </div>
+            <p className="mt-1 text-sm text-ink-600">{c.premiumSub}</p>
+            <ul className="mt-3 space-y-1 text-sm text-ink-600">
+              <li>{c.freePlan}</li>
+              <li>{c.plusPlan}</li>
+              <li>{c.proPlan}</li>
+            </ul>
+            <a href="/pricing" className="btn-secondary mt-4 inline-flex"><Crown className="w-4 h-4" /> {c.viewPlans}</a>
+          </div>
+        </div>
+      </section>
+
+
+
+      <section className="mt-5 card p-5 max-w-3xl border-rose-100 bg-rose-50/40">
+        <div className="flex items-start gap-3">
+          <span className="h-10 w-10 rounded-2xl bg-white text-rose-700 grid place-items-center shadow-soft shrink-0"><Trash2 className="w-5 h-5" /></span>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-extrabold text-ink-900">{c.dangerTitle}</h2>
+            <p className="mt-1 text-sm text-ink-600">{c.dangerSub}</p>
+            <label className="block mt-4">
+              <span className="label">{c.deleteLabel}</span>
+              <input className="input" value={deleteConfirm} onChange={(event) => setDeleteConfirm(event.target.value)} placeholder="DELETE" />
+            </label>
+            {deleteError && <p className="mt-3 text-sm font-semibold text-rose-700">{deleteError}</p>}
+            <button className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-bold text-white shadow-soft hover:bg-rose-700 disabled:opacity-50" onClick={deleteAccount} disabled={deleteBusy || deleteConfirm !== 'DELETE'}>
+              <Trash2 className="w-4 h-4" /> {deleteBusy ? c.deleting : c.deleteButton}
+            </button>
+          </div>
+        </div>
+      </section>
+
       <section className="mt-5 card p-5 max-w-3xl">
         <h2 className="font-bold text-ink-900 flex items-center gap-2"><Shield className="w-5 h-5 text-brand-600" /> {c.quickLinks}</h2>
         <div className="mt-4 grid sm:grid-cols-3 gap-3">
+          <a className="btn-secondary justify-start" href="/pricing"><Crown className="w-4 h-4" /> {c.viewPlans}</a>
           <a className="btn-secondary justify-start" href="/feedback"><MessageSquareHeart className="w-4 h-4" /> {c.feedback}</a>
           <a className="btn-secondary justify-start" href="/privacy"><Shield className="w-4 h-4" /> {c.privacy}</a>
           <a className="btn-secondary justify-start" href="/terms"><FileText className="w-4 h-4" /> {c.terms}</a>

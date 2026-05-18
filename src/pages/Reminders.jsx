@@ -1,20 +1,23 @@
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Bell, CheckCircle2, Circle, Plus, Trash2, Inbox } from 'lucide-react'
 import Modal from '../components/Modal.jsx'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import {
-  CATEGORIES, todayISO, parseNaturalReminder,
+  CATEGORIES, todayISO, isSameDay, parseLocalDateOnly,
   categoryLabel, repeatLabel,
 } from '../lib/lifeStore.js'
 import { remindersDb, useRemoteCollection } from '../lib/db.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
+import { parseSmartReminder } from '../lib/smartAssistantLite.js'
 
 const copy = {
   vi: {
     title: 'Nhắc việc',
     sub: 'Việc một lần, việc lặp lại, nhắc hóa đơn và nhắc cho gia đình — gom chung một chỗ.',
     active: 'Đang cần nhớ',
+    todayFilter: 'Việc hôm nay',
     done: 'Đã xong gần đây',
     new: 'Tạo mới',
     emptyActiveTitle: 'Chưa có việc nào',
@@ -38,6 +41,7 @@ const copy = {
     title: 'Reminders',
     sub: 'One-time tasks, recurring tasks, bill reminders, and family nudges — all in one place.',
     active: 'Active',
+    todayFilter: 'Today',
     done: 'Done recently',
     new: 'New',
     emptyActiveTitle: 'Nothing here yet',
@@ -64,8 +68,17 @@ export default function Reminders() {
   const c = copy[lang]
   const { user } = useAuth()
   const [items, api, state] = useRemoteCollection(user?.id, remindersDb)
+  const [searchParams] = useSearchParams()
   const [open, setOpen] = useState(false)
   const active = useMemo(() => items.filter((x) => !x.done), [items])
+  const activeShown = useMemo(() => {
+    if (searchParams.get('filter') !== 'today') return active
+    const today = new Date()
+    return active.filter((x) => {
+      const date = parseLocalDateOnly(x.date)
+      return isSameDay(x.date, today) || (date && date < new Date(today.getFullYear(), today.getMonth(), today.getDate()))
+    })
+  }, [active, searchParams])
   const done = useMemo(() => items.filter((x) => x.done).slice(0, 20), [items])
 
   return (
@@ -84,7 +97,7 @@ export default function Reminders() {
 
       {state.error && <p className="mt-4 text-sm text-rose-600">{state.error}</p>}
       <section className="mt-5 grid lg:grid-cols-2 gap-4">
-        <ReminderCard title={c.active} items={active} api={api} emptyTitle={c.emptyActiveTitle} empty={state.loading ? c.loading : c.emptyActive} onAdd={() => setOpen(true)} addLabel={c.new} c={c} lang={lang} />
+        <ReminderCard title={searchParams.get('filter') === 'today' ? c.todayFilter : c.active} items={activeShown} api={api} emptyTitle={c.emptyActiveTitle} empty={state.loading ? c.loading : c.emptyActive} onAdd={() => setOpen(true)} addLabel={c.new} c={c} lang={lang} />
         <ReminderCard title={c.done} items={done} api={api} empty={c.emptyDone} done c={c} lang={lang} />
       </section>
 
@@ -171,7 +184,7 @@ function ReminderCard({ title, items, api, emptyTitle, empty, done, onAdd, addLa
 function ReminderModal({ open, onClose, onSave, c, lang }) {
   const [quick, setQuick] = useState('')
   const [form, setForm] = useState({ title: '', date: todayISO(), time: '', category: 'personal', repeat: 'none', notes: '' })
-  const applyQuick = () => setForm({ ...form, ...parseNaturalReminder(quick) })
+  const applyQuick = () => setForm({ ...form, ...parseSmartReminder(quick) })
   const save = () => {
     const item = { ...form, done: false }
     if (!item.title) return

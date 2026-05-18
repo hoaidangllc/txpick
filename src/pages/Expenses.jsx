@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Plus, Receipt, Trash2, Wallet } from 'lucide-react'
 import Modal from '../components/Modal.jsx'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
@@ -17,6 +18,7 @@ const copy = {
     sub: 'Ghi tay một dòng cho mỗi khoản — nhẹ, nhanh và dễ dùng mỗi ngày.',
     add: 'Thêm', thisMonth: 'Tháng này', business: 'Kinh doanh', personal: 'Cá nhân / khác',
     list: 'Danh sách chi tiêu',
+    monthList: 'Chi tiêu tháng này',
     emptyTitle: 'Chưa có chi tiêu nào',
     empty: 'Ghi khoản đầu tiên để app tổng kết tháng giúp bạn.',
     modal: 'Thêm chi tiêu', close: 'Đóng', save: 'Lưu',
@@ -29,6 +31,7 @@ const copy = {
     sub: 'One line per expense — light, quick, and easy to keep up with every day.',
     add: 'Add', thisMonth: 'This month', business: 'Business', personal: 'Personal / Other',
     list: 'Expense list',
+    monthList: 'This month expenses',
     emptyTitle: 'No expenses yet',
     empty: 'Log your first expense and the app will total the month for you.',
     modal: 'Add expense', close: 'Cancel', save: 'Save',
@@ -43,6 +46,7 @@ export default function Expenses() {
   const c = copy[lang]
   const { user } = useAuth()
   const [items, api, state] = useRemoteCollection(user?.id, expensesDb)
+  const [searchParams] = useSearchParams()
   const [open, setOpen] = useState(false)
   const [confirm, setConfirm] = useState(null)
 
@@ -53,6 +57,7 @@ export default function Expenses() {
   }
   const monthItems = useMemo(() => items.filter((x) => isCurrentMonth(x.date)), [items])
   const total = monthItems.reduce((s, e) => s + Number(e.amount || 0), 0)
+  const visibleItems = searchParams.get('month') === 'current' ? monthItems : items
   const business = monthItems.filter((e) => ['business', 'salon', 'supply'].includes(e.category)).reduce((s, e) => s + Number(e.amount || 0), 0)
 
   return (
@@ -76,16 +81,16 @@ export default function Expenses() {
       </section>
 
       <div className="mt-5 card p-5">
-        <h2 className="font-bold text-ink-900">{c.list}</h2>
+        <h2 className="font-bold text-ink-900">{searchParams.get('month') === 'current' ? c.monthList : c.list}</h2>
         {state.loading ? (
           <p className="py-10 text-center text-sm text-ink-400">{c.loading}</p>
         ) : state.error ? (
           <p className="py-10 text-center text-sm text-rose-600">{state.error}</p>
-        ) : items.length === 0 ? (
+        ) : visibleItems.length === 0 ? (
           <EmptyExpenses c={c} onAdd={() => setOpen(true)} />
         ) : (
           <ul className="mt-3 divide-y divide-ink-100">
-            {items.map((e) => (
+            {visibleItems.map((e) => (
               <li key={e.id} className="py-3 flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <p className="font-semibold text-ink-900 truncate">{e.title}</p>

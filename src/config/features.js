@@ -1,5 +1,5 @@
 export const FEATURES = {
-  premium: false,
+  premium: true,
   aiAssistant: false,
   voiceAssistant: false,
   feedback: true,
