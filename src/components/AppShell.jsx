@@ -16,6 +16,7 @@ import {
 import Modal from './Modal.jsx'
 import Logo from './Logo.jsx'
 import LanguageToggle from './LanguageToggle.jsx'
+import PWAInstallBanner from './pwa/PWAInstallBanner.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { FEATURES } from '../config/features.js'
@@ -130,6 +131,9 @@ export default function AppShell() {
       </header>
 
       <main className="flex-1 pb-32 lg:pb-10">
+        <div className="container-app pt-4">
+          <PWAInstallBanner compact />
+        </div>
         <Outlet />
       </main>
 

@@ -6,6 +6,7 @@ import {
 import Logo from '../components/Logo.jsx'
 import LanguageToggle from '../components/LanguageToggle.jsx'
 import Footer from '../components/Footer.jsx'
+import PWAInstallBanner from '../components/pwa/PWAInstallBanner.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
 
 const copy = {
@@ -147,6 +148,9 @@ export default function Landing() {
             <p className="mt-4 text-sm text-ink-400 max-w-2xl mx-auto">
               {c.trustLine}
             </p>
+            <div className="mt-6 max-w-2xl mx-auto text-left">
+              <PWAInstallBanner compact />
+            </div>
           </div>
           <HeroMock c={c} />
         </div>
