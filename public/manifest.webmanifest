@@ -1,7 +1,7 @@
 {
   "name": "TXPick",
   "short_name": "TXPick",
-  "description": "Simple reminder, bill, payroll, expense, and daily life app.",
+  "description": "Daily organizer for reminders, bills, expenses, payroll, and small business tasks.",
   "id": "/",
   "start_url": "/today",
   "scope": "/",
