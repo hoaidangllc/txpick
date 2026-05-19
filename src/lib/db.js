@@ -36,6 +36,27 @@ export function buildDueDateFromDay(dueDay) {
   return toISODate(d)
 }
 
+// For repeating reminders: when a user marks the current occurrence done,
+// bump due_at to the next occurrence instead of marking it permanently complete.
+// This keeps daily/weekly/monthly reminders firing in future periods.
+function computeNextOccurrence(currentISO, pattern) {
+  if (!currentISO || !pattern || pattern === 'none') return null
+  const current = new Date(currentISO)
+  if (Number.isNaN(current.getTime())) return null
+  const now = new Date()
+  const next = new Date(current)
+  // Step forward at least once and keep stepping until the next occurrence is in the future.
+  let safety = 0
+  do {
+    if (pattern === 'daily') next.setDate(next.getDate() + 1)
+    else if (pattern === 'weekly') next.setDate(next.getDate() + 7)
+    else if (pattern === 'monthly') next.setMonth(next.getMonth() + 1)
+    else return null
+    safety += 1
+  } while (next <= now && safety < 1200)
+  return next.toISOString()
+}
+
 export function normalizeReminder(row) {
   return {
     ...row,
@@ -57,13 +78,36 @@ export function normalizeExpense(row) {
 }
 
 export function normalizeBill(row) {
-  const dueDate = toISODate(row.due_date)
-  const dueDay = dueDate ? new Date(`${dueDate}T00:00:00`).getDate() : 1
+  // Source of truth for monthly bills is "dueDay" (day-of-month 1..31).
+  // The stored due_date is the original creation period; on every read we
+  // re-compute the active due date so the bill rolls into the current month
+  // automatically without a cron job. Paid status is also period-aware:
+  // the bill is considered paid for THIS month only if paid_at falls in the
+  // current month/year — next month it auto-resets to unpaid.
+  const storedDueISO = toISODate(row.due_date)
+  const dueDay = storedDueISO ? new Date(`${storedDueISO}T00:00:00`).getDate() : 1
+
+  const now = new Date()
+  const lastDayThisMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+  const clampedDay = Math.min(Math.max(dueDay, 1), lastDayThisMonth)
+  const periodDue = new Date(now.getFullYear(), now.getMonth(), clampedDay)
+  const dueDate = toISODate(periodDue)
+
+  let paidThisPeriod = false
+  if (row.paid && row.paid_at) {
+    const paidAt = new Date(row.paid_at)
+    if (!Number.isNaN(paidAt.getTime())) {
+      paidThisPeriod = paidAt.getFullYear() === now.getFullYear()
+        && paidAt.getMonth() === now.getMonth()
+    }
+  }
+
   return {
     ...row,
     name: row.title,
     dueDay,
     dueDate,
+    paid: paidThisPeriod,
   }
 }
 
@@ -121,6 +165,39 @@ export const remindersDb = {
   },
   async update(userId, id, patch) {
     requireUserId(userId)
+
+    // Special case: marking a repeating reminder done should bump it to the next
+    // occurrence rather than ending the series. This keeps daily/weekly/monthly
+    // reminders firing on subsequent periods.
+    const markingDone = (patch.done === true) || (patch.completed === true)
+    if (markingDone) {
+      const { data: existing } = await supabase
+        .from('reminders')
+        .select('due_at, repeat_pattern')
+        .eq('id', id)
+        .eq('profile_id', userId)
+        .maybeSingle()
+      const pattern = existing?.repeat_pattern || 'none'
+      if (pattern !== 'none') {
+        const nextDue = computeNextOccurrence(existing.due_at, pattern)
+        if (nextDue) {
+          const { data, error } = await supabase
+            .from('reminders')
+            .update({
+              due_at: nextDue,
+              completed: false,
+              completed_at: null,
+            })
+            .eq('id', id)
+            .eq('profile_id', userId)
+            .select('*')
+            .single()
+          if (error) throw error
+          return normalizeReminder(data)
+        }
+      }
+    }
+
     const payload = {}
     if ('title' in patch) payload.title = patch.title
     if ('notes' in patch) payload.notes = patch.notes || ''
