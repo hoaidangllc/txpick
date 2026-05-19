@@ -309,14 +309,14 @@ export async function enableBackgroundReminders() {
   steps.push({ key: 'browser_subscription', ok: Boolean(subscription), endpointStart: subscription?.endpoint?.slice(0, 80) || '', message: 'Browser subscription created on this device.' })
 
   const result = await postJson('/api/push/subscribe', { subscription })
-  steps.push({ key: 'supabase_subscription', ok: Boolean(result?.ok), message: result?.ok ? 'Subscription saved to Supabase.' : 'Subscription was not saved to Supabase.' })
+  steps.push({ key: 'phone_saved', ok: Boolean(result?.ok), message: result?.ok ? 'This phone is saved for reminders.' : 'Could not save this phone for reminders.' })
 
   let serverStatus = null
   try {
     serverStatus = await checkServerPushStatus()
-    steps.push({ key: 'server_verify', ok: serverStatus?.enabled > 0, message: serverStatus?.enabled > 0 ? 'Supabase has an active subscription for this account.' : 'Supabase still has no active subscription for this account.' })
+    steps.push({ key: 'server_verify', ok: serverStatus?.enabled > 0, message: serverStatus?.enabled > 0 ? 'Reminders are ready to be sent to this account.' : 'No phone is registered for reminders yet.' })
   } catch (err) {
-    steps.push({ key: 'server_verify', ok: false, message: err.message || 'Could not verify server subscription.' })
+    steps.push({ key: 'server_verify', ok: false, message: err.message || 'Could not verify reminder setup.' })
   }
 
   try { localStorage.setItem(PUSH_STATUS_KEY, JSON.stringify({ enabledAt: new Date().toISOString() })) } catch {}

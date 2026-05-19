@@ -20,7 +20,7 @@ export const supabase = SUPABASE_CONFIGURED
   : createUnconfiguredClient()
 
 function createUnconfiguredClient() {
-  const notReady = async () => ({ data: null, error: new Error('Supabase is not configured.') })
+  const notReady = async () => ({ data: null, error: new Error('TXPick is not configured yet. Please contact support.') })
   return {
     auth: {
       getSession: async () => ({ data: { session: null }, error: null }),
@@ -41,7 +41,7 @@ function createUnconfiguredClient() {
         order: () => chain,
         maybeSingle: notReady,
         single: notReady,
-        then: (resolve) => resolve({ data: [], error: new Error('Supabase is not configured.') }),
+        then: (resolve) => resolve({ data: [], error: new Error('TXPick is not configured yet. Please contact support.') }),
       }
       return chain
     },

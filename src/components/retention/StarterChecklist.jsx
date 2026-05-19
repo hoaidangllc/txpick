@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 const copy = {
   vi: {
     title: 'Bắt đầu trong 30 giây',
-    sub: 'Public beta nên dễ hiểu ngay. Thêm 1 việc, 1 hóa đơn hoặc 1 chi tiêu để TXPick bắt đầu giúp bạn mỗi ngày.',
+    sub: 'Thêm 1 việc, 1 hóa đơn hoặc 1 chi tiêu để TXPick bắt đầu giúp bạn mỗi ngày.',
     reminder: 'Tạo nhắc việc đầu tiên',
     bill: 'Thêm hóa đơn sắp tới',
     expense: 'Ghi chi tiêu đầu tiên',
@@ -12,7 +12,7 @@ const copy = {
   },
   en: {
     title: 'Start in 30 seconds',
-    sub: 'Public beta should make sense immediately. Add one reminder, bill, or expense so TXPick can start helping daily.',
+    sub: 'Add one reminder, bill, or expense so TXPick can start helping every day.',
     reminder: 'Create first reminder',
     bill: 'Add upcoming bill',
     expense: 'Log first expense',

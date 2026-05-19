@@ -39,7 +39,7 @@ export default function Login() {
   const handleGoogle = async () => {
     setError('')
     if (!SUPABASE_CONFIGURED) {
-      // Mock mode: just create a session and continue.
+      // Fallback when backend env is not configured.
       await supabase.auth.signInWithOAuth({ provider: 'google' })
       return redirectAfterLogin()
     }
