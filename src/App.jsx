@@ -21,6 +21,7 @@ const AdminFeedback = lazy(() => import('./pages/AdminFeedback.jsx'))
 const BusinessHome = lazy(() => import('./pages/BusinessHome.jsx'))
 const TaxCenter = lazy(() => import('./pages/TaxCenter.jsx'))
 const Settings = lazy(() => import('./pages/Settings.jsx'))
+const ProfitSplit = lazy(() => import('./pages/ProfitSplit.jsx'))
 const Privacy = lazy(() => import('./pages/Privacy.jsx'))
 const Terms = lazy(() => import('./pages/Terms.jsx'))
 
@@ -48,6 +49,7 @@ export default function App() {
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/admin/feedback" element={<AdminFeedback />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/profit-split" element={<ProfitSplit />} />
           <Route path="/ai" element={<Navigate to="/smart" replace />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

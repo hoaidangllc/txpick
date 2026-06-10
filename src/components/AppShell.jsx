@@ -12,6 +12,7 @@ import {
   Settings,
   UserRound,
   Plus,
+  Percent,
 } from 'lucide-react'
 import Modal from './Modal.jsx'
 import Logo from './Logo.jsx'
@@ -33,6 +34,7 @@ const personalNav = [
 const businessNav = [
   { to: '/business', icon: BriefcaseBusiness, en: 'Business', vi: 'Kinh doanh' },
   { to: '/tax', icon: FileText, en: '1099 / W-2', vi: '1099 / W-2' },
+  { to: '/profit-split', icon: Percent, en: 'Split', vi: 'Lợi Nhuận' },
   { to: '/reminders', icon: Bell, en: 'Reminders', vi: 'Nhắc việc' },
   { to: '/summary', icon: Receipt, en: 'Reports', vi: 'Tổng kết' },
 ]
