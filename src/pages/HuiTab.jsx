@@ -252,16 +252,56 @@ function DashboardPanel({ group, rounds, members, h }) {
           </div>
         </div>
       )}
+
+      {/* Member payment status table */}
+      {members.length > 0 && (
+        <div className="bg-white rounded-xl border border-ink-100 overflow-hidden">
+          <div className="px-3 py-2 bg-ink-50 border-b border-ink-100">
+            <span className="text-xs font-bold text-ink-600">{h.memberDebtSummary} · {h.completedRounds}: {currentRound}</span>
+          </div>
+          <div className="divide-y divide-ink-50">
+            {members.filter(m => m.active).map(m => {
+              const paid    = Number(m.paid_rounds_count || 0)
+              const owed    = Number(m.owed_rounds_count || 0)
+              const prevD   = Number(m.previous_debt || 0)
+              const amtPer  = Number(group.amount_per_member || 0)
+              const dueSoFar  = currentRound * amtPer
+              const paidAmt   = paid * amtPer
+              const totalDebt = dueSoFar - paidAmt + prevD
+              const debtColor = totalDebt > 0 ? 'text-red-600' : 'text-green-600'
+              return (
+                <div key={m.id} className="px-3 py-2 flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-sm font-medium text-ink-800">{m.name}</span>
+                      {m.has_received_payout && <span className="text-[10px] bg-green-50 text-green-700 rounded px-1 font-semibold">✓ hốt kỳ {m.payout_round}</span>}
+                    </div>
+                    <div className="text-xs text-ink-400 mt-0.5">
+                      {h.paidRoundsCount}: {paid} · {h.owedRoundsCount}: {owed}
+                      {prevD > 0 && ` · ${h.previousDebt}: ${fmtN(prevD)}`}
+                    </div>
+                  </div>
+                  <div className={`text-sm font-bold font-mono shrink-0 ${debtColor}`}>
+                    {totalDebt > 0 ? `-${fmtN(totalDebt)}` : totalDebt < 0 ? `+${fmtN(Math.abs(totalDebt))}` : '✓'}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
 // ── Members Panel ─────────────────────────────────────────────────────────────
 
-function MembersPanel({ userId, group, members, onRefresh, h, common }) {
+const EMPTY_MEMBER = { name: '', phone: '', note: '', active: true, has_received_payout: false, payout_round: '', payout_date: '', paid_rounds_count: '', owed_rounds_count: '', previous_debt: '' }
+
+function MembersPanel({ userId, group, members, rounds, onRefresh, h, common }) {
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
-  const [form, setForm] = useState({ name: '', phone: '', note: '', active: true, has_received_payout: false, payout_round: '', payout_date: '' })
+  const [form, setForm] = useState({ ...EMPTY_MEMBER })
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
@@ -272,19 +312,37 @@ function MembersPanel({ userId, group, members, onRefresh, h, common }) {
       group_id: group.id,
       payout_round: form.payout_round ? parseInt(form.payout_round) : null,
       payout_date: form.payout_date || null,
+      paid_rounds_count: parseFloat(form.paid_rounds_count) || 0,
+      owed_rounds_count: parseFloat(form.owed_rounds_count) || 0,
+      previous_debt: parseFloat(form.previous_debt) || 0,
     }
     await upsertHuiMember(userId, editing ? { ...payload, id: editing.id } : payload)
     setShowForm(false); setEditing(null)
-    setForm({ name: '', phone: '', note: '', active: true, has_received_payout: false, payout_round: '', payout_date: '' })
+    setForm({ ...EMPTY_MEMBER })
     onRefresh()
   }
 
   const startEdit = (m) => {
     setEditing(m)
-    setForm({ name: m.name, phone: m.phone || '', note: m.note || '', active: m.active,
-      has_received_payout: m.has_received_payout, payout_round: m.payout_round || '', payout_date: m.payout_date || '' })
+    setForm({
+      name: m.name, phone: m.phone || '', note: m.note || '', active: m.active,
+      has_received_payout: m.has_received_payout, payout_round: m.payout_round || '', payout_date: m.payout_date || '',
+      paid_rounds_count: m.paid_rounds_count ?? '', owed_rounds_count: m.owed_rounds_count ?? '', previous_debt: m.previous_debt ?? '',
+    })
     setShowForm(false)
   }
+
+  // Quick actions — bump paid or owed count directly on member
+  const quickPaid = async (m) => {
+    await upsertHuiMember(userId, { ...m, group_id: group.id, paid_rounds_count: Number(m.paid_rounds_count || 0) + 1 })
+    onRefresh()
+  }
+  const quickOwed = async (m) => {
+    await upsertHuiMember(userId, { ...m, group_id: group.id, owed_rounds_count: Number(m.owed_rounds_count || 0) + 1 })
+    onRefresh()
+  }
+
+  const completedRounds = rounds.length
 
   const handleDelete = async (id) => {
     if (!window.confirm(h.confirmDelete)) return
@@ -336,6 +394,23 @@ function MembersPanel({ userId, group, members, onRefresh, h, common }) {
                 </div>
               </>
             )}
+            {/* Import existing status */}
+            <div className="sm:col-span-2 pt-1 border-t border-ink-100">
+              <div className="text-xs font-bold text-ink-600 mb-2">{h.importStatus}</div>
+              <div className="text-xs text-ink-400 mb-2">{h.importStatusSub}</div>
+            </div>
+            <div>
+              <label className="label-sm">{h.paidRoundsCount}</label>
+              <input className="input-field" type="number" step="0.5" value={form.paid_rounds_count} onChange={e => set('paid_rounds_count', e.target.value)} placeholder="0" />
+            </div>
+            <div>
+              <label className="label-sm">{h.owedRoundsCount}</label>
+              <input className="input-field" type="number" step="0.5" value={form.owed_rounds_count} onChange={e => set('owed_rounds_count', e.target.value)} placeholder="0" />
+            </div>
+            <div>
+              <label className="label-sm">{h.previousDebt}</label>
+              <input className="input-field" type="number" value={form.previous_debt} onChange={e => set('previous_debt', e.target.value)} placeholder="0" />
+            </div>
           </div>
           <div className="flex gap-2">
             <button className="btn-primary text-sm" onClick={handleSave}>{common.save}</button>
@@ -348,30 +423,56 @@ function MembersPanel({ userId, group, members, onRefresh, h, common }) {
         <p className="text-sm text-ink-400 py-4 text-center">{h.noMembers}</p>
       ) : (
         <div className="space-y-2">
-          {members.map(m => (
-            <div key={m.id} className="bg-white rounded-xl border border-ink-100 px-4 py-3 flex items-center justify-between gap-2">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium text-ink-800 text-sm">{m.name}</span>
-                  {m.has_received_payout && (
-                    <span className="text-[10px] bg-green-50 text-green-700 rounded px-1.5 py-0.5 font-semibold">
-                      ✓ {h.hasReceivedPayout} {m.payout_round ? `kỳ ${m.payout_round}` : ''}
-                    </span>
-                  )}
-                  {!m.active && <span className="text-[10px] bg-ink-100 text-ink-400 rounded px-1.5">off</span>}
-                </div>
-                {(m.phone || m.note) && (
-                  <div className="text-xs text-ink-400 mt-0.5">
-                    {m.phone}{m.phone && m.note ? ' · ' : ''}{m.note}
+          {members.map(m => {
+            const paid   = Number(m.paid_rounds_count || 0)
+            const owed   = Number(m.owed_rounds_count || 0)
+            const prevD  = Number(m.previous_debt || 0)
+            const amtPer = Number(group.amount_per_member || 0)
+            const dueSoFar = completedRounds * amtPer
+            const paidAmt  = paid * amtPer
+            const totalDebt = dueSoFar - paidAmt + prevD
+            return (
+              <div key={m.id} className="bg-white rounded-xl border border-ink-100 p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-medium text-ink-800 text-sm">{m.name}</span>
+                      {m.has_received_payout && (
+                        <span className="text-[10px] bg-green-50 text-green-700 rounded px-1.5 py-0.5 font-semibold">
+                          ✓ {h.hasReceivedPayout}{m.payout_round ? ` kỳ ${m.payout_round}` : ''}
+                        </span>
+                      )}
+                      {!m.active && <span className="text-[10px] bg-ink-100 text-ink-400 rounded px-1.5">off</span>}
+                    </div>
+                    {/* Debt summary row */}
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-xs">
+                      <span className="text-green-700">{h.paidRoundsCount}: <b>{paid}</b></span>
+                      {owed > 0 && <span className="text-red-500">{h.owedRoundsCount}: <b>{owed}</b></span>}
+                      {prevD > 0 && <span className="text-amber-600">{h.previousDebt}: <b>{fmtN(prevD)}</b></span>}
+                      {totalDebt > 0 && <span className="text-red-600 font-semibold">{h.totalDebt}: {fmtN(totalDebt)}</span>}
+                      {totalDebt <= 0 && completedRounds > 0 && <span className="text-green-600 font-semibold">✓ {h.payStatusPaid}</span>}
+                    </div>
+                    {(m.phone || m.note) && (
+                      <div className="text-xs text-ink-400 mt-0.5">{m.phone}{m.phone && m.note ? ' · ' : ''}{m.note}</div>
+                    )}
                   </div>
-                )}
+                  <div className="flex gap-1 shrink-0">
+                    <button className="p-1.5 rounded hover:bg-ink-100 text-ink-400" onClick={() => startEdit(m)}><Pencil className="w-3.5 h-3.5" /></button>
+                    <button className="p-1.5 rounded hover:bg-red-50 text-red-400" onClick={() => handleDelete(m.id)}><Trash2 className="w-3.5 h-3.5" /></button>
+                  </div>
+                </div>
+                {/* Quick actions */}
+                <div className="flex gap-1.5 mt-2 pt-2 border-t border-ink-50">
+                  <button onClick={() => quickPaid(m)} className="text-[11px] bg-green-50 hover:bg-green-100 text-green-700 font-semibold rounded px-2 py-1 transition">
+                    {h.markPaidCurrentRound}
+                  </button>
+                  <button onClick={() => quickOwed(m)} className="text-[11px] bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded px-2 py-1 transition">
+                    {h.markOwedCurrentRound}
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-1 shrink-0">
-                <button className="p-1.5 rounded hover:bg-ink-100 text-ink-400" onClick={() => startEdit(m)}><Pencil className="w-3.5 h-3.5" /></button>
-                <button className="p-1.5 rounded hover:bg-red-50 text-red-400" onClick={() => handleDelete(m.id)}><Trash2 className="w-3.5 h-3.5" /></button>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
@@ -754,7 +855,7 @@ function GroupDetail({ userId, group, onBack, h, common }) {
       {loading ? <div className="text-sm text-ink-400 py-8 text-center">…</div> : (
         <>
           {subTab === 'dashboard' && <DashboardPanel group={group} rounds={rounds} members={members} h={h} />}
-          {subTab === 'members'   && <MembersPanel userId={userId} group={group} members={members} onRefresh={load} h={h} common={common} />}
+          {subTab === 'members'   && <MembersPanel userId={userId} group={group} members={members} rounds={rounds} onRefresh={load} h={h} common={common} />}
           {subTab === 'rounds'    && <RoundsPanel  userId={userId} group={group} members={members} rounds={rounds} onRefresh={load} h={h} common={common} />}
           {subTab === 'payments'  && <PaymentsPanel userId={userId} group={group} members={members} rounds={rounds} h={h} common={common} />}
         </>
