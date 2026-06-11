@@ -28,13 +28,17 @@ function fmt(value, currencyCode) {
 }
 
 function calcProfit({ quantity, base_rate, selling_rate, partner_percent, commission_percent }) {
-  const q = parseFloat(quantity) || 0
-  const gross = q * (parseFloat(selling_rate) || 0)
-  const base_cost = q * (parseFloat(base_rate) || 0)
-  const partner_share = gross * (parseFloat(partner_percent) || 0) / 100
-  const commission_share = gross * (parseFloat(commission_percent) || 0) / 100
-  const net_profit = gross - base_cost - partner_share - commission_share
-  return { gross, base_cost, partner_share, commission_share, net_profit }
+  const q    = parseFloat(quantity) || 0
+  const pp   = parseFloat(partner_percent) || 0
+  const cp   = parseFloat(commission_percent) || 0
+  const gross           = q * (parseFloat(selling_rate) || 0)
+  const partner_share   = gross * pp / 100
+  const commission_share = gross * cp / 100
+  const my_share_percent = 100 - pp - cp
+  const my_gross_share  = gross * my_share_percent / 100
+  const base_cost       = q * (parseFloat(base_rate) || 0)
+  const net_profit      = my_gross_share - base_cost
+  return { gross, partner_share, commission_share, my_share_percent, my_gross_share, base_cost, net_profit }
 }
 
 const EMPTY_PROFILE = { name: '', base_rate: '', selling_rate: '', partner_percent: '', commission_percent: '', active: true }
@@ -296,11 +300,12 @@ function CalculatorTab({ profiles, userId, onHistoryChange, ps, common }) {
             <span className="text-xs font-bold text-ink-500 uppercase tracking-wide">{ps.quantity}: {parseFloat(quantity).toLocaleString()}</span>
           </div>
           {[
-            { label: ps.gross,         value: result.gross,            bold: false },
-            { label: ps.baseCost,      value: result.base_cost,        bold: false },
-            { label: ps.partnerShare,  value: result.partner_share,    bold: false },
-            { label: ps.commission,    value: result.commission_share,  bold: false },
-            { label: ps.netProfit,     value: result.net_profit,        bold: true  },
+            { label: ps.gross,          value: result.gross,             bold: false, pct: null },
+            { label: ps.partnerShare,   value: result.partner_share,     bold: false, pct: null },
+            { label: ps.commission,     value: result.commission_share,  bold: false, pct: null },
+            { label: `${ps.myGrossShare} (${result.my_share_percent}%)`, value: result.my_gross_share, bold: false, pct: null },
+            { label: ps.baseCost,       value: result.base_cost,         bold: false, pct: null },
+            { label: ps.netProfit,      value: result.net_profit,        bold: true,  pct: null },
           ].map(({ label, value, bold }) => (
             <div key={label} className={`flex justify-between items-center px-4 py-2.5 ${bold ? 'bg-brand-50 border-t border-brand-100' : 'border-b border-ink-50'}`}>
               <span className={`text-sm ${bold ? 'font-bold text-brand-700' : 'text-ink-600'}`}>{label}</span>
@@ -337,12 +342,13 @@ function HistoryTab({ profiles, history, loading, onRefresh, ps }) {
   })
 
   const totals = filtered.reduce((acc, h) => ({
-    gross:      acc.gross      + Number(h.gross_revenue),
-    base_cost:  acc.base_cost  + Number(h.base_cost),
-    partner:    acc.partner    + Number(h.partner_share),
-    commission: acc.commission + Number(h.commission_share),
-    net:        acc.net        + Number(h.net_profit),
-  }), { gross: 0, base_cost: 0, partner: 0, commission: 0, net: 0 })
+    gross:          acc.gross          + Number(h.gross_revenue),
+    partner:        acc.partner        + Number(h.partner_share),
+    commission:     acc.commission     + Number(h.commission_share),
+    my_gross_share: acc.my_gross_share + Number(h.my_gross_share || 0),
+    base_cost:      acc.base_cost      + Number(h.base_cost),
+    net:            acc.net            + Number(h.net_profit),
+  }), { gross: 0, partner: 0, commission: 0, my_gross_share: 0, base_cost: 0, net: 0 })
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete?')) return
@@ -394,9 +400,10 @@ function HistoryTab({ profiles, history, loading, onRefresh, ps }) {
                   </div>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
                     <div className="flex justify-between"><span className="text-ink-400">{ps.gross}</span><span className="font-mono text-ink-700">{sym}{fmt(h.gross_revenue, h.currency)}</span></div>
-                    <div className="flex justify-between"><span className="text-ink-400">{ps.baseCost}</span><span className="font-mono text-ink-600">{sym}{fmt(h.base_cost, h.currency)}</span></div>
                     <div className="flex justify-between"><span className="text-ink-400">{ps.partnerShare}</span><span className="font-mono text-ink-600">{sym}{fmt(h.partner_share, h.currency)}</span></div>
                     <div className="flex justify-between"><span className="text-ink-400">{ps.commission}</span><span className="font-mono text-ink-600">{sym}{fmt(h.commission_share, h.currency)}</span></div>
+                    <div className="flex justify-between"><span className="text-ink-400">{ps.myGrossShare}{h.my_share_percent ? ` (${h.my_share_percent}%)` : ''}</span><span className="font-mono text-brand-600">{sym}{fmt(h.my_gross_share, h.currency)}</span></div>
+                    <div className="flex justify-between"><span className="text-ink-400">{ps.baseCost}</span><span className="font-mono text-ink-600">{sym}{fmt(h.base_cost, h.currency)}</span></div>
                   </div>
                   <div className="mt-2 pt-2 border-t border-ink-50 flex justify-between items-center">
                     <span className="text-xs font-bold text-brand-700">{ps.netProfit}</span>
@@ -410,9 +417,10 @@ function HistoryTab({ profiles, history, loading, onRefresh, ps }) {
               <div className="mb-1">{ps.totals} ({filtered.length})</div>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                 <div className="flex justify-between"><span>{ps.gross}</span><span className="font-mono">{fmt(totals.gross, 'VND')}</span></div>
-                <div className="flex justify-between"><span>{ps.baseCost}</span><span className="font-mono">{fmt(totals.base_cost, 'VND')}</span></div>
                 <div className="flex justify-between"><span>{ps.partnerShare}</span><span className="font-mono">{fmt(totals.partner, 'VND')}</span></div>
                 <div className="flex justify-between"><span>{ps.commission}</span><span className="font-mono">{fmt(totals.commission, 'VND')}</span></div>
+                <div className="flex justify-between"><span>{ps.myGrossShare}</span><span className="font-mono">{fmt(totals.my_gross_share, 'VND')}</span></div>
+                <div className="flex justify-between"><span>{ps.baseCost}</span><span className="font-mono">{fmt(totals.base_cost, 'VND')}</span></div>
                 <div className="flex justify-between col-span-2 pt-1 border-t border-brand-100"><span>{ps.netProfit}</span><span className="font-mono">{fmt(totals.net, 'VND')}</span></div>
               </div>
             </div>
@@ -426,9 +434,10 @@ function HistoryTab({ profiles, history, loading, onRefresh, ps }) {
                   <th className="text-left py-2 px-3">{ps.tabProfiles}</th>
                   <th className="text-right py-2 px-3">{ps.quantity}</th>
                   <th className="text-right py-2 px-3">{ps.gross}</th>
-                  <th className="text-right py-2 px-3">{ps.baseCost}</th>
                   <th className="text-right py-2 px-3">{ps.partnerShare}</th>
                   <th className="text-right py-2 px-3">{ps.commission}</th>
+                  <th className="text-right py-2 px-3">{ps.myGrossShare}</th>
+                  <th className="text-right py-2 px-3">{ps.baseCost}</th>
                   <th className="text-right py-2 px-3 font-bold text-brand-700">{ps.netProfit}</th>
                   <th className="py-2 px-3"></th>
                 </tr>
@@ -444,9 +453,10 @@ function HistoryTab({ profiles, history, loading, onRefresh, ps }) {
                       </td>
                       <td className="text-right py-2 px-3 font-mono text-ink-700">{Number(h.quantity).toLocaleString()}</td>
                       <td className="text-right py-2 px-3 font-mono text-ink-700">{sym}{fmt(h.gross_revenue, h.currency)}</td>
-                      <td className="text-right py-2 px-3 font-mono text-ink-600">{sym}{fmt(h.base_cost, h.currency)}</td>
                       <td className="text-right py-2 px-3 font-mono text-ink-600">{sym}{fmt(h.partner_share, h.currency)}</td>
                       <td className="text-right py-2 px-3 font-mono text-ink-600">{sym}{fmt(h.commission_share, h.currency)}</td>
+                      <td className="text-right py-2 px-3 font-mono text-brand-600">{sym}{fmt(h.my_gross_share, h.currency)}{h.my_share_percent ? ` (${h.my_share_percent}%)` : ''}</td>
+                      <td className="text-right py-2 px-3 font-mono text-ink-600">{sym}{fmt(h.base_cost, h.currency)}</td>
                       <td className="text-right py-2 px-3 font-mono font-bold text-brand-700">{sym}{fmt(h.net_profit, h.currency)}</td>
                       <td className="py-2 px-2">
                         <button className="p-1 rounded hover:bg-red-50 text-red-300 hover:text-red-500" onClick={() => handleDelete(h.id)}>
@@ -461,9 +471,10 @@ function HistoryTab({ profiles, history, loading, onRefresh, ps }) {
                 <tr className="bg-brand-50 text-xs font-bold text-brand-700 border-t border-brand-100">
                   <td className="py-2 px-3" colSpan={2}>{ps.totals} ({filtered.length})</td>
                   <td className="text-right py-2 px-3 font-mono">{fmt(totals.gross, 'VND')}</td>
-                  <td className="text-right py-2 px-3 font-mono">{fmt(totals.base_cost, 'VND')}</td>
                   <td className="text-right py-2 px-3 font-mono">{fmt(totals.partner, 'VND')}</td>
                   <td className="text-right py-2 px-3 font-mono">{fmt(totals.commission, 'VND')}</td>
+                  <td className="text-right py-2 px-3 font-mono">{fmt(totals.my_gross_share, 'VND')}</td>
+                  <td className="text-right py-2 px-3 font-mono">{fmt(totals.base_cost, 'VND')}</td>
                   <td className="text-right py-2 px-3 font-mono">{fmt(totals.net, 'VND')}</td>
                   <td></td>
                 </tr>
