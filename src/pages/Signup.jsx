@@ -4,6 +4,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import { AuthLayout, GoogleIcon } from './Login.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { supabase, SUPABASE_CONFIGURED } from '../lib/supabase.js'
+import { authRedirectUrl } from '../lib/authRedirects.js'
 
 export default function Signup() {
   const { t } = useLang()
@@ -13,26 +14,41 @@ export default function Signup() {
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
     setLoading(true)
-    const { error: err } = await supabase.auth.signUp({ email, password })
+    const { data, error: err } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: authRedirectUrl('/auth/callback') },
+    })
     setLoading(false)
     if (err) return setError(err.message)
-    navigate('/onboarding')
+
+    const identities = data?.user?.identities || []
+    if (data?.user && identities.length === 0) {
+      return setError('This email may already be registered. Please sign in or use Forgot Password.')
+    }
+
+    if (data?.session) return navigate('/onboarding', { replace: true })
+    setSuccess('Signup successful. Please check your email and click the confirmation link before logging in.')
   }
 
   const handleGoogle = async () => {
+    setError('')
     if (!SUPABASE_CONFIGURED) {
       await supabase.auth.signInWithOAuth({ provider: 'google' })
       return navigate('/onboarding')
     }
-    await supabase.auth.signInWithOAuth({
+    const { error: err } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin + '/today' },
+      options: { redirectTo: authRedirectUrl('/auth/callback') },
     })
+    if (err) setError(err.message)
   }
 
   return (
@@ -60,6 +76,7 @@ export default function Signup() {
         </div>
 
         {error && <p className="text-sm text-rose-600">{error}</p>}
+        {success && <p className="rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{success}</p>}
 
         <button type="submit" className="btn-primary w-full" disabled={loading}>
           {loading ? '…' : t.auth.signUp}

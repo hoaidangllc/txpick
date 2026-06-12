@@ -6,6 +6,7 @@ import LanguageToggle from '../components/LanguageToggle.jsx'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { supabase, SUPABASE_CONFIGURED } from '../lib/supabase.js'
+import { authRedirectUrl, nextAppRoute } from '../lib/authRedirects.js'
 
 export default function Login() {
   const { t } = useLang()
@@ -21,9 +22,7 @@ export default function Login() {
   const redirectAfterLogin = () => {
     const from = location.state?.from?.pathname
     if (from) return navigate(from, { replace: true })
-    if (profile?.type === 'business') return navigate('/business', { replace: true })
-    if (profile?.type === 'personal') return navigate('/today', { replace: true })
-    navigate('/onboarding', { replace: true })
+    navigate(nextAppRoute(profile), { replace: true })
   }
 
   const handleSubmit = async (e) => {
@@ -45,7 +44,7 @@ export default function Login() {
     }
     const { error: err } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin + '/onboarding' },
+      options: { redirectTo: authRedirectUrl('/auth/callback') },
     })
     if (err) setError(err.message)
   }
@@ -71,7 +70,7 @@ export default function Login() {
         <div>
           <div className="flex items-center justify-between">
             <label className="label" htmlFor="password">{t.auth.password}</label>
-            <Link to="#" className="text-xs font-semibold text-brand-700 hover:underline">{t.auth.forgot}</Link>
+            <Link to="/forgot-password" className="text-xs font-semibold text-brand-700 hover:underline">{t.auth.forgot}</Link>
           </div>
           <div className="relative">
             <input

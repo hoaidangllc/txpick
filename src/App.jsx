@@ -10,6 +10,9 @@ const Landing = lazy(() => import('./pages/Landing.jsx'))
 const Pricing = lazy(() => import('./pages/Pricing.jsx'))
 const Login = lazy(() => import('./pages/Login.jsx'))
 const Signup = lazy(() => import('./pages/Signup.jsx'))
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'))
+const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'))
+const AuthCallback = lazy(() => import('./pages/AuthCallback.jsx'))
 const Onboarding = lazy(() => import('./pages/Onboarding.jsx'))
 const Today = lazy(() => import('./pages/Today.jsx'))
 const Reminders = lazy(() => import('./pages/Reminders.jsx'))
@@ -34,6 +37,9 @@ export default function App() {
         <Route path="/pricing" element={FEATURES.premium ? <Pricing /> : <Navigate to="/feedback" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/privacy" element={<><SEO page="privacy" /><Privacy /></>} />
         <Route path="/terms" element={<><SEO page="terms" /><Terms /></>} />
         <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
