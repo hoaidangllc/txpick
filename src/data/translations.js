@@ -25,9 +25,7 @@ export const translations = {
     common: { save: 'Lưu', cancel: 'Hủy', delete: 'Xóa', add: 'Thêm', amount: 'Số tiền', date: 'Ngày', category: 'Phân loại', note: 'Ghi chú', name: 'Tên' },
     profitSplit: {
       title: 'Chia Lợi Nhuận',
-      tabProfiles: 'Hồ Sơ',
       tabCalculator: 'Tính Toán',
-      tabHistory: 'Lịch Sử',
       newProfile: 'Thêm Hồ Sơ',
       editProfile: 'Sửa Hồ Sơ',
       profileName: 'Tên',
@@ -166,9 +164,7 @@ export const translations = {
     common: { save: 'Save', cancel: 'Cancel', delete: 'Delete', add: 'Add', amount: 'Amount', date: 'Date', category: 'Category', note: 'Note', name: 'Name' },
     profitSplit: {
       title: 'Profit Split',
-      tabProfiles: 'Profiles',
       tabCalculator: 'Calculator',
-      tabHistory: 'History',
       newProfile: 'New Profile',
       editProfile: 'Edit Profile',
       profileName: 'Name',

@@ -4,6 +4,7 @@ import AppShell from './components/AppShell.jsx'
 import PageLoader from './components/PageLoader.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import { FEATURES } from './config/features.js'
+import SEO from './components/seo/SEO.jsx'
 
 const Landing = lazy(() => import('./pages/Landing.jsx'))
 const Pricing = lazy(() => import('./pages/Pricing.jsx'))
@@ -29,12 +30,12 @@ export default function App() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<><SEO page="home" /><Landing /></>} />
         <Route path="/pricing" element={FEATURES.premium ? <Pricing /> : <Navigate to="/feedback" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<><SEO page="privacy" /><Privacy /></>} />
+        <Route path="/terms" element={<><SEO page="terms" /><Terms /></>} />
         <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
         <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
           <Route path="/today" element={<Today />} />
@@ -46,10 +47,10 @@ export default function App() {
           <Route path="/summary" element={<Summary />} />
           <Route path="/tax" element={<TaxCenter />} />
           <Route path="/smart" element={<SmartTools />} />
-          <Route path="/feedback" element={<Feedback />} />
+          <Route path="/feedback" element={<><SEO page="feedback" /><Feedback /></>} />
           <Route path="/admin/feedback" element={<AdminFeedback />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/profit-split" element={<ProfitSplit />} />
+          <Route path="/profit-split" element={<><SEO page="profitSplit" /><ProfitSplit /></>} />
           <Route path="/ai" element={<Navigate to="/smart" replace />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

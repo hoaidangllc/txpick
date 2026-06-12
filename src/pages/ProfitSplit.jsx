@@ -118,17 +118,12 @@ function ProfileForm({ initial, onSave, onCancel, ps, common }) {
 function ProfilesTab({ profiles, loading, onRefresh, userId, ps, common }) {
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
-  const [saving, setSaving] = useState(false)
-
   const handleSave = async (form) => {
     if (!form.name.trim()) return
-    setSaving(true)
-    try {
-      await upsertProfile(userId, editing ? { ...form, id: editing.id } : form)
-      setShowForm(false)
-      setEditing(null)
-      onRefresh()
-    } finally { setSaving(false) }
+    await upsertProfile(userId, editing ? { ...form, id: editing.id } : form)
+    setShowForm(false)
+    setEditing(null)
+    onRefresh()
   }
 
   const handleDelete = async (id) => {
@@ -187,7 +182,7 @@ function ProfilesTab({ profiles, loading, onRefresh, userId, ps, common }) {
   )
 }
 
-function CalculatorTab({ profiles, userId, onHistoryChange, ps, common }) {
+function CalculatorTab({ profiles, userId, onHistoryChange, ps }) {
   const [profileId, setProfileId] = useState('')
   const [quantity, setQuantity] = useState('')
   const [currency, setCurrency] = useState(() => {
@@ -215,7 +210,6 @@ function CalculatorTab({ profiles, userId, onHistoryChange, ps, common }) {
 
   const handleSave = async () => {
     if (!result || !selectedProfile) return
-    setSaving(true)
     try {
       await saveHistory(userId, {
         profile_id: selectedProfile.id,

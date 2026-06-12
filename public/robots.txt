@@ -3,6 +3,7 @@ Allow: /
 Allow: /what-is-txpick.html
 Allow: /how-it-works.html
 Allow: /guides/
+Allow: /profit-split
 Disallow: /today
 Disallow: /personal
 Disallow: /business
