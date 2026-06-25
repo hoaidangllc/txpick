@@ -156,10 +156,31 @@ export async function getHuiRounds(userId, groupId) {
 }
 
 export async function saveHuiRound(userId, round) {
+  if (!userId) throw new Error('Missing user session. Please log in again.')
+
+  // Keep the payload aligned with the real Supabase hui_rounds schema.
+  // Do not spread UI-only fields into the insert, because Supabase rejects
+  // unknown columns and the save appears to do nothing.
+  const payload = {
+    user_id: userId,
+    group_id: round.group_id,
+    round_number: Number(round.round_number) || 1,
+    round_date: round.round_date,
+    winner_member_id: round.winner_member_id || null,
+    winner_name: round.winner_name || '',
+    bid_amount: Number(round.bid_amount) || 0,
+    gross_pot: Number(round.gross_pot) || 0,
+    winner_receive: Number(round.winner_receive) || 0,
+    bonus_per_remaining: Number(round.bonus_per_remaining ?? round.bonus_per_remaining_member) || 0,
+    remaining_unpaid_count: Number(round.remaining_unpaid_count) || 0,
+    notes: round.notes || null,
+  }
+
   const { data, error } = await supabase
     .from('hui_rounds')
-    .insert({ ...round, user_id: userId })
-    .select().single()
+    .insert(payload)
+    .select()
+    .single()
   if (error) throw error
   return data
 }

@@ -346,45 +346,51 @@ function CurrentRoundTab({ userId, group, h, common }) {
   const handleSaveRound = async () => {
     if (!roundForm.round_date || !roundForm.winner_member_id) return
     const winner = members.find(m => m.id === roundForm.winner_member_id)
+    if (!winner) return window.alert('Please choose a valid winner.')
 
-    await saveHuiRound(userId, {
-      group_id: group.id,
-      round_number: nextRoundNum,
-      round_date: roundForm.round_date,
-      winner_member_id: roundForm.winner_member_id,
-      winner_name: winner?.name || '',
-      bid_amount: bid,
-      gross_pot: gross,
-      winner_receive: winnerReceive,
-      bonus_per_remaining_member: bonusPerRemaining,
-      remaining_unpaid_count: remainingCount,
-      notes: roundForm.notes,
-    })
+    try {
+      await saveHuiRound(userId, {
+        group_id: group.id,
+        round_number: nextRoundNum,
+        round_date: roundForm.round_date,
+        winner_member_id: roundForm.winner_member_id,
+        winner_name: winner?.name || '',
+        bid_amount: bid,
+        gross_pot: gross,
+        winner_receive: winnerReceive,
+        bonus_per_remaining: bonusPerRemaining,
+        remaining_unpaid_count: remainingCount,
+        notes: roundForm.notes,
+      })
 
-    // Mark winner as received payout
-    await upsertHuiMember(userId, {
-      ...winner, group_id: group.id,
-      has_received_payout: true,
-      payout_round: nextRoundNum,
-      payout_date: roundForm.round_date,
-    })
+      // Mark winner as received payout
+      await upsertHuiMember(userId, {
+        ...winner, group_id: group.id,
+        has_received_payout: true,
+        payout_round: nextRoundNum,
+        payout_date: roundForm.round_date,
+      })
 
-    // Auto-create payment records for all active members
-    const payloads = members.filter(m => m.active).map(m => ({
-      group_id: group.id,
-      round_number: nextRoundNum,
-      member_id: m.id,
-      member_name: m.name,
-      amount_due: Number(group.amount_per_member),
-      amount_paid: 0,
-      paid_date: null,
-      status: 'unpaid',
-    }))
-    if (payloads.length > 0) await bulkInsertHuiPayments(userId, payloads)
+      // Auto-create payment records for all active members
+      const payloads = members.filter(m => m.active).map(m => ({
+        group_id: group.id,
+        round_number: nextRoundNum,
+        member_id: m.id,
+        member_name: m.name,
+        amount_due: Number(group.amount_per_member),
+        amount_paid: 0,
+        paid_date: null,
+        status: 'unpaid',
+      }))
+      if (payloads.length > 0) await bulkInsertHuiPayments(userId, payloads)
 
-    setShowRoundForm(false)
-    setRoundForm({ round_date: '', winner_member_id: '', bid_amount: '', notes: '' })
-    load()
+      setShowRoundForm(false)
+      setRoundForm({ round_date: '', winner_member_id: '', bid_amount: '', notes: '' })
+      await load()
+    } catch (err) {
+      console.error('Save hui round failed:', err)
+      window.alert(err?.message || 'Could not save hui round. Please check Supabase table/RLS.')
+    }
   }
 
   // Toggle member payment in checklist (one-click)
