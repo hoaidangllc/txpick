@@ -185,9 +185,7 @@ function ProfilesTab({ profiles, loading, onRefresh, userId, ps, common }) {
 function CalculatorTab({ profiles, userId, onHistoryChange, ps }) {
   const [profileId, setProfileId] = useState('')
   const [quantity, setQuantity] = useState('')
-  const [currency, setCurrency] = useState(() => {
-    try { return localStorage.getItem('ps_currency') || 'VND' } catch { return 'VND' }
-  })
+  const [currency, setCurrency] = useState('VND')
   const [result, setResult] = useState(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -197,7 +195,6 @@ function CalculatorTab({ profiles, userId, onHistoryChange, ps }) {
 
   const handleCurrency = (c) => {
     setCurrency(c)
-    try { localStorage.setItem('ps_currency', c) } catch {}
     setResult(null)
   }
 
@@ -209,19 +206,30 @@ function CalculatorTab({ profiles, userId, onHistoryChange, ps }) {
   }
 
   const handleSave = async () => {
-    if (!result || !selectedProfile) return
+    if (!result || !selectedProfile || !userId || saving) return
+    setSaving(true)
     try {
       await saveHistory(userId, {
         profile_id: selectedProfile.id,
         profile_name: selectedProfile.name,
         quantity: parseFloat(quantity),
-        ...result,
+        gross_revenue: result.gross,
+        partner_share: result.partner_share,
+        commission_share: result.commission_share,
+        my_share_percent: result.my_share_percent,
+        my_gross_share: result.my_gross_share,
+        base_cost: result.base_cost,
+        net_profit: result.net_profit,
         currency,
       })
       setSaved(true)
-      onHistoryChange()
-    } catch { alert(ps.errorSave) }
-    finally { setSaving(false) }
+      await onHistoryChange()
+    } catch (error) {
+      console.error('Profit Split save failed:', error)
+      alert(error?.message ? `${ps.errorSave}: ${error.message}` : ps.errorSave)
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -336,12 +344,12 @@ function HistoryTab({ profiles, history, loading, onRefresh, ps }) {
   })
 
   const totals = filtered.reduce((acc, h) => ({
-    gross:          acc.gross          + Number(h.gross_revenue),
-    partner:        acc.partner        + Number(h.partner_share),
-    commission:     acc.commission     + Number(h.commission_share),
-    my_gross_share: acc.my_gross_share + Number(h.my_gross_share || 0),
-    base_cost:      acc.base_cost      + Number(h.base_cost),
-    net:            acc.net            + Number(h.net_profit),
+    gross:          acc.gross          + (Number(h.gross_revenue) || 0),
+    partner:        acc.partner        + (Number(h.partner_share) || 0),
+    commission:     acc.commission     + (Number(h.commission_share) || 0),
+    my_gross_share: acc.my_gross_share + (Number(h.my_gross_share) || 0),
+    base_cost:      acc.base_cost      + (Number(h.base_cost) || 0),
+    net:            acc.net            + (Number(h.net_profit) || 0),
   }), { gross: 0, partner: 0, commission: 0, my_gross_share: 0, base_cost: 0, net: 0 })
 
   const handleDelete = async (id) => {

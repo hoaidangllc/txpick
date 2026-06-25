@@ -35,9 +35,26 @@ export async function deleteProfile(id) {
 // ── History ───────────────────────────────────────────────────────────────────
 
 export async function saveHistory(userId, entry) {
+  if (!userId) throw new Error('Missing user session. Please log in again.')
+
+  const payload = {
+    user_id: userId,
+    profile_id: entry.profile_id || null,
+    profile_name: entry.profile_name || null,
+    quantity: Number(entry.quantity) || 0,
+    gross_revenue: Number(entry.gross_revenue ?? entry.gross) || 0,
+    base_cost: Number(entry.base_cost) || 0,
+    partner_share: Number(entry.partner_share) || 0,
+    commission_share: Number(entry.commission_share) || 0,
+    my_share_percent: Number(entry.my_share_percent) || 0,
+    my_gross_share: Number(entry.my_gross_share) || 0,
+    net_profit: Number(entry.net_profit) || 0,
+    currency: entry.currency || 'VND',
+  }
+
   const { data, error } = await supabase
     .from('profit_split_history')
-    .insert({ ...entry, user_id: userId })
+    .insert(payload)
     .select()
     .single()
   if (error) throw error
